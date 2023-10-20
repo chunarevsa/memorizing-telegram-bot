@@ -1,5 +1,6 @@
 package org.memorizing.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -7,15 +8,20 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
+    @Value("${bot.name}")
+    private String botName;
+
+    @Value("${bot.token}")
+    private String botToken;
 
     @Override
     public String getBotUsername() {
-        return "memorizing_telegram_bot";
+        return botName;
     }
 
     @Override
     public String getBotToken() {
-        return "6784016579:AAGLRgVj4z-ktU8DWlSt4SORX6Pdy0etZ_o";
+        return botToken;
     }
 
     @Override
