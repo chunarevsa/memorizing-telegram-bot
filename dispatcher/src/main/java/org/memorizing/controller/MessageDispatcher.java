@@ -1,8 +1,10 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
+import org.memorizing.botinstance.UserDto;
 import org.memorizing.entity.User;
 import org.memorizing.repository.UsersRepo;
+import org.memorizing.utils.cardApi.StorageDto;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -29,6 +31,20 @@ public class MessageDispatcher {
     }
 
     public SendMessage getResponseByRegularMessage(Long chatId, String messageText) {
+        Integer userId = null;
+
+//        if (usersWithChatIds.containsKey(chatId)) {
+//            userId = usersWithChatIds.get(chatId);
+//        } else {
+//            UserDto userDto = userResource.getUserByChatId(update.getMessage().getChatId());
+//            if (userDto != null && userDto.getId() != null) {
+//                userId = userDto.getId();
+//            } else return; // TODO: добавить обработку ошибки
+//        }
+//
+//        StorageDto storage = storageResource.getStorageByUserId(userId);
+
+
         User user = usersRepo.findByChatId(chatId);
         Integer currentQId = user.getCurrentQId();
         List<Integer> historyArray = new ArrayList<>(usersRepo.findByChatId(chatId).getHistoryArray());
@@ -39,23 +55,21 @@ public class MessageDispatcher {
             case "Next":
             case "/next":
 //                currentQId = RandomUtil.inRangeExcludeList(1, maxQNumber, historyArray);
-//                if (currentQId == 0) {
-//                    text = THATS_ALL.toString();
-//                    text += statistic;
-//                    keyboard = getDefaultKeyboard();
-//                } else {
+                if (currentQId == 0) {
+                    text = THATS_ALL.toString();
+                    keyboard = getDefaultKeyboard();
+                } else {
 //                    Question question = questionsRepo.findById(currentQId).get();
 //                    historyArray.add(currentQId);
 //                    text = question.getQuestion();
-//                    keyboard = getInlineKeyboard(new String[][]{{"Skip", "Expand description"}});
-//                }
+                    keyboard = getInlineKeyboard(new String[][]{{"Skip", "Expand description"}});
+                }
                 log.debug("Execute button NEXT");
                 break;
-//            case "Statistics":
-//            case "/statistics":
-//                text = statistic;
-//                keyboard = getDefaultKeyboard();
-//                break;
+            case "Statistics":
+            case "/statistics":
+                keyboard = getDefaultKeyboard();
+                break;
             case "Reset":
             case "/reset":
                 historyArray = Collections.emptyList();
@@ -95,6 +109,7 @@ public class MessageDispatcher {
      * @param messageText
      * @return
      */
+    
     public SendMessage getResponseByCallback(Long chatId, String messageText) {
         User user = usersRepo.findByChatId(chatId);
 //        Question question = questionsRepo.findById(user.getCurrentQId()).get();
@@ -114,6 +129,7 @@ public class MessageDispatcher {
             default:
                 text = BAD_REQUEST.toString();
         }
+        if (text == null) text = "!";
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
                 .replyMarkup(keyboard)

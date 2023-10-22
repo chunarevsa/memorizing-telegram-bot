@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = Logger.getLogger(TelegramBot.class);
     private final String botName;
-        private final UsersRepo usersRepo;
+    private final UsersRepo usersRepo;
     private final StorageResource storageResource;
     private final UserResource userResource;
     private final MessageDispatcher messageDispatcher;
@@ -61,21 +61,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Long chatId = update.getMessage().getChatId();
-        Integer userId = null;
-
-        if (usersWithChatIds.containsKey(chatId)) {
-            userId = usersWithChatIds.get(chatId);
-        } else {
-            UserDto userDto = userResource.getUserByChatId(update.getMessage().getChatId());
-            if (userDto != null && userDto.getId() != null) {
-                userId = userDto.getId();
-            } else return; // TODO: добавить обработку ошибки
-        }
-
-        StorageDto storage = storageResource.getStorageByUserId(userId);
-
         log.info("onUpdateReceived:" + update + "\n---");
+        Long chatId = update.getMessage().getChatId();
+
         Message message = null;
         String data = null;
         boolean hasCallback = false,
@@ -121,14 +109,15 @@ public class TelegramBot extends TelegramLongPollingBot {
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-            } else if (!usersWithChatIds.containsKey(chatId)) {
-                usersWithChatIds.put(chatId, userId);
-                messageDispatcher.registerIfAbsent(chatId, userName);
-                try {
-                    execute(messageDispatcher.getWelcomeMessage(chatId, userName));
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
+//            } else if (!usersWithChatIds.containsKey(chatId)) {
+//                usersWithChatIds.put(chatId, userId);
+//                users.put(chatId, LocalDate.now());
+//                messageDispatcher.registerIfAbsent(chatId, userName);
+//                try {
+//                    execute(messageDispatcher.getWelcomeMessage(chatId, userName));
+//                } catch (TelegramApiException e) {
+//                    e.printStackTrace();
+//                }
             } else {
                 try {
                     execute(messageDispatcher.getResponseByRegularMessage(chatId, data));
@@ -138,14 +127,4 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         }
     }
-
-//    public void sendAnswerMessage(SendMessage message) {
-//        if (message != null) {
-//            try {
-//                execute(message);
-//            } catch (TelegramApiException e) {
-//                log.error(e);
-//            }
-//        }
-//    }
 }

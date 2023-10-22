@@ -13,6 +13,9 @@ public class User {
     String name;
     @Column(name = "current_q_id")
     Integer currentQId;
+
+    @Column(name = "current_menu_id")
+    Integer currentMenuId;
     @ElementCollection(fetch = FetchType.EAGER)
     List<Integer> historyArray;
 
