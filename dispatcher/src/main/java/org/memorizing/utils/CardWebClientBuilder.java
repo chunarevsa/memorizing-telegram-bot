@@ -17,14 +17,15 @@ public class CardWebClientBuilder {
         try {
             StorageDto req = new StorageDto(null, userId, null);
             log.debug("retrieve req to serviceName + \"/storage/getByUserId\" with req: " + req);
-            return WebClient.create(baseUrl)
-                    .post()
-                    .uri(serviceName + "/storage/getByUserId")
-                    .bodyValue(req)
-                    .retrieve()
-                    .bodyToFlux(StorageDto.class)
-                    .blockFirst();
-
+//            return WebClient.create(baseUrl)
+//                    .post()
+//                    .uri(serviceName + "/storage/getByUserId")
+//                    .bodyValue(req)
+//                    .retrieve()
+//                    .bodyToFlux(StorageDto.class)
+//                    .blockFirst();
+            // TODO: TEMP
+            return new StorageDto(1, userId, "Some name");
         } catch (Exception e) {
             e.printStackTrace();
         }
