@@ -1,50 +1,57 @@
 package org.memorizing.botinstance;
 
 import org.apache.log4j.Logger;
-import org.memorizing.controller.UpdateController;
+import org.memorizing.controller.MessageDispatcher;
+import org.memorizing.repository.StorageResource;
+import org.memorizing.repository.UserResource;
 import org.memorizing.repository.UsersRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.memorizing.utils.cardApi.StorageDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
+    private static final Logger log = Logger.getLogger(TelegramBot.class);
     private final String botName;
-
-//    private final UpdateController updateController;
-    private final TelegramBotsApi session;
-    private final UsersRepo usersRepo;
+        private final UsersRepo usersRepo;
+    private final StorageResource storageResource;
+    private final UserResource userResource;
+    private final MessageDispatcher messageDispatcher;
+    public static ConcurrentHashMap<Long, LocalDate> users = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Long, Integer> usersWithChatIds = new ConcurrentHashMap<>();
 
     public TelegramBot(
             @Value("${telegram.bot.token}") String botToken,
             @Value("${telegram.bot.name}") String botName,
-//            UpdateController updateController,
-            TelegramBotsApi session,
-            UsersRepo usersRepo) {
+            UsersRepo usersRepo,
+            StorageResource storageResource,
+            UserResource userResource,
+            MessageDispatcher messageDispatcher) {
         super(botToken);
         this.botName = botName;
-//        this.updateController = updateController;
-        this.session = session;
         this.usersRepo = usersRepo;
+        this.storageResource = storageResource;
+        this.userResource = userResource;
+        this.messageDispatcher = messageDispatcher;
     }
 
-    private static final Logger log = Logger.getLogger(TelegramBot.class);
-    public static ConcurrentHashMap<Long, LocalDate> users = new ConcurrentHashMap<>();
-
     @PostConstruct
-    void init() throws TelegramApiException {
-        usersRepo.findAll().forEach(user -> TelegramBot.users.put(user.getChatId(), LocalDate.now()));
+    void init() {
+        userResource.getChatIdListWithUserId().forEach(user -> usersWithChatIds.put(user.getChatId(), user.getId()));
+        log.debug("usersWithChatIds:" + usersWithChatIds.toString());
+        usersRepo.findAll().forEach(user -> users.put(user.getChatId(), LocalDate.now()));
         log.debug("Users:" + users.toString());
-//        session.registerBot(this);
     }
 
     @Override
@@ -54,18 +61,91 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.debug("onUpdateReceived");
-        var message = update.getMessage();
-//        updateController.processUpdate(update);
-    }
+        Long chatId = update.getMessage().getChatId();
+        Integer userId = null;
 
-    public void sendAnswerMessage(SendMessage message) {
-        if (message != null) {
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                log.error(e);
+        if (usersWithChatIds.containsKey(chatId)) {
+            userId = usersWithChatIds.get(chatId);
+        } else {
+            UserDto userDto = userResource.getUserByChatId(update.getMessage().getChatId());
+            if (userDto != null && userDto.getId() != null) {
+                userId = userDto.getId();
+            } else return; // TODO: добавить обработку ошибки
+        }
+
+        StorageDto storage = storageResource.getStorageByUserId(userId);
+
+        log.info("onUpdateReceived:" + update + "\n---");
+        Message message = null;
+        String data = null;
+        boolean hasCallback = false,
+                hasRegularMessage = false;
+
+        //take apart incoming update
+        if (update.hasCallbackQuery()) {
+            hasCallback = true;
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            message = callbackQuery.getMessage();
+            data = callbackQuery.getData();
+        } else if (update.hasMessage()) {
+            hasRegularMessage = true;
+            message = update.getMessage();
+            data = message.getText();
+        }
+
+        if (hasCallback || hasRegularMessage) {
+            String userName = Optional.ofNullable(message.getFrom().getUserName())
+                    .orElse(message.getFrom().getFirstName() + " " + message.getFrom().getLastName());
+
+            //routing by request
+            if (hasCallback) {
+                SendMessage responseByCallback = messageDispatcher.getResponseByCallback(chatId, data);
+                try {
+                    execute(responseByCallback);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+//                    try {
+//                        responseByCallback.setParseMode("HTML");
+//                        responseByCallback.setText("<pre>" + responseByCallback.getText() + "</pre>");
+//                        execute(responseByCallback);
+//                    } catch (TelegramApiException ee) {
+//                        responseByCallback.enableMarkdown(false);
+//                        execute(responseByCallback);
+//                    }
+                }
+            } else if (!users.containsKey(chatId)) {
+                users.put(chatId, LocalDate.now());
+                messageDispatcher.registerIfAbsent(chatId, userName);
+                try {
+                    execute(messageDispatcher.getWelcomeMessage(chatId, userName));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            } else if (!usersWithChatIds.containsKey(chatId)) {
+                usersWithChatIds.put(chatId, userId);
+                messageDispatcher.registerIfAbsent(chatId, userName);
+                try {
+                    execute(messageDispatcher.getWelcomeMessage(chatId, userName));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    execute(messageDispatcher.getResponseByRegularMessage(chatId, data));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
+
+//    public void sendAnswerMessage(SendMessage message) {
+//        if (message != null) {
+//            try {
+//                execute(message);
+//            } catch (TelegramApiException e) {
+//                log.error(e);
+//            }
+//        }
+//    }
 }
