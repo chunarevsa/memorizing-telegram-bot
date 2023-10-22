@@ -12,17 +12,17 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Component
 public class UpdateController {
     private static final Logger log = Logger.getLogger(UpdateController.class);
-    private TelegramBot bot;
+    private final TelegramBot bot;
     private final MessageUtils messageUtils;
-    private final CardWebClientBuilder cardWebClientBuilder; // UpdateProducer
+    private final CardWebClientBuilder cardWebClientBuilder;
 
-    public UpdateController(MessageUtils messageUtils, CardWebClientBuilder cardWebClientBuilder) {
+    public UpdateController(
+            TelegramBot bot,
+            MessageUtils messageUtils,
+            CardWebClientBuilder cardWebClientBuilder) {
+        this.bot = bot;
         this.messageUtils = messageUtils;
         this.cardWebClientBuilder = cardWebClientBuilder;
-    }
-
-    public void registerBot(TelegramBot bot) {
-        this.bot = bot;
     }
 
     public void processUpdate(Update update) {

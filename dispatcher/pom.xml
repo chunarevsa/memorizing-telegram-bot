@@ -14,7 +14,8 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <telegrambot.starter.version>6.1.0</telegrambot.starter.version>
+        <telegrambot.starter.version>6.5.0</telegrambot.starter.version>
+        <postgresql.starter.version>42.5.4</postgresql.starter.version>
     </properties>
 
     <dependencies>
@@ -29,6 +30,15 @@
             <version>${telegrambot.starter.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.starter.version}</version>
+        </dependency>
 
     </dependencies>
 
