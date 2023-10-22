@@ -1,6 +1,7 @@
-package org.memorizing.controller;
+package org.memorizing.botinstance;
 
 import org.apache.log4j.Logger;
+import org.memorizing.controller.UpdateController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,8 +14,8 @@ import javax.annotation.PostConstruct;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = Logger.getLogger(TelegramBot.class);
-    @Value("${bot.name}") private String botName;
-    @Value("${bot.token}") private String botToken;
+    @Value("${telegram.bot.name}") private String botName;
+    @Value("${telegram.bot.token}") private String botToken;
     private UpdateController updateController;
 
     public TelegramBot(UpdateController updateController) {

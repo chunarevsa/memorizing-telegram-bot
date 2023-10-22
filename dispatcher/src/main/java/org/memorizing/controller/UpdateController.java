@@ -1,6 +1,7 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
+import org.memorizing.botinstance.TelegramBot;
 import org.memorizing.utils.CardWebClientBuilder;
 import org.memorizing.utils.MessageUtils;
 import org.memorizing.utils.cardApi.StorageDto;
