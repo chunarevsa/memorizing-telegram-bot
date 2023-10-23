@@ -2,8 +2,12 @@ package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
 import org.memorizing.botinstance.UserDto;
+import org.memorizing.entity.EMenu;
 import org.memorizing.entity.User;
+import org.memorizing.repository.StorageResource;
+import org.memorizing.repository.UserResource;
 import org.memorizing.repository.UsersRepo;
+import org.memorizing.utils.cardApi.CardStockDto;
 import org.memorizing.utils.cardApi.StorageDto;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -13,10 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.memorizing.entity.Constants.*;
 
@@ -25,71 +26,47 @@ public class MessageDispatcher {
     private static final Logger log = Logger.getLogger(MessageDispatcher.class);
 
     private final UsersRepo usersRepo;
+    private final UserResource userResource;
+    private final StorageResource storageResource;
 
-    public MessageDispatcher(UsersRepo usersRepo) {
+    public MessageDispatcher(UsersRepo usersRepo, UserResource userResource, StorageResource storageResource) {
         this.usersRepo = usersRepo;
+        this.userResource = userResource;
+        this.storageResource = storageResource;
     }
 
     public SendMessage getResponseByRegularMessage(Long chatId, String messageText) {
-        Integer userId = null;
-
-//        if (usersWithChatIds.containsKey(chatId)) {
-//            userId = usersWithChatIds.get(chatId);
-//        } else {
-//            UserDto userDto = userResource.getUserByChatId(update.getMessage().getChatId());
-//            if (userDto != null && userDto.getId() != null) {
-//                userId = userDto.getId();
-//            } else return; // TODO: добавить обработку ошибки
-//        }
-//
-//        StorageDto storage = storageResource.getStorageByUserId(userId);
-
-
         User user = usersRepo.findByChatId(chatId);
-        Integer currentQId = user.getCurrentQId();
+        EMenu menu = EMenu.valueOf(user.getCurrentMenuName());
+
         List<Integer> historyArray = new ArrayList<>(usersRepo.findByChatId(chatId).getHistoryArray());
         String text = null;
         ReplyKeyboard keyboard = null;
 
         switch (messageText) {
-            case "Next":
-            case "/next":
-//                currentQId = RandomUtil.inRangeExcludeList(1, maxQNumber, historyArray);
-                if (currentQId == 0) {
-                    text = THATS_ALL.toString();
-                    keyboard = getDefaultKeyboard();
-                } else {
-//                    Question question = questionsRepo.findById(currentQId).get();
-//                    historyArray.add(currentQId);
-//                    text = question.getQuestion();
-                    keyboard = getInlineKeyboard(new String[][]{{"Skip", "Expand description"}});
-                }
+            case "Add card stock":
+            case "/addCardStock":
+//                if (currentQId == 0) {
+//                    text = THATS_ALL.toString();
+//                    keyboard = getKeyboardByMenu(menu);
+//                } else {
+//                    keyboard = getInlineKeyboard(new String[][]{{"Skip", "Expand description"}});
+//                }
+                keyboard = getKeyboardByMenu(menu);
                 log.debug("Execute button NEXT");
-                break;
-            case "Statistics":
-            case "/statistics":
-                keyboard = getDefaultKeyboard();
-                break;
-            case "Reset":
-            case "/reset":
-                historyArray = Collections.emptyList();
-                text = RESET_SUCCESSFUL.toString();
-                keyboard = getDefaultKeyboard();
-                log.debug("Execute button RESET");
                 break;
             case "Info":
             case "/info":
                 log.debug("Execute button INFO");
                 text = INFO_MESSAGE.toString().replaceAll("\\{name}", user.getName());
-                keyboard = getDefaultKeyboard();
+                keyboard = getKeyboardByMenu(menu);
                 break;
             default:
                 log.debug("BAD BUTTON");
                 text = BAD_REQUEST.toString();
-                keyboard = getDefaultKeyboard();
+                keyboard = getKeyboardByMenu(menu);
         }
 
-        user.setCurrentQId(currentQId);
         user.setHistoryArray(historyArray);
         usersRepo.save(user);
         SendMessage sendMessage = SendMessage.builder()
@@ -109,12 +86,17 @@ public class MessageDispatcher {
      * @param messageText
      * @return
      */
-    
+
     public SendMessage getResponseByCallback(Long chatId, String messageText) {
         User user = usersRepo.findByChatId(chatId);
-//        Question question = questionsRepo.findById(user.getCurrentQId()).get();
+        EMenu menu = EMenu.valueOf(user.getCurrentMenuName());
+        EMenu nextMenu = menu.getNext();
+        ReplyKeyboard keyboard = getInlineKeyboardByMenu(chatId, nextMenu, messageText);
+
         String text = null;
-        ReplyKeyboard keyboard = getDefaultKeyboard();
+
+        // messageText = EnglishRussian
+        // Может сначала получить все данные, потом их распихивать уже по методам
 
         switch (messageText) {
             case "Expand description":
@@ -130,6 +112,8 @@ public class MessageDispatcher {
                 text = BAD_REQUEST.toString();
         }
         if (text == null) text = "!";
+
+
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
                 .replyMarkup(keyboard)
@@ -138,6 +122,67 @@ public class MessageDispatcher {
         sendMessage.enableMarkdown(true);
         return sendMessage;
     }
+
+    private ReplyKeyboard getInlineKeyboardByMenu(Long chatId, EMenu menu, String messageText) {
+        InlineKeyboardMarkup inlineKeyboard;
+        switch (menu) {
+            case MAIN:
+                // TODO: temp
+                inlineKeyboard = getInlineKeyboardForCardStocksMenu(chatId);
+                break;
+            case CARD_STOCKS:
+                inlineKeyboard = getInlineKeyboardForCardStocksMenu(chatId);
+                break;
+            case CARDS:
+                inlineKeyboard = getInlineKeyboardForCardsMenu(chatId, messageText);
+                break;
+            default:
+                inlineKeyboard = null;
+        }
+        return inlineKeyboard;
+
+    }
+
+    private InlineKeyboardMarkup getInlineKeyboardForCardsMenu(Long chatId, String keyTypePlusKeyValue) {
+        User user = usersRepo.findByChatId(chatId);
+        Integer storageId = user.getStorageId();
+        InlineKeyboardMarkup inlineKeyboard = null;
+        List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(storageId);
+        String[] split = keyTypePlusKeyValue.split("/");
+        String keyType = split[0];
+        Optional<CardStockDto> cardStockDto = cardStocks.stream().filter(it -> Objects.equals(it.getKeyType(), keyType)).findAny();
+        if (cardStockDto.isEmpty()) {
+            return null;
+        }
+
+        List<CardDto> cards = storageResource.getCardsByCardStockId(cardStockDto.get().getId());
+        if (!cards.isEmpty()) {
+            String[][] cardValues = new String[1][cards.size()];
+            for (int i = 0; i < cards.size(); i++) {
+                cardValues[0][i] = cards.get(i).getCardKey();
+            }
+            inlineKeyboard = getInlineKeyboard(cardValues);
+        }
+
+        return inlineKeyboard;
+    }
+
+    public InlineKeyboardMarkup getInlineKeyboardForCardStocksMenu(Long chatId) {
+        User user = usersRepo.findByChatId(chatId);
+        List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(user.getStorageId());
+        InlineKeyboardMarkup inlineKeyboard = null;
+        if (!cardStocks.isEmpty()) {
+            String[][] cardStockTypes = new String[1][cardStocks.size()];
+            for (int i = 0; i < cardStocks.size(); i++) {
+                cardStockTypes[0][i] = cardStocks.get(i).getKeyType() + "/" + cardStocks.get(i).getValueType();
+            }
+            inlineKeyboard = getInlineKeyboard(cardStockTypes);
+        }
+
+        return inlineKeyboard;
+    }
+
+
 
     /**
      * Inline keyboard - buttons below questions
@@ -188,29 +233,38 @@ public class MessageDispatcher {
     }
 
     /**
-     * Default regular keyboard
-     *
-     * @return
-     */
-    private ReplyKeyboardMarkup getDefaultKeyboard() {
-        return getKeyboard(new String[][]{
-                {"Next"},
-                {"Statistics"},
-                {"Reset"},
-                {"Info"}
-        });
-    }
-
-    /**
      * Register in db through spring data
      *
      * @param chatId
      * @param userName
      */
     public void registerIfAbsent(Long chatId, String userName) {
-        if (usersRepo.existsByChatId(chatId)) return;
-        else usersRepo.save(new User(chatId, userName, 0, new ArrayList<>()));
+        if (!usersRepo.existsByChatId(chatId)) {
+            UserDto userDto = userResource.getUserByChatId(chatId);
+            StorageDto storageDto = storageResource.getStorageByUserId(userDto.getId());
+            usersRepo.save(new User(chatId, userName, 0, EMenu.MAIN.name(), new ArrayList<>(), storageDto.getId()));
+        }
     }
+
+    public SendMessage getMessageForMainMenu(Long chatId, String data) {
+        User user = usersRepo.findByChatId(chatId);
+        List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(user.getStorageId());
+        InlineKeyboardMarkup inlineKeyboard = getInlineKeyboardForCardStocksMenu(chatId);
+
+        if (inlineKeyboard == null) {
+            return SendMessage.builder()
+                    .chatId(user.getChatId())
+                    .text(WELCOME_MESSAGE.toString().replaceAll("\\{name}", user.getName()) + "Тут пустой список")
+                    .build();
+        } else {
+            return SendMessage.builder()
+                    .chatId(user.getChatId())
+                    .replyMarkup(inlineKeyboard)
+                    .text(WELCOME_MESSAGE.toString().replaceAll("\\{name}", user.getName()))
+                    .build();
+        }
+    }
+
 
     /**
      * @param chatId
@@ -220,9 +274,60 @@ public class MessageDispatcher {
     public SendMessage getWelcomeMessage(Long chatId, String name) {
         return SendMessage.builder()
                 .chatId(chatId)
-                .replyMarkup(getDefaultKeyboard())
+                .replyMarkup(getKeyboardByMenu(EMenu.CARD_STOCKS))
                 .text(WELCOME_MESSAGE.toString().replaceAll("\\{name}", name))
                 .build();
+    }
+
+    public ReplyKeyboardMarkup getKeyboardByMenu(EMenu menu) {
+        ReplyKeyboardMarkup keyboard = null;
+
+        switch (menu) {
+            case MAIN:
+                keyboard = getKeyboard(new String[][]{
+                        {"Add card stock"},
+                        {"Info"}
+                });
+                break;
+            case CARD_STOCKS:
+                keyboard = getKeyboard(new String[][]{
+                        {"Add card stock"},
+                        {"Info"}
+                });
+                break;
+            case CARD_STOCK:
+                keyboard = getKeyboard(new String[][]{
+                        {"Start studying"},
+                        {"Show cards"},
+                        {"Edit card stock"},
+                        {"Delete card stock"},
+                        {"Info"},
+                        {"Go to back"},
+                });
+                break;
+            case CARDS:
+                keyboard = getKeyboard(new String[][]{
+                        {"Add card"},
+                        {"Info"},
+                        {"Go to back"},
+                });
+                break;
+            case CARD:
+                keyboard = getKeyboard(new String[][]{
+                        {"Edit card"},
+                        {"Delete card"},
+                        {"Info"},
+                        {"Go to back"},
+                });
+                break;
+            default:
+                keyboard = getKeyboard(new String[][]{
+                        {"Info"},
+                        {"Go to back"},
+                });
+                break;
+        }
+        return keyboard;
     }
 
 }

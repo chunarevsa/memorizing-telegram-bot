@@ -14,19 +14,24 @@ public class User {
     @Column(name = "current_q_id")
     Integer currentQId;
 
-    @Column(name = "current_menu_id")
-    Integer currentMenuId;
+    @Column(name = "current_menu_name")
+    String currentMenuName;
     @ElementCollection(fetch = FetchType.EAGER)
     List<Integer> historyArray;
+
+    @Column(name = "storage_id")
+    Integer storageId;
 
     protected User() {
     }
 
-    public User(Long chatId, String name, Integer currentQId, List<Integer> historyArray) {
+    public User(Long chatId, String name, Integer currentQId, String currentMenuName, List<Integer> historyArray, Integer storageId) {
         this.chatId = chatId;
         this.name = name;
         this.currentQId = currentQId;
+        this.currentMenuName = currentMenuName;
         this.historyArray = historyArray;
+        this.storageId = storageId;
     }
 
     public Integer getId() {
@@ -61,12 +66,28 @@ public class User {
         this.currentQId = currentQId;
     }
 
+    public String getCurrentMenuName() {
+        return currentMenuName;
+    }
+
+    public void setCurrentMenuName(String currentMenuName) {
+        this.currentMenuName = currentMenuName;
+    }
+
     public List<Integer> getHistoryArray() {
         return historyArray;
     }
 
     public void setHistoryArray(List<Integer> historyArray) {
         this.historyArray = historyArray;
+    }
+
+    public Integer getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(Integer storageId) {
+        this.storageId = storageId;
     }
 
     @Override
@@ -76,7 +97,9 @@ public class User {
                 ", chatId=" + chatId +
                 ", name='" + name + '\'' +
                 ", currentQId=" + currentQId +
+                ", currentMenuName='" + currentMenuName + '\'' +
                 ", historyArray=" + historyArray +
+                ", storageId=" + storageId +
                 '}';
     }
 }
