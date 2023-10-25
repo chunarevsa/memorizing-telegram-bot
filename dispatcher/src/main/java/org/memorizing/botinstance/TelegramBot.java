@@ -47,7 +47,7 @@ public class TelegramBot extends TelegramLongPollingBot {
      * "ENG/RUS" "Interview question/Answer"          -> Card stock menu
      * <p>
      * "add card stock"                               -> adding Card stock menu
-     * "info"                                         -> info menu 0
+     * "info"                                         -> info menu 1
      * <p>
      * -- Card stock menu (2)
      * Информация о текущем Card Stock   / ENG/RUS

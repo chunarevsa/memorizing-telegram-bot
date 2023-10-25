@@ -3,6 +3,7 @@ package org.memorizing.controller;
 import org.apache.log4j.Logger;
 import org.memorizing.botinstance.UserDto;
 import org.memorizing.entity.EMenu;
+import org.memorizing.entity.ESubMenu;
 import org.memorizing.entity.User;
 import org.memorizing.repository.StorageResource;
 import org.memorizing.repository.UserResource;
@@ -46,14 +47,9 @@ public class MessageDispatcher {
         switch (messageText) {
             case "Add card stock":
             case "/addCardStock":
-//                if (currentQId == 0) {
-//                    text = THATS_ALL.toString();
-//                    keyboard = getKeyboardByMenu(menu);
-//                } else {
-//                    keyboard = getInlineKeyboard(new String[][]{{"Skip", "Expand description"}});
-//                }
-                keyboard = getKeyboardByMenu(menu);
                 log.debug("Execute button NEXT");
+                ESubMenu.ADDING_CARD_STOCK_MENU
+                keyboard = getKeyboardByMenu(nextMenu);
                 break;
             case "Info":
             case "/info":
@@ -91,12 +87,13 @@ public class MessageDispatcher {
         User user = usersRepo.findByChatId(chatId);
         EMenu menu = EMenu.valueOf(user.getCurrentMenuName());
         EMenu nextMenu = menu.getNext();
-        ReplyKeyboard keyboard = getInlineKeyboardByMenu(chatId, nextMenu, messageText);
-
-        String text = null;
+        ReplyKeyboard inlineKeyboard = getInlineKeyboardByMenu(chatId, nextMenu, messageText);
+        ReplyKeyboard keyboard = getKeyboardByMenu(nextMenu);
+        String text = getTextByMenu(nextMenu);
 
         // messageText = EnglishRussian
         // Может сначала получить все данные, потом их распихивать уже по методам
+
 
         switch (messageText) {
             case "Expand description":
@@ -116,6 +113,7 @@ public class MessageDispatcher {
 
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
+                .replyMarkup(inlineKeyboard)
                 .replyMarkup(keyboard)
                 .text(text)
                 .build();
@@ -126,10 +124,7 @@ public class MessageDispatcher {
     private ReplyKeyboard getInlineKeyboardByMenu(Long chatId, EMenu menu, String messageText) {
         InlineKeyboardMarkup inlineKeyboard;
         switch (menu) {
-            case MAIN:
-                // TODO: temp
-                inlineKeyboard = getInlineKeyboardForCardStocksMenu(chatId);
-                break;
+            case MAIN: // TODO: temp solution
             case CARD_STOCKS:
                 inlineKeyboard = getInlineKeyboardForCardStocksMenu(chatId);
                 break;
@@ -284,11 +279,6 @@ public class MessageDispatcher {
 
         switch (menu) {
             case MAIN:
-                keyboard = getKeyboard(new String[][]{
-                        {"Add card stock"},
-                        {"Info"}
-                });
-                break;
             case CARD_STOCKS:
                 keyboard = getKeyboard(new String[][]{
                         {"Add card stock"},
