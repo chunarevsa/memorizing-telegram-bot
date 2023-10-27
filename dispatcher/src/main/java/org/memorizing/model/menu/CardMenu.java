@@ -1,7 +1,6 @@
-package org.memorizing.controller;
+package org.memorizing.model.menu;
 
-import org.memorizing.entity.AMenu;
-import org.memorizing.entity.EMenu;
+import org.memorizing.resource.cardApi.CardDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
@@ -34,7 +33,12 @@ public class CardMenu extends AMenu {
 
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
-        return null;
+        return getKeyboardByButtons(new String[][]{
+                {"X edit card"},
+                {"X delete card"},
+                {"info"},
+                {"go to back"},
+        });
     }
 
     @Override
@@ -51,5 +55,10 @@ public class CardMenu extends AMenu {
     @Override
     public InlineKeyboardMarkup getInlineKeyboard() {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return "Card menu";
     }
 }

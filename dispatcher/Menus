@@ -1,0 +1,39 @@
+
+    /**
+     * -- Card Stocks menu (1):
+     * Список Card Stock
+     * "ENG/RUS" "Interview question/Answer"          -> Card stock menu
+     *
+     * "add card stock"                               -> adding Card stock menu
+     * "info"                                         -> info menu 1
+     *
+     * -- Card stock menu (2)
+     * Информация о текущем Card Stock   / ENG/RUS
+     * Какие доступны режимы                          / TESTING_TO_KEY, TESTING_FROM_KEY, SHOWING SELF-CHECK
+     * Сколько карточек                               / 385
+     * Показывается статистика по доступным режимам   / FROM_KEY HARD:20 NORMAL:60 COMPLETED 305
+     * / TO_KEY HARD:15 NORMAL:200 COMPLETED 170
+     *
+     * "start studying"                               -> Studying menu
+     * "show cards"                                   -> Cards menu
+     * "edit card stock"                              -> editing Card Stock menu
+     * "delete card stock"                            -> Delete Card stock and -> Main menu (1)
+     * "info"                                         -> info menu 2
+     * "go to back"                                   -> Card Stocks (1)
+     *
+     * -- Cards menu (3)
+     * Все карточки из этого Card Stock
+     * "provide" "supply"
+     *
+     * "add card"                                     -> adding Card menu
+     * "go to back"                                   -> Card stock menu (2)
+     * "info"                                         -> info menu 3
+     *
+     * -- Card menu (4)
+     * Информация о карте
+     *
+     * "edit card"                                    -> editing Card menu
+     * "delete card"                                  -> Delete Card and -> Cards menu (3)
+     * "info"                                         -> info menu 2
+     * "go to back"                                   -> Card Stocks (1)
+     */

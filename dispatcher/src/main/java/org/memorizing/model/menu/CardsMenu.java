@@ -1,13 +1,13 @@
-package org.memorizing.controller;
+package org.memorizing.model.menu;
 
-import org.memorizing.entity.AMenu;
-import org.memorizing.entity.EMenu;
+import org.memorizing.model.menu.AMenu;
+import org.memorizing.model.menu.EMenu;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class CardsMenu extends AMenu {
     private final Integer cardStockId;
-    private InlineKeyboardMarkup inlineKeyboard;
+    private final InlineKeyboardMarkup inlineKeyboard;
 
     public CardsMenu(Integer cardStockId, String[][] strings) {
         this.cardStockId = cardStockId;
@@ -31,7 +31,7 @@ public class CardsMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"add card"},
+                {"X add card"},
                 {"info"},
                 {"go to back"}
         });
@@ -44,9 +44,8 @@ public class CardsMenu extends AMenu {
 
     @Override
     public String getText() {
-        int size = 0;
         if (!inlineKeyboard.getKeyboard().isEmpty()) {
-            size = inlineKeyboard.getKeyboard().get(0).size();
+            int size = inlineKeyboard.getKeyboard().get(0).size();
             return String.format("You have %s cards", size);
         } else return "You don't have cards. " +
                 "Push the button `add card`";
@@ -55,5 +54,10 @@ public class CardsMenu extends AMenu {
     @Override
     public InlineKeyboardMarkup getInlineKeyboard() {
         return inlineKeyboard;
+    }
+
+    @Override
+    public String getName() {
+        return "Cards menu";
     }
 }

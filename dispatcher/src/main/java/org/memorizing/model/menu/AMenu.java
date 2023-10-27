@@ -1,4 +1,4 @@
-package org.memorizing.entity;
+package org.memorizing.model.menu;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class AMenu implements MenuFactory {
+
     public InlineKeyboardMarkup createInlineKeyboard(String[][] strings) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
@@ -44,5 +45,10 @@ public abstract class AMenu implements MenuFactory {
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
         return keyboardMarkup;
+    }
+
+    @Override
+    public InlineKeyboardMarkup getInlineKeyboard() {
+        return null;
     }
 }
