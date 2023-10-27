@@ -1,6 +1,7 @@
 package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.memorizing.model.menu.EMenu;
 
 import javax.persistence.*;
 
@@ -13,7 +14,6 @@ public class UserState {
     @OneToOne(optional = false, mappedBy = "userState")
     private User user;
     private EMenu currentMenu;
-    private EMenu lastMenu;
     private Integer cardStockId;
     private Integer cardId;
 
@@ -23,7 +23,6 @@ public class UserState {
     public UserState(User user) {
         this.user = user;
         this.currentMenu = EMenu.MAIN;
-        this.lastMenu = EMenu.MAIN;
         this.cardStockId = null;
         this.cardId = null;
     }
@@ -52,14 +51,6 @@ public class UserState {
         this.currentMenu = currentMenu;
     }
 
-    public EMenu getLastMenu() {
-        return lastMenu;
-    }
-
-    public void setLastMenu(EMenu lastMenu) {
-        this.lastMenu = lastMenu;
-    }
-
     public Integer getCardStockId() {
         return cardStockId;
     }
@@ -82,9 +73,19 @@ public class UserState {
                 "id=" + id +
                 ", user=" + user +
                 ", currentMenu=" + currentMenu +
-                ", lastMenu=" + lastMenu +
                 ", cardStockId=" + cardStockId +
                 ", cardId=" + cardId +
                 '}';
+    }
+
+    public EMenu getLastMenu() {
+        switch (this.currentMenu) {
+            case MAIN:
+            case CARD_STOCKS: return EMenu.MAIN;
+            case CARD_STOCK: return EMenu.CARD_STOCKS;
+            case CARDS: return EMenu.CARD_STOCK;
+            case CARD: return EMenu.CARDS;
+            default: return EMenu.MAIN;
+        }
     }
 }
