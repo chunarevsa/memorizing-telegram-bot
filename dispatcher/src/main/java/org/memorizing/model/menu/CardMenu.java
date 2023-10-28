@@ -37,7 +37,7 @@ public class CardMenu extends AMenu {
                 {"X edit card"},
                 {"X delete card"},
                 {"info"},
-                {"go to back"},
+                {"back"},
         });
     }
 

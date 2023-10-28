@@ -33,7 +33,7 @@ public class CardsMenu extends AMenu {
         return getKeyboardByButtons(new String[][]{
                 {"X add card"},
                 {"info"},
-                {"go to back"}
+                {"back"}
         });
     }
 

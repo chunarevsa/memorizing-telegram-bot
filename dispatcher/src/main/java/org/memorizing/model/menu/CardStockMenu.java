@@ -31,7 +31,7 @@ public class CardStockMenu extends AMenu {
                 {"X edit card stock"},
                 {"X delete card stock"},
                 {"info"},
-                {"go to back"},
+                {"back"},
         });
     }
 

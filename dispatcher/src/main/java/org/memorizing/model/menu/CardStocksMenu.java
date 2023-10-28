@@ -34,7 +34,7 @@ public class CardStocksMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"X add card stock"},
+                {"add card stock"},
                 {"info"}
         });
     }
