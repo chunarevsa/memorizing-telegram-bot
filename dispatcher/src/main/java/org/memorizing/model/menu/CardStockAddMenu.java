@@ -42,14 +42,16 @@ public class CardStockAddMenu extends AMenu {
                 "This card won't show you again in this test mode. We recommend set this value from 4 to 8\n" +
                 "We need to send this message:\n" +
                 "\n" +
-                "/Card stock adding\n"+
-                "name =English words\n" +
-                "description =some description\n" +
-                "key =English\n" +
-                "value =Russian\n" +
-                "max point =5\n" +
-                "test mode is available =true\n" +
-                "only from key =false\n" +
+                "#add-CardStock\n"+
+                "{\n" +
+                "  \"cardStockName\": \"English words\",\n" +
+                "  \"description\": \"Some description\",\n" +
+                "  \"keyType\": \"English\",\n" +
+                "  \"valueType\": \"Russian\",\n" +
+                "  \"maxPoint\": 5,\n" +
+                "  \"testModeIsAvailable\": \"true\",\n" +
+                "  \"onlyFromKey\": \"false\"\n" +
+                "}\n" +
                 "\n";
 
     }
@@ -59,14 +61,16 @@ public class CardStockAddMenu extends AMenu {
         return "Send me information about your new card stock.\n" +
                 "Please use this format:\n" +
                 "\n" +
-                "/Card stock adding\n"+
-                "name =some name\n" +
-                "description =some description\n" +
-                "key =key\n" +
-                "value =value\n" +
-                "max point =number\n" +
-                "test mode is available =true (or false)\n" +
-                "only from key =true (or false)\n" +
+                "#add-CardStock\n"+
+                "{\n" +
+                "  \"cardStockName\": \"Some name\",\n" +
+                "  \"description\": \"Some description\",\n" +
+                "  \"keyType\": \"Key name\",\n" +
+                "  \"valueType\": \"Value name\",\n" +
+                "  \"maxPoint\": 10,\n" +
+                "  \"testModeIsAvailable\": \"true\",\n" +
+                "  \"onlyFromKey\": \"false\"\n" +
+                "}\n" +
                 "\n" +
                 "if you need descriptions these, push the button `info`\n" +
                 "\n"

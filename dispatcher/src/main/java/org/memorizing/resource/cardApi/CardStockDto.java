@@ -1,4 +1,4 @@
-package org.memorizing.utils.cardApi;
+package org.memorizing.resource.cardApi;
 
 public class CardStockDto {
     private int id;

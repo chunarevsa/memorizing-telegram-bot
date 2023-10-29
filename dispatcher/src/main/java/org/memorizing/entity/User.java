@@ -1,7 +1,6 @@
 package org.memorizing.entity;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -11,13 +10,10 @@ public class User {
     Integer id;
     Long chatId;
     String name;
-    @Column(name = "current_q_id")
-    Integer currentQId;
 
-    @Column(name = "current_menu_name")
-    String currentMenuName;
-    @ElementCollection(fetch = FetchType.EAGER)
-    List<Integer> historyArray;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_state_id", unique = true)
+    UserState userState;
 
     @Column(name = "storage_id")
     Integer storageId;
@@ -25,13 +21,11 @@ public class User {
     protected User() {
     }
 
-    public User(Long chatId, String name, Integer currentQId, String currentMenuName, List<Integer> historyArray, Integer storageId) {
+    public User(Long chatId, String name, Integer storageId) {
         this.chatId = chatId;
         this.name = name;
-        this.currentQId = currentQId;
-        this.currentMenuName = currentMenuName;
-        this.historyArray = historyArray;
         this.storageId = storageId;
+        this.userState = new UserState(this);
     }
 
     public Integer getId() {
@@ -58,28 +52,12 @@ public class User {
         this.name = name;
     }
 
-    public Integer getCurrentQId() {
-        return currentQId;
+    public UserState getUserState() {
+        return userState;
     }
 
-    public void setCurrentQId(Integer currentQId) {
-        this.currentQId = currentQId;
-    }
-
-    public String getCurrentMenuName() {
-        return currentMenuName;
-    }
-
-    public void setCurrentMenuName(String currentMenuName) {
-        this.currentMenuName = currentMenuName;
-    }
-
-    public List<Integer> getHistoryArray() {
-        return historyArray;
-    }
-
-    public void setHistoryArray(List<Integer> historyArray) {
-        this.historyArray = historyArray;
+    public void setUserState(UserState userState) {
+        this.userState = userState;
     }
 
     public Integer getStorageId() {
@@ -96,9 +74,7 @@ public class User {
                 "id=" + id +
                 ", chatId=" + chatId +
                 ", name='" + name + '\'' +
-                ", currentQId=" + currentQId +
-                ", currentMenuName='" + currentMenuName + '\'' +
-                ", historyArray=" + historyArray +
+                ", userState=" + userState +
                 ", storageId=" + storageId +
                 '}';
     }
