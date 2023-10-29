@@ -1,8 +1,8 @@
 package org.memorizing.service;
 
 import org.apache.log4j.Logger;
+import org.memorizing.entity.UserState;
 import org.memorizing.model.menu.*;
-import org.memorizing.entity.*;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.cardApi.CardDto;
 import org.memorizing.resource.cardApi.CardStockDto;
@@ -84,13 +84,11 @@ public class MenuService { //TODO: Add interface
                 break;
             default:
                 break;
-
         }
 
         userStateService.updateUserStateByMenu(userStateId, menuFactory);
         return menuFactory;
     }
-
 
     public MenuFactory createMenuByCallback(Integer storageId, Integer userStateId, EMenu currentMenu, String callback) throws Exception {
         log.debug("createMenuByCallback. req:" + storageId + ", " + userStateId + ", " + currentMenu.name());

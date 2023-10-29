@@ -24,7 +24,6 @@ import static org.memorizing.model.Constants.*;
 public class MessageDispatcherService {
     private static final Logger log = Logger.getLogger(MessageDispatcherService.class);
     private final UsersRepo usersRepo;
-    private final UserResource userResource;
     private final StorageResource storageResource;
     private final MenuService menuService;
     private final JsonObjectMapper mapper = new JsonObjectMapper();
@@ -35,7 +34,6 @@ public class MessageDispatcherService {
             StorageResource storageResource,
             MenuService menuService) {
         this.usersRepo = usersRepo;
-        this.userResource = userResource;
         this.storageResource = storageResource;
         this.menuService = menuService;
     }
@@ -224,7 +222,11 @@ public class MessageDispatcherService {
                     break;
                 case "delete":
                     List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
-                    cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+
+                    if (cards != null && !cards.isEmpty()) {
+                        cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+                    }
+
                     storageResource.deleteCardStock(userState.getCardStockId());
                     break;
                 default:

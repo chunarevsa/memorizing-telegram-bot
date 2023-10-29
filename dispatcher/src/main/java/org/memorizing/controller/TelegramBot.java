@@ -85,7 +85,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             MenuFactory menu;
             try {
                 if (hasCallback) {
-                    // TODO: переделать на Resp
                     DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
                     executeSending(chatId, resp.getMenu(), resp.getStatus());
 
