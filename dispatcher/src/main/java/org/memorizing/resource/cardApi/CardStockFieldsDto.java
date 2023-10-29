@@ -4,7 +4,7 @@ import org.memorizing.service.IMappable;
 
 public class CardStockFieldsDto implements IMappable {
     private Integer storageId;
-    private String name;
+    private String cardStockName;
     private String description;
     private String keyType;
     private String valueType;
@@ -15,9 +15,9 @@ public class CardStockFieldsDto implements IMappable {
     public CardStockFieldsDto() {
     }
 
-    public CardStockFieldsDto(Integer storageId, String name, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
+    public CardStockFieldsDto(Integer storageId, String cardStockName, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
         this.storageId = storageId;
-        this.name = name;
+        this.cardStockName = cardStockName;
         this.description = description;
         this.keyType = keyType;
         this.valueType = valueType;
@@ -34,12 +34,12 @@ public class CardStockFieldsDto implements IMappable {
         this.storageId = storageId;
     }
 
-    public String getName() {
-        return name;
+    public String getCardStockName() {
+        return cardStockName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCardStockName(String cardStockName) {
+        this.cardStockName = cardStockName;
     }
 
     public String getDescription() {
@@ -94,7 +94,7 @@ public class CardStockFieldsDto implements IMappable {
     public String toString() {
         return "CardStockFieldsDto{" +
                 "storageId=" + storageId +
-                ", name='" + name + '\'' +
+                ", name='" + cardStockName + '\'' +
                 ", description='" + description + '\'' +
                 ", keyType='" + keyType + '\'' +
                 ", valueType='" + valueType + '\'' +

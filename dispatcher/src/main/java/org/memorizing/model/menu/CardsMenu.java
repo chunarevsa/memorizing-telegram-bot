@@ -1,7 +1,5 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.model.menu.AMenu;
-import org.memorizing.model.menu.EMenu;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
@@ -19,11 +17,6 @@ public class CardsMenu extends AMenu {
     }
 
     @Override
-    public EMenu getLastMenu() {
-        return EMenu.CARD_STOCK;
-    }
-
-    @Override
     public EMenu getCurrentMenu() {
         return EMenu.CARDS;
     }
@@ -31,7 +24,7 @@ public class CardsMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"X add card"},
+                {"add card"},
                 {"info"},
                 {"back"}
         });

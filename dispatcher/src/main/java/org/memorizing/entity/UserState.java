@@ -72,7 +72,6 @@ public class UserState {
     public String toString() {
         return "UserState{" +
                 "id=" + id +
-                ", user=" + user +
                 ", currentMenu=" + currentMenu +
                 ", cardStockId=" + cardStockId +
                 ", cardId=" + cardId +
@@ -80,13 +79,6 @@ public class UserState {
     }
 
     public EMenu getLastMenu() {
-        switch (this.currentMenu) {
-            case MAIN:
-            case CARD_STOCKS: return EMenu.MAIN;
-            case CARD_STOCK: return EMenu.CARD_STOCKS;
-            case CARDS: return EMenu.CARD_STOCK;
-            case CARD: return EMenu.CARDS;
-            default: return EMenu.MAIN;
-        }
+        return this.currentMenu.getLastMenu();
     }
 }

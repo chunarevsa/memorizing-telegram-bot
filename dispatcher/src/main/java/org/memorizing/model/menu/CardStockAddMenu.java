@@ -10,11 +10,6 @@ public class CardStockAddMenu extends AMenu {
     }
 
     @Override
-    public EMenu getLastMenu() {
-        return EMenu.CARD_STOCKS;
-    }
-
-    @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
                 {"info"},
@@ -44,7 +39,7 @@ public class CardStockAddMenu extends AMenu {
                 "\n" +
                 "#add-cardStock\n"+
                 "{\n" +
-                "  \"name\": \"English words\",\n" +
+                "  \"cardStockName\": \"English words\",\n" +
                 "  \"description\": \"Some description\",\n" +
                 "  \"keyType\": \"English\",\n" +
                 "  \"valueType\": \"Russian\",\n" +
@@ -53,17 +48,17 @@ public class CardStockAddMenu extends AMenu {
                 "  \"onlyFromKey\": \"false\"\n" +
                 "}\n" +
                 "\n";
-
     }
 
     @Override
     public String getText() {
         return "Send me information about your new card stock.\n" +
+                "if you need descriptions these, push the button `info`\n" +
                 "Please use this format:\n" +
                 "\n" +
                 "#add-CardStock\n"+
                 "{\n" +
-                "  \"name\": \"Some name\",\n" +
+                "  \"cardStockName\": \"Some name\",\n" +
                 "  \"description\": \"Some description\",\n" +
                 "  \"keyType\": \"Key name\",\n" +
                 "  \"valueType\": \"Value name\",\n" +
@@ -71,10 +66,7 @@ public class CardStockAddMenu extends AMenu {
                 "  \"testModeIsAvailable\": \"true\",\n" +
                 "  \"onlyFromKey\": \"false\"\n" +
                 "}\n" +
-                "\n" +
-                "if you need descriptions these, push the button `info`\n" +
-                "\n"
-                ;
+                "\n";
     }
 
     @Override

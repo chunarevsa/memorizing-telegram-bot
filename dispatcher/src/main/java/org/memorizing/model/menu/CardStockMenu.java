@@ -11,11 +11,8 @@ public class CardStockMenu extends AMenu {
         this.cardStock = cardStock;
     }
 
-    public CardStockDto getCardStock() { return this.cardStock; }
-
-    @Override
-    public EMenu getLastMenu() {
-        return EMenu.CARD_STOCKS;
+    public CardStockDto getCardStock() {
+        return this.cardStock;
     }
 
     @Override
@@ -28,8 +25,8 @@ public class CardStockMenu extends AMenu {
         return getKeyboardByButtons(new String[][]{
                 {"X start studying"},
                 {"show cards"},
-                {"X edit card stock"},
-                {"X delete card stock"},
+                {"update card stock"},
+                {"delete card stock"},
                 {"info"},
                 {"back"},
         });

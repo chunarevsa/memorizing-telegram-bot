@@ -11,6 +11,11 @@ import java.util.List;
 
 public abstract class AMenu implements MenuFactory {
 
+    @Override
+    public EMenu getLastMenu() {
+        return this.getCurrentMenu().getLastMenu();
+    }
+
     public InlineKeyboardMarkup createInlineKeyboard(String[][] strings) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();

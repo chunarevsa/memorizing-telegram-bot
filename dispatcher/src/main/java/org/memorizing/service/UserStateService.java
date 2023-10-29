@@ -24,10 +24,12 @@ public class UserStateService {
         if (menu instanceof CardStocksMenu) {
             userState.setCardStockId(null);
             userState.setCardId(null);
+
         } else if (menu instanceof CardStockMenu) {
             CardStockMenu cardStockMenu = (CardStockMenu) menu;
             userState.setCardStockId(cardStockMenu.getCardStock().getId());
             userState.setCardId(null);
+
         } else if (menu instanceof CardsMenu) {
             CardsMenu cardsMenu = (CardsMenu) menu;
             userState.setCardStockId(cardsMenu.getCardStockId());

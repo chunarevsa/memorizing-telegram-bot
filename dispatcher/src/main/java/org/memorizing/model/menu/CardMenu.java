@@ -22,11 +22,6 @@ public class CardMenu extends AMenu {
     }
 
     @Override
-    public EMenu getLastMenu() {
-        return EMenu.CARDS;
-    }
-
-    @Override
     public EMenu getCurrentMenu() {
         return EMenu.CARD;
     }
@@ -34,8 +29,8 @@ public class CardMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"X edit card"},
-                {"X delete card"},
+                {"update card"},
+                {"delete card"},
                 {"info"},
                 {"back"},
         });

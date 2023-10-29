@@ -1,13 +1,8 @@
 package org.memorizing.service;
 
 import org.apache.log4j.Logger;
-import org.memorizing.model.menu.CardMenu;
-import org.memorizing.model.menu.CardsMenu;
+import org.memorizing.model.menu.*;
 import org.memorizing.entity.*;
-import org.memorizing.model.menu.CardStockMenu;
-import org.memorizing.model.menu.CardStocksMenu;
-import org.memorizing.model.menu.EMenu;
-import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.cardApi.CardDto;
 import org.memorizing.resource.cardApi.CardStockDto;
@@ -44,7 +39,7 @@ public class MenuService { //TODO: Add interface
             case CARD_STOCKS:
                 List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(storageId);
                 String[][] cardStockTypes = new String[0][];
-                if (!cardStocks.isEmpty()) {
+                if (cardStocks != null && !cardStocks.isEmpty()) {
                     cardStockTypes = new String[1][cardStocks.size()];
                     for (int i = 0; i < cardStocks.size(); i++) {
                         CardStockDto cardStock = cardStocks.get(i);
@@ -53,14 +48,21 @@ public class MenuService { //TODO: Add interface
                 }
                 menuFactory = new CardStocksMenu(cardStockTypes);
                 break;
+            case CARD_STOCK_ADD:
+                menuFactory = new CardStockAddMenu();
+                break;
             case CARD_STOCK:
                 CardStockDto cardStock = storageResource.getCardStockById(state.getCardStockId());
                 menuFactory = new CardStockMenu(cardStock);
                 break;
+            case CARD_STOCK_UPDATE:
+                CardStockDto oldCardStock = storageResource.getCardStockById(state.getCardStockId());
+                menuFactory = new CardStockUpdateMenu(oldCardStock);
+                break;
             case CARDS:
                 List<CardDto> cards = storageResource.getCardsByCardStockId(state.getCardStockId());
                 String[][] cardKeys = new String[0][];
-                if (!cards.isEmpty()) {
+                if (cards != null && !cards.isEmpty()) {
                     cardKeys = new String[1][cards.size()];
                     for (int i = 0; i < cards.size(); i++) {
                         CardDto card = cards.get(i);
@@ -69,9 +71,16 @@ public class MenuService { //TODO: Add interface
                 }
                 menuFactory = new CardsMenu(state.getCardStockId(), cardKeys);
                 break;
+            case CARD_ADD:
+                menuFactory = new CardAddMenu();
+                break;
             case CARD:
                 CardDto card = storageResource.getCardById(state.getCardId());
                 menuFactory = new CardMenu(state.getCardStockId(), card);
+                break;
+            case CARD_UPDATE:
+                CardDto oldCard = storageResource.getCardById(state.getCardId());
+                menuFactory = new CardUpdateMenu(oldCard);
                 break;
             default:
                 break;

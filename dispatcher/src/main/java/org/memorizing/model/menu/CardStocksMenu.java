@@ -22,11 +22,6 @@ public class CardStocksMenu extends AMenu {
     }
 
     @Override
-    public EMenu getLastMenu() {
-        return EMenu.CARD_STOCKS;
-    }
-
-    @Override
     public EMenu getCurrentMenu() {
         return EMenu.CARD_STOCKS;
     }
@@ -52,5 +47,4 @@ public class CardStocksMenu extends AMenu {
         } else return "You don't have card stocks. " +
                 "Push the button `add card stock`";
     }
-
 }

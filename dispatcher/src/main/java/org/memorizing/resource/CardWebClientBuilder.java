@@ -1,9 +1,7 @@
 package org.memorizing.resource;
 
 import org.apache.log4j.Logger;
-import org.memorizing.resource.cardApi.CardDto;
-import org.memorizing.resource.cardApi.CardStockDto;
-import org.memorizing.resource.cardApi.StorageDto;
+import org.memorizing.resource.cardApi.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -15,10 +13,11 @@ public class CardWebClientBuilder {
     private static final String baseUrl = "http://localhost:8095/";
     private static final String serviceName = "";
 
+    // /storage
     public StorageDto getStorageByUserId(Integer userId) {
+        log.debug("getStorageByUserId with req: " + userId);
         try {
             StorageDto req = new StorageDto(null, userId, null);
-            log.debug("retrieve req to serviceName + \"/storage/getByUserId\" with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/storage/getByUserId")
@@ -26,23 +25,22 @@ public class CardWebClientBuilder {
                     .retrieve()
                     .bodyToFlux(StorageDto.class)
                     .blockFirst();
-            // TODO: TEMP
-//            return new StorageDto(1, userId, "Some name");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    // /cardStock
     public List<CardStockDto> getCardStocksByStorageId(Integer storageId) {
         try {
-            log.debug("retrieve req to serviceName + \"/cardStorages\" with req: " + storageId);
+            log.debug("retrieve req to serviceName + \"/cardStocks\" with req: " + storageId);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/cardStocks")
                     .bodyValue(storageId)
                     .retrieve()
-                    .bodyToFlux( CardStockDto.class )
+                    .bodyToFlux(CardStockDto.class)
                     .buffer()
                     .blockFirst();
         } catch (Exception e) {
@@ -51,6 +49,54 @@ public class CardWebClientBuilder {
         return null;
     }
 
+    public CardStockDto createCardStock(CardStockFieldsDto req) {
+        try {
+            log.debug("retrieve req to serviceName + \"/cardStock\" with req: " + req);
+            return WebClient.create(baseUrl)
+                    .post()
+                    .uri(serviceName + "/cardStock")
+                    .bodyValue(req)
+                    .retrieve()
+                    .bodyToFlux(CardStockDto.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public CardStockDto updateCardStock(CardStockFieldsDto req, Integer cardStockId) {
+        try {
+            log.debug("retrieve req to serviceName + \"/cardStock\" with req: " + req);
+            return WebClient.create(baseUrl)
+                    .post()
+                    .uri(serviceName + "/cardStock/" + cardStockId)
+                    .bodyValue(req)
+                    .retrieve()
+                    .bodyToFlux(CardStockDto.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void deleteCardStock(Integer cardStockId) {
+        try {
+            log.debug("deleteCardStock req: " + cardStockId);
+            WebClient.create(baseUrl)
+                    .delete()
+                    .uri(serviceName + "/cardStock/" + cardStockId)
+                    .retrieve()
+                    .bodyToFlux(Void.class)
+                    .blockFirst();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // /card
     public List<CardDto> getCardsByCardStockId(Integer cardStockId) {
         try {
             log.debug("retrieve req to serviceName + \"/cards\" with req: " + cardStockId);
@@ -91,6 +137,68 @@ public class CardWebClientBuilder {
                     .uri(serviceName + "/card/" + cardId)
                     .retrieve()
                     .bodyToFlux(CardDto.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public CardDto createCard(CardFieldsDto req) {
+        try {
+            log.debug("retrieve req to serviceName + \"/card\" with req: " + req);
+            return WebClient.create(baseUrl)
+                    .post()
+                    .uri(serviceName + "/card")
+                    .bodyValue(req)
+                    .retrieve()
+                    .bodyToFlux(CardDto.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public CardDto updateCard(CardFieldsDto req, Integer cardId) {
+        try {
+            log.debug("retrieve req to serviceName + \"/card\" with req: " + req);
+            return WebClient.create(baseUrl)
+                    .post()
+                    .uri(serviceName + "/card/" + cardId)
+                    .bodyValue(req)
+                    .retrieve()
+                    .bodyToFlux(CardDto.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void deleteCard(Integer cardId) {
+        try {
+            log.debug("deleteCard req: " + cardId);
+            WebClient.create(baseUrl)
+                    .delete()
+                    .uri(serviceName + "/card/" + cardId)
+                    .retrieve()
+                    .bodyToFlux(Void.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public StorageDto createStorage(StorageFieldsDto req) {
+        try {
+            log.debug("createStorage req: " + req);
+            return WebClient.create(baseUrl)
+                    .post()
+                    .uri(serviceName + "/storage")
+                    .bodyValue(req)
+                    .retrieve()
+                    .bodyToFlux(StorageDto.class)
                     .blockFirst();
         } catch (Exception e) {
             e.printStackTrace();
