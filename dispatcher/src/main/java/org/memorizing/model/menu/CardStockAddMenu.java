@@ -42,9 +42,9 @@ public class CardStockAddMenu extends AMenu {
                 "This card won't show you again in this test mode. We recommend set this value from 4 to 8\n" +
                 "We need to send this message:\n" +
                 "\n" +
-                "#add-CardStock\n"+
+                "#add-cardStock\n"+
                 "{\n" +
-                "  \"cardStockName\": \"English words\",\n" +
+                "  \"name\": \"English words\",\n" +
                 "  \"description\": \"Some description\",\n" +
                 "  \"keyType\": \"English\",\n" +
                 "  \"valueType\": \"Russian\",\n" +
@@ -63,7 +63,7 @@ public class CardStockAddMenu extends AMenu {
                 "\n" +
                 "#add-CardStock\n"+
                 "{\n" +
-                "  \"cardStockName\": \"Some name\",\n" +
+                "  \"name\": \"Some name\",\n" +
                 "  \"description\": \"Some description\",\n" +
                 "  \"keyType\": \"Key name\",\n" +
                 "  \"valueType\": \"Value name\",\n" +

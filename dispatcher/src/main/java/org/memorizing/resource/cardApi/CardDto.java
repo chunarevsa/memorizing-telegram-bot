@@ -1,6 +1,8 @@
 package org.memorizing.resource.cardApi;
 
-public class CardDto {
+import org.memorizing.service.IMappable;
+
+public class CardDto implements IMappable {
     private int id;
     private String cardKey;
     private String cardValue;

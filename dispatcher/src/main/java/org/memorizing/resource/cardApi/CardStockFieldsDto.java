@@ -1,8 +1,10 @@
 package org.memorizing.resource.cardApi;
 
-public class CardStockDto {
-    private int id;
-    private String cardStockName;
+import org.memorizing.service.IMappable;
+
+public class CardStockFieldsDto implements IMappable {
+    private Integer storageId;
+    private String name;
     private String description;
     private String keyType;
     private String valueType;
@@ -10,12 +12,12 @@ public class CardStockDto {
     private Boolean testModeIsAvailable;
     private Boolean onlyFromKey;
 
-    public CardStockDto() {
+    public CardStockFieldsDto() {
     }
 
-    public CardStockDto(int id, String cardStockName, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
-        this.id = id;
-        this.cardStockName = cardStockName;
+    public CardStockFieldsDto(Integer storageId, String name, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
+        this.storageId = storageId;
+        this.name = name;
         this.description = description;
         this.keyType = keyType;
         this.valueType = valueType;
@@ -24,20 +26,20 @@ public class CardStockDto {
         this.onlyFromKey = onlyFromKey;
     }
 
-    public int getId() {
-        return id;
+    public Integer getStorageId() {
+        return storageId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStorageId(Integer storageId) {
+        this.storageId = storageId;
     }
 
-    public String getCardStockName() {
-        return cardStockName;
+    public String getName() {
+        return name;
     }
 
-    public void setCardStockName(String cardStockName) {
-        this.cardStockName = cardStockName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -90,9 +92,9 @@ public class CardStockDto {
 
     @Override
     public String toString() {
-        return "CardStockDto{" +
-                "id=" + id +
-                ", name='" + cardStockName + '\'' +
+        return "CardStockFieldsDto{" +
+                "storageId=" + storageId +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", keyType='" + keyType + '\'' +
                 ", valueType='" + valueType + '\'' +
