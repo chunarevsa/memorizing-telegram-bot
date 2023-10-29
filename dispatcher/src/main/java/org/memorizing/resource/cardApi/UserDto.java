@@ -1,4 +1,4 @@
-package org.memorizing.botinstance;
+package org.memorizing.resource.cardApi;
 
 public class UserDto {
     private Integer id;

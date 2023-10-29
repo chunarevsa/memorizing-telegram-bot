@@ -1,4 +1,4 @@
-package org.memorizing.controller;
+package org.memorizing.resource.cardApi;
 
 public class CardDto {
     private int id;

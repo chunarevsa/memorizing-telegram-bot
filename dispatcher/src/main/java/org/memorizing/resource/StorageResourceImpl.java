@@ -1,9 +1,8 @@
-package org.memorizing.repository;
+package org.memorizing.resource;
 
-import org.memorizing.controller.CardDto;
-import org.memorizing.utils.CardWebClientBuilder;
-import org.memorizing.utils.cardApi.CardStockDto;
-import org.memorizing.utils.cardApi.StorageDto;
+import org.memorizing.resource.cardApi.CardDto;
+import org.memorizing.resource.cardApi.CardStockDto;
+import org.memorizing.resource.cardApi.StorageDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,5 +29,15 @@ public class StorageResourceImpl implements StorageResource {
     @Override
     public List<CardDto> getCardsByCardStockId(Integer id) {
         return cardWebClientBuilder.getCardsByCardStockId(id);
+    }
+
+    @Override
+    public CardStockDto getCardStockById(Integer cardStockId) {
+        return cardWebClientBuilder.getCardStockById(cardStockId);
+    }
+
+    @Override
+    public CardDto getCardById(Integer cardId) {
+        return cardWebClientBuilder.getCardById(cardId);
     }
 }

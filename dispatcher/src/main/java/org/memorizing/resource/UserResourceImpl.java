@@ -1,7 +1,6 @@
-package org.memorizing.repository;
+package org.memorizing.resource;
 
-import org.memorizing.botinstance.UserDto;
-import org.memorizing.utils.UserWebClientBuilder;
+import org.memorizing.resource.cardApi.UserDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -1,7 +1,7 @@
-package org.memorizing.utils;
+package org.memorizing.resource;
 
 import org.apache.log4j.Logger;
-import org.memorizing.botinstance.UserDto;
+import org.memorizing.resource.cardApi.UserDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ public class UserWebClientBuilder {
     public List<UserDto> getChatIdListWithUserId() {
         try {
             log.debug("retrieve req to serviceName + \"/user/getChatIdListWithUserId\" with req: ");
+
 //            return WebClient.create(baseUrl)
 //                    .post()
 //                    .uri(serviceName + "/user/getByChatId")

@@ -1,4 +1,4 @@
-package org.memorizing.utils.cardApi;
+package org.memorizing.resource.cardApi;
 
 // TODO: add it to separated module
 public class StorageDto {

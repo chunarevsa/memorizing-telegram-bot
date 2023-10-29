@@ -13,6 +13,7 @@ public class UserState {
     @JsonIgnore
     @OneToOne(optional = false, mappedBy = "userState")
     private User user;
+    @Enumerated(EnumType.STRING)
     private EMenu currentMenu;
     private Integer cardStockId;
     private Integer cardId;

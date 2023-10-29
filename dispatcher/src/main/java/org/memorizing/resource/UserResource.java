@@ -1,6 +1,6 @@
-package org.memorizing.repository;
+package org.memorizing.resource;
 
-import org.memorizing.botinstance.UserDto;
+import org.memorizing.resource.cardApi.UserDto;
 
 import java.util.List;
 

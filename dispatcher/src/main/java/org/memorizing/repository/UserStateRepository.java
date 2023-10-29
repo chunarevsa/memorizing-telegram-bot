@@ -1,4 +1,4 @@
-package org.memorizing.controller;
+package org.memorizing.repository;
 
 import org.memorizing.entity.UserState;
 import org.springframework.data.jpa.repository.JpaRepository;
