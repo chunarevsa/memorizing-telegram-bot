@@ -6,14 +6,16 @@ public class CardFieldsDto implements IMappable {
     private Integer cardStockId;
     private String cardKey;
     private String cardValue;
+    private Boolean onlyFromKey;
 
     public CardFieldsDto() {
     }
 
-    public CardFieldsDto(Integer cardStockId, String cardKey, String cardValue) {
+    public CardFieldsDto(Integer cardStockId, String cardKey, String cardValue, Boolean onlyFromKey) {
         this.cardStockId = cardStockId;
         this.cardKey = cardKey;
         this.cardValue = cardValue;
+        this.onlyFromKey = onlyFromKey;
     }
 
     public Integer getCardStockId() {
@@ -40,12 +42,21 @@ public class CardFieldsDto implements IMappable {
         this.cardValue = cardValue;
     }
 
+    public Boolean getOnlyFromKey() {
+        return onlyFromKey;
+    }
+
+    public void setOnlyFromKey(Boolean onlyFromKey) {
+        this.onlyFromKey = onlyFromKey;
+    }
+
     @Override
     public String toString() {
         return "CardFieldsDto{" +
                 "cardStockId=" + cardStockId +
                 ", cardKey='" + cardKey + '\'' +
                 ", cardValue='" + cardValue + '\'' +
+                ", onlyFromKey=" + onlyFromKey +
                 '}';
     }
 }

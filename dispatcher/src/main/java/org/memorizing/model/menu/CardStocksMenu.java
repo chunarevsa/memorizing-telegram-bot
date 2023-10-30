@@ -17,8 +17,8 @@ public class CardStocksMenu extends AMenu {
     }
 
     @Override
-    public String getName() {
-        return "Card Stocks Menu";
+    public String getTitle() {
+        return "*Card stocks menu*";
     }
 
     @Override

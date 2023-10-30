@@ -16,7 +16,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.net.ProtocolException;
 import java.util.List;
-import java.util.Optional;
 
 import static org.memorizing.model.Constants.*;
 
@@ -37,6 +36,8 @@ public class MessageDispatcherService {
         this.storageResource = storageResource;
         this.menuService = menuService;
     }
+
+    // TODO: обработка ошибок, когда основной сервис не доступен сервис не доступен
 
     public DispatcherResponse getResponseByRegularMessage(Long chatId, String messageText) throws Exception {
         log.debug("getResponseByRegularMessage. req:" + chatId + ", " + messageText);
@@ -125,7 +126,10 @@ public class MessageDispatcherService {
             }
 
             if (!method.equals("delete")) {
-                body = text.substring(text.indexOf("{")).replace("\n", "");
+                body = text.substring(text.indexOf("{"))
+                        .replace("\n", "")
+                        .replace("*", "")
+                        .replace("`","");
             }
 
             status = executeRequest(entity, method, body, userState);
@@ -236,6 +240,8 @@ public class MessageDispatcherService {
         } else if (iMappable instanceof CardFieldsDto) {
             CardFieldsDto cardFieldsDto = (CardFieldsDto) iMappable;
             cardFieldsDto.setCardStockId(userState.getCardStockId());
+            CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
+            cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
             switch (method) {
                 case "add":
                     storageResource.createCard(cardFieldsDto);

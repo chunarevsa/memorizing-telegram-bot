@@ -39,8 +39,22 @@ public class CardStockMenu extends AMenu {
 
     @Override
     public String getText() {
-        return cardStock.getKeyType() + "/" + cardStock.getValueType() + "\n" +
-                cardStock.toString();
+        String testModeIsAvailable = "isn't";
+        String testBackwardIsAvailable = "";
+
+        if (cardStock.getTestModeIsAvailable()) {
+            testModeIsAvailable = "is";
+            if (!cardStock.getOnlyFromKey()) testBackwardIsAvailable = "You can learn it backwards";
+        }
+
+        return cardStock.getCardStockName() + "\n" +
+                cardStock.getDescription() + "\n" +
+                "Key and value: " + cardStock.getKeyType() + "/" + cardStock.getValueType() + "\n" +
+                "Your card is complete when it have "+ cardStock.getMaxPoint() + " points" + "\n" +
+                "This card stock "+testModeIsAvailable+" available for test"+ "\n" +
+                testBackwardIsAvailable +
+                "\n";
+
     }
 
     @Override
@@ -49,8 +63,8 @@ public class CardStockMenu extends AMenu {
     }
 
     @Override
-    public String getName() {
-        return "Card Stock Menu";
+    public String getTitle() {
+        return "*Card Stock Menu*";
     }
 
 }

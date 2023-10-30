@@ -37,40 +37,41 @@ public class CardStockAddMenu extends AMenu {
                 "This card won't show you again in this test mode. We recommend set this value from 4 to 8\n" +
                 "We need to send this message:\n" +
                 "\n" +
-                "#add-cardStock\n"+
+                "#add-CardStock\n"+
                 "{\n" +
-                "  \"cardStockName\": \"English words\",\n" +
-                "  \"description\": \"Some description\",\n" +
-                "  \"keyType\": \"English\",\n" +
-                "  \"valueType\": \"Russian\",\n" +
-                "  \"maxPoint\": 5,\n" +
-                "  \"testModeIsAvailable\": \"true\",\n" +
-                "  \"onlyFromKey\": \"false\"\n" +
+                "  \"`cardStockName`\":       \"Deutch words\",\n" +
+                "  \"`description`\":                 \"all words\",\n" +
+                "  \"`keyType`\":                      \"Deutch\",\n" +
+                "  \"`valueType`\":                   \"Russian\",\n" +
+                "  \"`maxPoint`\":                    5,\n" +
+                "  \"`testModeIsAvailable`\": \"true\",\n" +
+                "  \"`onlyFromKey`\":               \"false\"\n" +
                 "}\n" +
                 "\n";
     }
 
     @Override
     public String getText() {
-        return "Send me information about your new card stock.\n" +
-                "if you need descriptions these, push the button `info`\n" +
-                "Please use this format:\n" +
-                "\n" +
-                "#add-CardStock\n"+
+        return "#add-CardStock\n"+
                 "{\n" +
-                "  \"cardStockName\": \"Some name\",\n" +
-                "  \"description\": \"Some description\",\n" +
-                "  \"keyType\": \"Key name\",\n" +
-                "  \"valueType\": \"Value name\",\n" +
-                "  \"maxPoint\": 10,\n" +
-                "  \"testModeIsAvailable\": \"true\",\n" +
-                "  \"onlyFromKey\": \"false\"\n" +
+                "  \"`cardStockName`\":       \"IT term\",\n" +
+                "  \"`description`\":                 \"Only it words for interview\",\n" +
+                "  \"`keyType`\":                      \"ENG\",\n" +
+                "  \"`valueType`\":                   \"RUS\",\n" +
+                "  \"`maxPoint`\":                    5,\n" +
+                "  \"`testModeIsAvailable`\": \"true\",\n" +
+                "  \"`onlyFromKey`\":                \"false\"\n" +
                 "}\n" +
                 "\n";
     }
 
     @Override
-    public String getName() {
-        return "Card stock add menu";
+    public String getTitle() {
+        return "*Card stock add menu*\n" +
+                "Send me information about your new card stock.\n" +
+                "if you need descriptions these, push the button `info`\n" +
+                "Please use this format:\n" +
+                "\n";
+
     }
 }

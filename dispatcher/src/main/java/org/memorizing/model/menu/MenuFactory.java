@@ -17,5 +17,5 @@ public interface MenuFactory {
 
     InlineKeyboardMarkup createInlineKeyboard(String[][] cardStockTypes);
 
-    String getName();
+    String getTitle();
 }

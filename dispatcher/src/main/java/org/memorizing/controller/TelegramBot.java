@@ -98,6 +98,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                     menu = messageDispatcherService.getFirstMenu(chatId);
                     executeSending(chatId, menu, SUCCESSFULLY);
                 } else if (data.startsWith("#")) {
+                    // TODO: for test
+                    if(data.startsWith("#test")) {
+                        startEcho(chatId, data);
+                        return;
+                    }
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholder(chatId, data);
                     // send status
@@ -111,11 +116,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                     DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
 
                     if (data.equals("info") && resp.getMenu() != null) {
-                        // send only info text
-                        execute(SendMessage.builder()
+                        SendMessage infoText = SendMessage.builder()
                                 .chatId(chatId)
                                 .text(resp.getMenu().getInfoText())
-                                .build());
+                                .build();
+                        infoText.enableMarkdown(true);
+                        // send only info text
+                        execute(infoText);
                     } else executeSending(chatId, resp.getMenu(), resp.getStatus());
                 }
             } catch (Exception e) {
@@ -143,7 +150,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage messageWithKeyboard = SendMessage.builder()
                 .chatId(chatId)
                 .replyMarkup(menu.getKeyboard())
-                .text(menu.getName())
+                .text(menu.getTitle())
                 .build();
         messageWithKeyboard.enableMarkdown(true);
         execute(messageWithKeyboard);
@@ -155,6 +162,38 @@ public class TelegramBot extends TelegramLongPollingBot {
                 .build();
         messageWithInlineKeyboard.enableMarkdown(true);
         execute(messageWithInlineKeyboard);
+    }
+
+    private void startEcho(Long chatId, String data) throws TelegramApiException {
+        String testString = data.substring("#test ".length());
+        log.debug("testString: "+ testString);
+
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .replyMarkup(null)
+                .text("Markdown: " + testString)
+                .build();
+        message.enableMarkdown(true);
+        execute(message);
+
+        String innerText = "|innerText|";
+        message = SendMessage.builder()
+                .chatId(chatId)
+                .replyMarkup(null)
+                .text("Markdown" + innerText)
+                .build();
+        message.enableMarkdown(true);
+        execute(message);
+
+        String innerText2 = "||innerText||";
+        message = SendMessage.builder()
+                .chatId(chatId)
+                .replyMarkup(null)
+                .text("MarkdownV2: " + innerText2)
+                .build();
+        message.enableMarkdownV2(true);
+        execute(message);
+
     }
 
 }

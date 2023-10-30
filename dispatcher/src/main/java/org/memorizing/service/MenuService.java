@@ -43,7 +43,7 @@ public class MenuService { //TODO: Add interface
                     cardStockTypes = new String[1][cardStocks.size()];
                     for (int i = 0; i < cardStocks.size(); i++) {
                         CardStockDto cardStock = cardStocks.get(i);
-                        cardStockTypes[0][i] = cardStock.getKeyType() + "/" + cardStock.getValueType();
+                        cardStockTypes[0][i] = cardStock.getCardStockName();
                     }
                 }
                 menuFactory = new CardStocksMenu(cardStockTypes);
@@ -76,7 +76,8 @@ public class MenuService { //TODO: Add interface
                 break;
             case CARD:
                 CardDto card = storageResource.getCardById(state.getCardId());
-                menuFactory = new CardMenu(state.getCardStockId(), card);
+                int maxPoint = storageResource.getCardStockById(state.getCardStockId()).getMaxPoint();
+                menuFactory = new CardMenu(state.getCardStockId(),maxPoint, card);
                 break;
             case CARD_UPDATE:
                 CardDto oldCard = storageResource.getCardById(state.getCardId());
@@ -100,9 +101,8 @@ public class MenuService { //TODO: Add interface
             case CARD_STOCKS:
                 Optional<CardStockDto> cardStock = Optional.empty();
                 if (!cardStocks.isEmpty()) {
-                    String keyType = callback.split("/")[0];
                     cardStock = cardStocks.stream()
-                            .filter(cardStockDto -> Objects.equals(cardStockDto.getKeyType(), keyType))
+                            .filter(cardStockDto -> Objects.equals(cardStockDto.getCardStockName(), callback))
                             .findFirst();
                 }
 
@@ -123,7 +123,8 @@ public class MenuService { //TODO: Add interface
                 }
 
                 if (card.isPresent()) {
-                    menuFactory = new CardMenu(userState.getCardStockId(), card.get());
+                    int maxPoint = storageResource.getCardStockById(userState.getCardStockId()).getMaxPoint();
+                    menuFactory = new CardMenu(userState.getCardStockId(), maxPoint, card.get());
                     userStateService.updateUserStateByMenu(userStateId, menuFactory);
                 }
                 break;

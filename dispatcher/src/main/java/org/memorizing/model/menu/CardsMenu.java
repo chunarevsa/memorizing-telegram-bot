@@ -50,7 +50,7 @@ public class CardsMenu extends AMenu {
     }
 
     @Override
-    public String getName() {
-        return "Cards menu";
+    public String getTitle() {
+        return "*Cards menu*";
     }
 }

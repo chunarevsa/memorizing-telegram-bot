@@ -35,13 +35,13 @@ public class CardStockUpdateMenu extends AMenu {
                 "\n" +
                 "#update-CardStock\n" +
                 "{\n" +
-                "  \"cardStockName\": \""+cardStock.getCardStockName()+"\",\n" +
-                "  \"description\": \""+cardStock.getDescription()+"\",\n" +
-                "  \"keyType\": \""+cardStock.getKeyType()+"\",\n" +
-                "  \"valueType\": \""+cardStock.getValueType()+"\",\n" +
-                "  \"maxPoint\": "+cardStock.getMaxPoint()+",\n" +
-                "  \"testModeIsAvailable\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
-                "  \"onlyFromKey\": \""+cardStock.getOnlyFromKey()+"\"\n" +
+                "  \"`cardStockName`\":       \""+cardStock.getCardStockName()+"\",\n" +
+                "  \"`description`\":                 \""+cardStock.getDescription()+"\",\n" +
+                "  \"`keyType`\":                      \""+cardStock.getKeyType()+"\",\n" +
+                "  \"`valueType`\":                   \""+cardStock.getValueType()+"\",\n" +
+                "  \"`maxPoint`\":                     "+cardStock.getMaxPoint()+",\n" +
+                "  \"`testModeIsAvailable`\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
+                "  \"`onlyFromKey`\":                 \""+cardStock.getOnlyFromKey()+"\"\n" +
                 "}\n" +
                 "\n";
 
@@ -49,25 +49,25 @@ public class CardStockUpdateMenu extends AMenu {
 
     @Override
     public String getText() {
-        return "Send me information about your new card stock.\n" +
-                "if you need descriptions of these, push the button `info`\n" +
-                "Please use this format:\n" +
-                "\n" +
-                "#update-CardStock\n" +
+        return "#update-CardStock\n" +
                 "{\n" +
-                "  \"cardStockName\": \""+cardStock.getCardStockName()+"\",\n" +
-                "  \"description\": \""+cardStock.getDescription()+"\",\n" +
-                "  \"keyType\": \""+cardStock.getKeyType()+"\",\n" +
-                "  \"valueType\": \""+cardStock.getValueType()+"\",\n" +
-                "  \"maxPoint\": "+cardStock.getMaxPoint()+",\n" +
-                "  \"testModeIsAvailable\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
-                "  \"onlyFromKey\": \""+cardStock.getOnlyFromKey()+"\"\n" +
+                "  \"`cardStockName`\":       \""+cardStock.getCardStockName()+"\",\n" +
+                "  \"`description`\":                 \""+cardStock.getDescription()+"\",\n" +
+                "  \"`keyType`\":                      \""+cardStock.getKeyType()+"\",\n" +
+                "  \"`valueType`\":                   \""+cardStock.getValueType()+"\",\n" +
+                "  \"`maxPoint`\":                     "+cardStock.getMaxPoint()+",\n" +
+                "  \"`testModeIsAvailable`\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
+                "  \"`onlyFromKey`\":                \""+cardStock.getOnlyFromKey()+"\"\n" +
                 "}\n" +
                 "\n";
     }
 
     @Override
-    public String getName() {
-        return "Card stock add menu";
+    public String getTitle() {
+        return "*Card stock add menu*\n" +
+                "Send me information about your new card stock.\n" +
+                "if you need descriptions of these, push the button `info`\n" +
+                "Please use this format:\n" +
+                "\n";
     }
 }
