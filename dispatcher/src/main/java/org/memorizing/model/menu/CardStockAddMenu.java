@@ -39,13 +39,13 @@ public class CardStockAddMenu extends AMenu {
                 "\n" +
                 "#add-CardStock\n"+
                 "{\n" +
-                "  \"`cardStockName`\":       \"Deutch words\",\n" +
-                "  \"`description`\":                 \"all words\",\n" +
-                "  \"`keyType`\":                      \"Deutch\",\n" +
-                "  \"`valueType`\":                   \"Russian\",\n" +
-                "  \"`maxPoint`\":                    5,\n" +
+                "  \"`cardStockName`\":             \"Deutch words\",\n" +
+                "  \"`description`\":                   \"all words\",\n" +
+                "  \"`keyType`\":                            \"Deutch\",\n" +
+                "  \"`valueType`\":                         \"Russian\",\n" +
+                "  \"`maxPoint`\":                           5,\n" +
                 "  \"`testModeIsAvailable`\": \"true\",\n" +
-                "  \"`onlyFromKey`\":               \"false\"\n" +
+                "  \"`onlyFromKey`\":                 \"false\"\n" +
                 "}\n" +
                 "\n";
     }
@@ -54,13 +54,13 @@ public class CardStockAddMenu extends AMenu {
     public String getText() {
         return "#add-CardStock\n"+
                 "{\n" +
-                "  \"`cardStockName`\":       \"IT term\",\n" +
-                "  \"`description`\":                 \"Only it words for interview\",\n" +
-                "  \"`keyType`\":                      \"ENG\",\n" +
-                "  \"`valueType`\":                   \"RUS\",\n" +
-                "  \"`maxPoint`\":                    5,\n" +
+                "  \"`cardStockName`\":             \"IT term\",\n" +
+                "  \"`description`\":                   \"Only it words for interview\",\n" +
+                "  \"`keyType`\":                            \"ENG\",\n" +
+                "  \"`valueType`\":                         \"RUS\",\n" +
+                "  \"`maxPoint`\":                           5,\n" +
                 "  \"`testModeIsAvailable`\": \"true\",\n" +
-                "  \"`onlyFromKey`\":                \"false\"\n" +
+                "  \"`onlyFromKey`\":                     \"false\"\n" +
                 "}\n" +
                 "\n";
     }

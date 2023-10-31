@@ -18,6 +18,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -99,17 +101,17 @@ public class TelegramBot extends TelegramLongPollingBot {
                     executeSending(chatId, menu, SUCCESSFULLY);
                 } else if (data.startsWith("#")) {
                     // TODO: for test
-                    if(data.startsWith("#test")) {
+                    if (data.startsWith("#test")) {
                         startEcho(chatId, data);
                         return;
                     }
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholder(chatId, data);
-                    // send status
-                    execute(SendMessage.builder()
-                            .chatId(chatId)
-                            .text(resp.getStatus().toString())
-                            .build());
+//                    // send status
+//                    execute(SendMessage.builder()
+//                            .chatId(chatId)
+//                            .text(resp.getStatus().toString())
+//                            .build());
                     // back to last menu
                     executeSending(chatId, resp.getMenu(), resp.getStatus());
                 } else {
@@ -146,6 +148,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                     .build());
             return;
         }
+        if (status == SUCCESSFULLY) {
+            execute(SendMessage.builder()
+                    .chatId(chatId)
+                    .text(SUCCESSFULLY.toString())
+                    .build());
+        }
+
 
         SendMessage messageWithKeyboard = SendMessage.builder()
                 .chatId(chatId)
@@ -164,36 +173,74 @@ public class TelegramBot extends TelegramLongPollingBot {
         execute(messageWithInlineKeyboard);
     }
 
+    // For testing "Styled" text
     private void startEcho(Long chatId, String data) throws TelegramApiException {
         String testString = data.substring("#test ".length());
-        log.debug("testString: "+ testString);
+        log.debug("testString: " + testString);
+        String tempVar = "\\uD83D\uDD18▪️▫️\uD83D\uDD39✅❗️❌\uD83D\uDC49\uD83E\uDEE5";
 
-        SendMessage message = SendMessage.builder()
+        SendMessage sendMessage = SendMessage.builder()
                 .chatId(chatId)
                 .replyMarkup(null)
-                .text("Markdown: " + testString)
+                .text(testString)
                 .build();
-        message.enableMarkdown(true);
-        execute(message);
+        execute(sendMessage);
 
-        String innerText = "|innerText|";
-        message = SendMessage.builder()
-                .chatId(chatId)
-                .replyMarkup(null)
-                .text("Markdown" + innerText)
-                .build();
-        message.enableMarkdown(true);
-        execute(message);
+        List<String> messages = new ArrayList<>();
+        messages.add("Some text with Styled text");
 
-        String innerText2 = "||innerText||";
-        message = SendMessage.builder()
-                .chatId(chatId)
-                .replyMarkup(null)
-                .text("MarkdownV2: " + innerText2)
-                .build();
-        message.enableMarkdownV2(true);
-        execute(message);
+        messages.forEach(message -> {
+            try {
+                sendMessage.setText(message + " MD");
+                sendMessage.enableMarkdownV2(false);
+                sendMessage.enableMarkdown(true);
+                execute(sendMessage);
+            } catch (Exception e) {
+                log.debug("exception MD with message:" + message);
+            }
 
+            try {
+                sendMessage.setText(message + " MDV2");
+                sendMessage.enableMarkdown(false);
+                sendMessage.enableMarkdownV2(true);
+                execute(sendMessage);
+            } catch (Exception e) {
+                log.debug("exception MDV2 with message:" + message);
+            }
+
+        });
+
+        List<String> trueMDList = new ArrayList<>();
+        trueMDList.add("`Inner text`");
+        trueMDList.add("*innerText*");
+        trueMDList.add("#Inner text");
+        trueMDList.add("_Inner text_");
+        trueMDList.forEach(message -> {
+            try {
+                sendMessage.setText(message + " MD");
+                sendMessage.enableMarkdownV2(false);
+                sendMessage.enableMarkdown(true);
+                execute(sendMessage);
+            } catch (Exception e) {
+                log.debug("exception MD with message:" + message);
+            }
+        });
+
+        List<String> trueMDV2List = new ArrayList<>();
+        trueMDV2List.add(">innerText ");
+        trueMDV2List.add("* innerText *");
+        trueMDV2List.add("_Inner text_");
+        trueMDV2List.add("~Inner text~");
+        trueMDV2List.add("__Inner text__");
+        trueMDV2List.forEach(message -> {
+            try {
+                sendMessage.setText(message + " MDV2");
+                sendMessage.enableMarkdown(false);
+                sendMessage.enableMarkdownV2(true);
+                execute(sendMessage);
+            } catch (Exception e) {
+                log.debug("exception MDV2 with message:" + message);
+            }
+        });
     }
-
 }
