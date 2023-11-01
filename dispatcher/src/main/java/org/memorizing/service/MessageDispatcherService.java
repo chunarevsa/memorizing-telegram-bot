@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.log4j.Logger;
 import org.memorizing.entity.User;
 import org.memorizing.entity.UserState;
-import org.memorizing.model.Constants;
+import org.memorizing.model.ResponseStatus;
 import org.memorizing.model.menu.EMenu;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import java.net.ProtocolException;
 import java.util.List;
 
-import static org.memorizing.model.Constants.*;
+import static org.memorizing.model.ResponseStatus.*;
 
 @Service
 public class MessageDispatcherService {
@@ -45,7 +45,7 @@ public class MessageDispatcherService {
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
         MenuFactory menu = null;
-        Constants status = null;
+        ResponseStatus status = null;
 
         switch (messageText) {
             case "info":
@@ -105,7 +105,7 @@ public class MessageDispatcherService {
         User user = usersRepo.findByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
-        Constants status;
+        ResponseStatus status;
 
         MenuFactory menu;
 
@@ -149,9 +149,15 @@ public class MessageDispatcherService {
      */
     public SendMessage getWelcomeMessage(Long chatId, String name) {
         log.debug("getWelcomeMessage. req:" + chatId);
+        String welcomeMessage = "Hi, {name}!\n" +
+                "This is a Memorizing bot.\n" +
+                "This service help you with memorizing any items.\n" +
+                "Please report bugs to @chunarevsea\n";
+
+
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(WELCOME_MESSAGE.toString().replaceAll("\\{name}", name))
+                .text(welcomeMessage.replaceAll("\\{name}", name))
                 .build();
     }
 
@@ -192,7 +198,7 @@ public class MessageDispatcherService {
     }
 
 
-    private Constants executeRequest(String entity, String method, String body, UserState userState) {
+    private ResponseStatus executeRequest(String entity, String method, String body, UserState userState) {
         log.debug("executeRequest. req:" + entity + ", " + method + ", " + body + ", " + userState);
         IMappable iMappable;
 

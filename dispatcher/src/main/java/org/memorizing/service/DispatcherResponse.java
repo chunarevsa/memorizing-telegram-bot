@@ -1,13 +1,13 @@
 package org.memorizing.service;
 
-import org.memorizing.model.Constants;
+import org.memorizing.model.ResponseStatus;
 import org.memorizing.model.menu.MenuFactory;
 
 public class DispatcherResponse {
     private MenuFactory menu;
-    private Constants status;
+    private ResponseStatus status;
 
-    public DispatcherResponse(MenuFactory menu, Constants status) {
+    public DispatcherResponse(MenuFactory menu, ResponseStatus status) {
         this.menu = menu;
         this.status = status;
     }
@@ -20,11 +20,11 @@ public class DispatcherResponse {
         this.menu = menu;
     }
 
-    public Constants getStatus() {
+    public ResponseStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Constants status) {
+    public void setStatus(ResponseStatus status) {
         this.status = status;
     }
 }

@@ -1,7 +1,7 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
-import org.memorizing.model.Constants;
+import org.memorizing.model.ResponseStatus;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.UserResource;
@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.memorizing.model.Constants.BAD_REQUEST;
-import static org.memorizing.model.Constants.SUCCESSFULLY;
+import static org.memorizing.model.ResponseStatus.BAD_REQUEST;
+import static org.memorizing.model.ResponseStatus.SUCCESSFULLY;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -107,12 +107,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                     }
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholder(chatId, data);
-//                    // send status
-//                    execute(SendMessage.builder()
-//                            .chatId(chatId)
-//                            .text(resp.getStatus().toString())
-//                            .build());
-                    // back to last menu
+                    if (resp.getStatus() == SUCCESSFULLY) {
+                        execute(SendMessage.builder()
+                                .chatId(chatId)
+                                .text(SUCCESSFULLY.toString())
+                                .build());
+                    }
+
                     executeSending(chatId, resp.getMenu(), resp.getStatus());
                 } else {
                     DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
@@ -133,7 +134,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void executeSending(Long chatId, MenuFactory menu, Constants status) throws TelegramApiException {
+    private void executeSending(Long chatId, MenuFactory menu, ResponseStatus status) throws TelegramApiException {
         if (status != null && status != SUCCESSFULLY) {
             execute(SendMessage.builder()
                     .chatId(chatId)
@@ -148,13 +149,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                     .build());
             return;
         }
-        if (status == SUCCESSFULLY) {
-            execute(SendMessage.builder()
-                    .chatId(chatId)
-                    .text(SUCCESSFULLY.toString())
-                    .build());
-        }
-
 
         SendMessage messageWithKeyboard = SendMessage.builder()
                 .chatId(chatId)

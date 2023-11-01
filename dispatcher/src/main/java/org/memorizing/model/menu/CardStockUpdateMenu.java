@@ -35,11 +35,11 @@ public class CardStockUpdateMenu extends AMenu {
                 "\n" +
                 "#update-CardStock\n" +
                 "{\n" +
-                "  \"`cardStockName`\":       \""+cardStock.getCardStockName()+"\",\n" +
-                "  \"`description`\":                 \""+cardStock.getDescription()+"\",\n" +
-                "  \"`keyType`\":                      \""+cardStock.getKeyType()+"\",\n" +
-                "  \"`valueType`\":                   \""+cardStock.getValueType()+"\",\n" +
-                "  \"`maxPoint`\":                     "+cardStock.getMaxPoint()+",\n" +
+                "  \"`cardStockName`\":             \""+cardStock.getCardStockName()+"\",\n" +
+                "  \"`description`\":                   \""+cardStock.getDescription()+"\",\n" +
+                "  \"`keyType`\":                            \""+cardStock.getKeyType()+"\",\n" +
+                "  \"`valueType`\":                         \""+cardStock.getValueType()+"\",\n" +
+                "  \"`maxPoint`\":                           "+cardStock.getMaxPoint()+",\n" +
                 "  \"`testModeIsAvailable`\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
                 "  \"`onlyFromKey`\":                 \""+cardStock.getOnlyFromKey()+"\"\n" +
                 "}\n" +
@@ -51,13 +51,13 @@ public class CardStockUpdateMenu extends AMenu {
     public String getText() {
         return "#update-CardStock\n" +
                 "{\n" +
-                "  \"`cardStockName`\":       \""+cardStock.getCardStockName()+"\",\n" +
-                "  \"`description`\":                 \""+cardStock.getDescription()+"\",\n" +
-                "  \"`keyType`\":                      \""+cardStock.getKeyType()+"\",\n" +
-                "  \"`valueType`\":                   \""+cardStock.getValueType()+"\",\n" +
-                "  \"`maxPoint`\":                     "+cardStock.getMaxPoint()+",\n" +
+                "  \"`cardStockName`\":             \""+cardStock.getCardStockName()+"\",\n" +
+                "  \"`description`\":                   \""+cardStock.getDescription()+"\",\n" +
+                "  \"`keyType`\":                            \""+cardStock.getKeyType()+"\",\n" +
+                "  \"`valueType`\":                         \""+cardStock.getValueType()+"\",\n" +
+                "  \"`maxPoint`\":                           "+cardStock.getMaxPoint()+",\n" +
                 "  \"`testModeIsAvailable`\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
-                "  \"`onlyFromKey`\":                \""+cardStock.getOnlyFromKey()+"\"\n" +
+                "  \"`onlyFromKey`\":                 \""+cardStock.getOnlyFromKey()+"\"\n" +
                 "}\n" +
                 "\n";
     }

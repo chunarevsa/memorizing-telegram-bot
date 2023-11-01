@@ -26,8 +26,8 @@ public class CardAddMenu extends AMenu {
     public String getText() {
         return "#add-Card\n"+
                 "{\n" +
-                "  \"`cardKey`\":     \"provide\",\n" +
-                "  \"`cardValue`\":    \"предоставлять\"\n" +
+                "  \"`cardKey`\":       \"provide\",\n" +
+                "  \"`cardValue`\":     \"предоставлять\"\n" +
                 "}\n" +
                 "\n";
     }
