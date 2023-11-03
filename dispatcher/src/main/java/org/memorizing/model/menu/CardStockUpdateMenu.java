@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 public class CardStockUpdateMenu extends AMenu {
 
     private final CardStockDto cardStock;
+
     public CardStockUpdateMenu(CardStockDto oldCardStock) {
         this.cardStock = oldCardStock;
     }
@@ -29,21 +30,18 @@ public class CardStockUpdateMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Copy text start with `#` and edit fields that you want:\n" +
-                "Send all fields, even if they haven't changed:\n" +
-                "Please use this format:\n" +
+        return "\n" +
+                "\"`cardStockName`\": Name will be unique for your list.\n" +
+                "\"`description`\": It need for you. I think, you manage it\n" +
+                "\"`keyType`\":\"English word\", \"Interview question\" etc.\n" +
+                "\"`valueType`\": What do you want to learn. \"Russian translation\", \"My answer\" etc\n" +
+                "\"`maxPoint`\": How many correct answers do you need before the card is no longer shown (status = COMPLETED)\n" +
+                "\"`testModeIsAvailable`\": Can you type entirely card value? If need it set it true \n" +
+                "\"`onlyFromKey`\": Do you need backward submode? It means, you have to remember key by value.\n " +
+                "\"English word\" by \"Russian translation\" is acceptable situation. \n" +
+                "But \"Interview question\" by \"My answer\" is bad approach. You should set it `false`\n" +
                 "\n" +
-                "#update-CardStock\n" +
-                "{\n" +
-                "  \"`cardStockName`\":             \""+cardStock.getCardStockName()+"\",\n" +
-                "  \"`description`\":                   \""+cardStock.getDescription()+"\",\n" +
-                "  \"`keyType`\":                            \""+cardStock.getKeyType()+"\",\n" +
-                "  \"`valueType`\":                         \""+cardStock.getValueType()+"\",\n" +
-                "  \"`maxPoint`\":                           "+cardStock.getMaxPoint()+",\n" +
-                "  \"`testModeIsAvailable`\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
-                "  \"`onlyFromKey`\":                 \""+cardStock.getOnlyFromKey()+"\"\n" +
-                "}\n" +
-                "\n";
+                "You can read more information by /howItWorks command and /info in testing menu";
 
     }
 
@@ -51,13 +49,13 @@ public class CardStockUpdateMenu extends AMenu {
     public String getText() {
         return "#update-CardStock\n" +
                 "{\n" +
-                "  \"`cardStockName`\":             \""+cardStock.getCardStockName()+"\",\n" +
-                "  \"`description`\":                   \""+cardStock.getDescription()+"\",\n" +
-                "  \"`keyType`\":                            \""+cardStock.getKeyType()+"\",\n" +
-                "  \"`valueType`\":                         \""+cardStock.getValueType()+"\",\n" +
-                "  \"`maxPoint`\":                           "+cardStock.getMaxPoint()+",\n" +
-                "  \"`testModeIsAvailable`\": \""+cardStock.getTestModeIsAvailable()+"\",\n" +
-                "  \"`onlyFromKey`\":                 \""+cardStock.getOnlyFromKey()+"\"\n" +
+                "  \"`cardStockName`\":             \"" + cardStock.getCardStockName() + "\",\n" +
+                "  \"`description`\":                   \"" + cardStock.getDescription() + "\",\n" +
+                "  \"`keyType`\":                            \"" + cardStock.getKeyType() + "\",\n" +
+                "  \"`valueType`\":                         \"" + cardStock.getValueType() + "\",\n" +
+                "  \"`maxPoint`\":                           " + cardStock.getMaxPoint() + ",\n" +
+                "  \"`testModeIsAvailable`\": \"" + cardStock.getTestModeIsAvailable() + "\",\n" +
+                "  \"`onlyFromKey`\":                 \"" + cardStock.getOnlyFromKey() + "\"\n" +
                 "}\n" +
                 "\n";
     }
@@ -66,7 +64,7 @@ public class CardStockUpdateMenu extends AMenu {
     public String getTitle() {
         return "*Card stock add menu*\n" +
                 "Send me information about your new card stock.\n" +
-                "if you need descriptions of these, push the button `info`\n" +
+                "if you need descriptions of these, push the button /info/\n" +
                 "Please use this format:\n" +
                 "\n";
     }

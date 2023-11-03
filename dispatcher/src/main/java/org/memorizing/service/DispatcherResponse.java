@@ -1,13 +1,13 @@
 package org.memorizing.service;
 
-import org.memorizing.model.ResponseStatus;
+import org.memorizing.model.RegularMessages;
 import org.memorizing.model.menu.MenuFactory;
 
 public class DispatcherResponse {
     private MenuFactory menu;
-    private ResponseStatus status;
+    private RegularMessages status;
 
-    public DispatcherResponse(MenuFactory menu, ResponseStatus status) {
+    public DispatcherResponse(MenuFactory menu, RegularMessages status) {
         this.menu = menu;
         this.status = status;
     }
@@ -20,11 +20,11 @@ public class DispatcherResponse {
         this.menu = menu;
     }
 
-    public ResponseStatus getStatus() {
+    public RegularMessages getStatus() {
         return status;
     }
 
-    public void setStatus(ResponseStatus status) {
+    public void setStatus(RegularMessages status) {
         this.status = status;
     }
 }

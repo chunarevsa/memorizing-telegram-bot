@@ -1,7 +1,7 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
-import org.memorizing.model.ResponseStatus;
+import org.memorizing.model.RegularMessages;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.UserResource;
@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.memorizing.model.ResponseStatus.BAD_REQUEST;
-import static org.memorizing.model.ResponseStatus.SUCCESSFULLY;
+import static org.memorizing.model.RegularMessages.*;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -96,7 +95,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                     messageDispatcherService.registerIfAbsent(chatId, userName);
                     users.put(chatId, LocalDate.now());
 
-                    execute(messageDispatcherService.getWelcomeMessage(chatId, userName));
+                    // Send welcome message
+                    SendMessage welcomeMessage = SendMessage.builder()
+                            .chatId(chatId)
+                            .text((WELCOME + HOW_IT_WORKS.toString()).replaceAll("\\{name}", userName))
+                            .build();
+                    welcomeMessage.enableMarkdown(true);
+                    execute(welcomeMessage);
+
                     menu = messageDispatcherService.getFirstMenu(chatId);
                     executeSending(chatId, menu, SUCCESSFULLY);
                 } else if (data.startsWith("#")) {
@@ -118,7 +124,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 } else {
                     DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
 
-                    if (data.equals("info") && resp.getMenu() != null) {
+                    if ((data.equals("info") || data.equals("/info")) && resp.getMenu() != null) {
                         SendMessage infoText = SendMessage.builder()
                                 .chatId(chatId)
                                 .text(resp.getMenu().getInfoText())
@@ -126,7 +132,26 @@ public class TelegramBot extends TelegramLongPollingBot {
                         infoText.enableMarkdown(true);
                         // send only info text
                         execute(infoText);
-                    } else executeSending(chatId, resp.getMenu(), resp.getStatus());
+                        return;
+                    } else if ((data.equals("howitworks") || data.equals("/howitworks")) && resp.getMenu() != null) {
+                        SendMessage helpText = SendMessage.builder()
+                                .chatId(chatId)
+                                .text(HOW_IT_WORKS.toString())
+                                .build();
+                        helpText.enableMarkdown(true);
+                        // Send help text and current menu
+                        execute(helpText);
+                    } else if ((data.equals("help") || data.equals("/help")) && resp.getMenu() != null) {
+                        SendMessage helpText = SendMessage.builder()
+                                .chatId(chatId)
+                                .text(HELP.toString())
+                                .build();
+                        helpText.enableMarkdown(true);
+                        // Send help text and current menu
+                        execute(helpText);
+                    }
+
+                    executeSending(chatId, resp.getMenu(), resp.getStatus());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -134,7 +159,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void executeSending(Long chatId, MenuFactory menu, ResponseStatus status) throws TelegramApiException {
+    private void executeSending(Long chatId, MenuFactory menu, RegularMessages status) throws TelegramApiException {
         if (status != null && status != SUCCESSFULLY) {
             execute(SendMessage.builder()
                     .chatId(chatId)

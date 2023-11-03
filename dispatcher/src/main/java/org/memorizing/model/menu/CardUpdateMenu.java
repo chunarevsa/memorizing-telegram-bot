@@ -54,7 +54,7 @@ public class CardUpdateMenu extends AMenu {
     public String getTitle() {
         return "*Card add menu*\n"+
                 "Send me information about your new card stock.\n" +
-                "if you need descriptions these, push the button `info`\n" +
+                "if you need descriptions these, push the button /info\n" +
                 "Please use this format:\n" +
                 "\n";
     }

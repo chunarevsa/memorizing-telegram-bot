@@ -42,10 +42,16 @@ public class CardMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Statuses\n" +
-                "`HARD` status means that your last answer was incorrect\n"+
-                "`NORMAL` status you didn't make mistakes \n"+
-                "`COMPLETED` status means that you didn't make mistakes \n"
+        return "Card is your `key` and `value` in chosen card stock\n" +
+                "For example:\n" +
+                "Card \"memory\" have two properties\n" +
+                "`key` = \"memory\"\n" +
+                "`value` = \"память\"" +
+                "\n" +
+                "Statuses\n" +
+                "▪ `HARD` status means that your last answer was incorrect\n"+
+                "▪ `NORMAL` status you didn't make mistakes \n"+
+                "▪ `COMPLETED` status means that you didn't make mistakes \n"
                 +maxCardStockPoint+" times (`max point` in this card stock) and you're good!\n"+
                 "This card won't show you in test mode\n"+
                 "If you have `HARD` status in this card, Let's start test";
@@ -55,11 +61,12 @@ public class CardMenu extends AMenu {
     public String getText() {
         String backwardString = "";
         if (!Objects.equals(card.getStatusToKey(), "NO_SUPPORTED")) {
-            backwardString = "backward (value->key): `" + card.getStatusToKey() + "` (" + card.getPointToKey() + ")\n";
+            backwardString = "▪ backward (value->key): `" + card.getStatusToKey() + "` (" + card.getPointToKey() + ")\n";
         }
 
         return card.getCardKey() + " = " + card.getCardValue() + "\n" +
-                "forward (key->value): `" + card.getStatusFromKey() + "` (" + card.getPointFromKey() + ")\n" +
+                "\n" +
+                "▪ forward (key->value): `" + card.getStatusFromKey() + "` (" + card.getPointFromKey() + ")\n" +
                 backwardString +
                 "\n";
 

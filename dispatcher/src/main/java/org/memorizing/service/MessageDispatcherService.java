@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.log4j.Logger;
 import org.memorizing.entity.User;
 import org.memorizing.entity.UserState;
-import org.memorizing.model.ResponseStatus;
+import org.memorizing.model.RegularMessages;
 import org.memorizing.model.menu.EMenu;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import java.net.ProtocolException;
 import java.util.List;
 
-import static org.memorizing.model.ResponseStatus.*;
+import static org.memorizing.model.RegularMessages.*;
 
 @Service
 public class MessageDispatcherService {
@@ -45,17 +45,22 @@ public class MessageDispatcherService {
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
         MenuFactory menu = null;
-        ResponseStatus status = null;
+        RegularMessages status = null;
 
         switch (messageText) {
             case "info":
             case "/info":
+            case "help":
+            case "/help":
+            case "howitworks":
+            case "/howitworks":
                 menu = menuService.createMenu(storageId, userState.getId(), userState.getCurrentMenu());
                 break;
             case "back":
             case "/back":
                 menu = menuService.createLastMenu(storageId, userState.getId(), userState.getLastMenu());
                 break;
+
             case "add card stock":
                 menu = menuService.createMenu(storageId, userState.getId(), EMenu.CARD_STOCK_ADD);
                 break;
@@ -105,7 +110,7 @@ public class MessageDispatcherService {
         User user = usersRepo.findByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
-        ResponseStatus status;
+        RegularMessages status;
 
         MenuFactory menu;
 
@@ -140,25 +145,6 @@ public class MessageDispatcherService {
 
         menu = menuService.createLastMenu(storageId, userState.getId(), userState.getLastMenu());
         return new DispatcherResponse(menu, status);
-    }
-
-    /**
-     * @param chatId
-     * @param name
-     * @return
-     */
-    public SendMessage getWelcomeMessage(Long chatId, String name) {
-        log.debug("getWelcomeMessage. req:" + chatId);
-        String welcomeMessage = "Hi, {name}!\n" +
-                "This is a Memorizing bot.\n" +
-                "This service help you with memorizing any items.\n" +
-                "Please report bugs to @chunarevsea\n";
-
-
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text(welcomeMessage.replaceAll("\\{name}", name))
-                .build();
     }
 
     public MenuFactory getFirstMenu(Long chatId) throws Exception {
@@ -198,7 +184,7 @@ public class MessageDispatcherService {
     }
 
 
-    private ResponseStatus executeRequest(String entity, String method, String body, UserState userState) {
+    private RegularMessages executeRequest(String entity, String method, String body, UserState userState) {
         log.debug("executeRequest. req:" + entity + ", " + method + ", " + body + ", " + userState);
         IMappable iMappable;
 

@@ -19,7 +19,15 @@ public class CardAddMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Some info text";
+        return "Card stock is a card storage with one topic.\n" +
+                "For example:\n" +
+                "The card stock \"English words\" will have\n" +
+                "keyType = \"English word\"\n" +
+                "valueType = \"Russian translations\"\n" +
+                "\n" +
+                "We can add card\n" +
+                "key = \"memory\"\n" +
+                "value = \"память\"";
     }
 
     @Override
@@ -36,7 +44,7 @@ public class CardAddMenu extends AMenu {
     public String getTitle() {
         return "*Card add menu*\n" +
                 "Send me information about your new card stock.\n" +
-                "if you need descriptions these, push the button `info`\n" +
+                "if you need descriptions these, push the button /info\n" +
                 "Please use this format:\n" +
                 "\n";
     }

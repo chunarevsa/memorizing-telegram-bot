@@ -36,7 +36,26 @@ public class CardStocksMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Some info text for Card Stocks Menu";
+        return "Card stock is a card storage with one topic.\n" +
+                "For example:\n" +
+                "The card stock \"English words\"  will have\n" +
+                "`keyType` = \"English word\"\n" +
+                "`valueType` = \"Russian translations\"\n" +
+                "\n" +
+                "We can add card\n" +
+                "`key` = \"memory\"\n" +
+                "`value` = \"память\"\n" +
+                "\n" +
+                "The card stock \"Answers for interview questions\"  will have\n" +
+                "`keyType` = \"Question\"\n" +
+                "`valueType` = \"Answer\"\n" +
+                "\n" +
+                "We can add card\n" +
+                "`key` = \"Why do you leave your last job?\"\n" +
+                "`value` = \"Your some interesting answer \"\n" +
+                "etc.\n" +
+                "\n" +
+                "If you want to manage a card stock, Just open it.";
     }
 
     @Override

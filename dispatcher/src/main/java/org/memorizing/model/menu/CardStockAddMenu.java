@@ -19,35 +19,19 @@ public class CardStockAddMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "For example:\n" +
-                "Our native language is Russian. We want to learn English.\n" +
-                "We should add a new card stock `ENGLISH/RUSSIAN`.\n" +
-                "It means, we have to add english words (keys) and these translations (values)\n" +
+        return "\n" +
+                "\"`cardStockName`\": Name will be unique for your list.\n" +
+                "\"`description`\": It need for you. I think, you manage it\n" +
+                "\"`keyType`\":\"English word\", \"Interview question\" etc.\n" +
+                "\"`valueType`\": What do you want to learn. \"Russian translation\", \"My answer\" etc\n" +
+                "\"`maxPoint`\": How many correct answers do you need before the card is no longer shown (status = COMPLETED)\n" +
+                "\"`testModeIsAvailable`\": Can you type entirely card value? If need it set it true \n" +
+                "\"`onlyFromKey`\": Do you need backward submode? It means, you have to remember key by value.\n " +
+                "\"English word\" by \"Russian translation\" is acceptable situation. \n" +
+                "But \"Interview question\" by \"My answer\" is bad approach. You should set it `false`\n" +
                 "\n" +
-                "We also want to have test mode. In this mode, you will get only english word (key) and have to type your answer\n" +
-                "This mode has name `Form key` because we try to remember a translate (value) by a word (key) -> `From key`\n" +
-                "If your answer will be correct your card increase a point `From key point` and your card status will become `NORMAL`\n" +
-                "If your answer won't be correct your card decrease a point `From key point` and your card status will become `HARD`\n" +
-                "Status NORMAL can have only positive numbers. Status HARD can have only negative numbers\n" +
-                "If you got a correct answer to card with HARD status (for example: From key point = -5) \n" +
-                "This card become `Normal` and will have `From key point` = 1. It works the other way, too.\n" +
-                "\n"+
-                "We also want to have inverse mode `From value` (remember a word (key) by a translate (value) you need to declare `only from key` = false\n" +
-                "You have to declare max point. When your card will have `From key point` equals this value Your card will become status `COMPLETE`\n" +
-                "This card won't show you again in this test mode. We recommend set this value from 4 to 8\n" +
-                "We need to send this message:\n" +
-                "\n" +
-                "#add-CardStock\n"+
-                "{\n" +
-                "  \"`cardStockName`\":             \"Deutch words\",\n" +
-                "  \"`description`\":                   \"all words\",\n" +
-                "  \"`keyType`\":                            \"Deutch\",\n" +
-                "  \"`valueType`\":                         \"Russian\",\n" +
-                "  \"`maxPoint`\":                           5,\n" +
-                "  \"`testModeIsAvailable`\": \"true\",\n" +
-                "  \"`onlyFromKey`\":                 \"false\"\n" +
-                "}\n" +
-                "\n";
+                "You can read more information by /howItWorks command and /info in testing menu";
+
     }
 
     @Override
@@ -69,7 +53,7 @@ public class CardStockAddMenu extends AMenu {
     public String getTitle() {
         return "*Card stock add menu*\n" +
                 "Send me information about your new card stock.\n" +
-                "if you need descriptions these, push the button `info`\n" +
+                "if you need descriptions these, push the button /info\n" +
                 "Please use this format:\n" +
                 "\n";
 
