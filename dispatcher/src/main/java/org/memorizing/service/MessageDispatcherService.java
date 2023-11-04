@@ -12,7 +12,6 @@ import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.UserResource;
 import org.memorizing.resource.cardApi.*;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.net.ProtocolException;
 import java.util.List;
@@ -54,35 +53,26 @@ public class MessageDispatcherService {
             case "/help":
             case "howitworks":
             case "/howitworks":
-                menu = menuService.createMenu(storageId, userState.getId(), userState.getCurrentMenu());
+                menu = menuService.createMenu(storageId, userState, userState.getCurrentMenu());
                 break;
             case "back":
             case "/back":
-                menu = menuService.createLastMenu(storageId, userState.getId(), userState.getLastMenu());
+                menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
                 break;
 
-            case "add card stock":
-                menu = menuService.createMenu(storageId, userState.getId(), EMenu.CARD_STOCK_ADD);
-                break;
-            case "update card stock":
-                menu = menuService.createMenu(storageId, userState.getId(), EMenu.CARD_STOCK_UPDATE);
-                break;
             case "delete card stock":
                 return getResponseByPlaceholder(chatId, "#delete-CardStock");
-            case "show cards":
-                menu = menuService.createMenu(storageId, userState.getId(), EMenu.CARDS);
-                break;
-            case "add card":
-                menu = menuService.createMenu(storageId, userState.getId(), EMenu.CARD_ADD);
-                break;
-            case "update card":
-                menu = menuService.createMenu(storageId, userState.getId(), EMenu.CARD_UPDATE);
-                break;
             case "delete card":
                 return getResponseByPlaceholder(chatId, "#delete-Card");
+
             default:
-                status = BAD_REQUEST;
-                break;
+                EMenu menuType = EMenu.getMenuByCallButton(messageText);
+                if (menuType != null) {
+                    menu = menuService.createMenu(storageId, userState, menuType);
+                } else {
+                    status = BAD_REQUEST;
+                    break;
+                }
         }
 
         if (menu == null && status == null) status = SOMETHING_WENT_WRONG;
@@ -100,8 +90,8 @@ public class MessageDispatcherService {
     public DispatcherResponse getResponseByCallback(Long chatId, String messageText) throws Exception {
         log.debug("getResponseByCallback. req:" + chatId + ", " + messageText);
         User user = usersRepo.findByChatId(chatId);
-        UserState state = user.getUserState();
-        MenuFactory menu = menuService.createMenuByCallback(user.getStorageId(), state.getId(), state.getCurrentMenu(), messageText);
+        UserState userState = user.getUserState();
+        MenuFactory menu = menuService.createMenuByCallback(user.getStorageId(), userState, userState.getCurrentMenu(), messageText);
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 
@@ -115,7 +105,7 @@ public class MessageDispatcherService {
         MenuFactory menu;
 
         if (text.isBlank() || !text.startsWith("#") || !text.lines().findFirst().get().contains("-")) {
-            menu = menuService.createLastMenu(storageId, userState.getId(), userState.getLastMenu());
+            menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
             return new DispatcherResponse(menu, BAD_REQUEST);
         }
 
@@ -126,7 +116,7 @@ public class MessageDispatcherService {
             String body = null;
 
             if (!method.equals("add") && !method.equals("update") && !method.equals("delete")) {
-                menu = menuService.createLastMenu(storageId, userState.getId(), userState.getLastMenu());
+                menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
                 return new DispatcherResponse(menu, BAD_REQUEST);
             }
 
@@ -134,7 +124,7 @@ public class MessageDispatcherService {
                 body = text.substring(text.indexOf("{"))
                         .replace("\n", "")
                         .replace("*", "")
-                        .replace("`","");
+                        .replace("`", "");
             }
 
             status = executeRequest(entity, method, body, userState);
@@ -143,7 +133,7 @@ public class MessageDispatcherService {
             status = SOMETHING_WENT_WRONG;
         }
 
-        menu = menuService.createLastMenu(storageId, userState.getId(), userState.getLastMenu());
+        menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
         return new DispatcherResponse(menu, status);
     }
 
@@ -154,7 +144,7 @@ public class MessageDispatcherService {
 
         // TODO: Temp. Clear it after adding auth
         EMenu firstMenu = EMenu.CARD_STOCKS;
-        return menuService.createMenu(user.getStorageId(), state.getId(), firstMenu);
+        return menuService.createMenu(user.getStorageId(), state, firstMenu);
     }
 
     /**

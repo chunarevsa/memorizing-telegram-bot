@@ -2,8 +2,10 @@ package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.memorizing.model.menu.EMenu;
+import org.memorizing.utils.IntegerArrayConverter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class UserState {
@@ -17,6 +19,9 @@ public class UserState {
     private EMenu currentMenu;
     private Integer cardStockId;
     private Integer cardId;
+
+    @Convert(converter = IntegerArrayConverter.class)
+    private List<Integer> testUncompletedCardIds;
 
     public UserState() {
     }
@@ -66,6 +71,14 @@ public class UserState {
 
     public void setCardId(Integer cardId) {
         this.cardId = cardId;
+    }
+
+    public List<Integer> getTestUncompletedCardIds() {
+        return testUncompletedCardIds;
+    }
+
+    public void setTestUncompletedCardIds(List<Integer> testUncompletedCardIds3) {
+        this.testUncompletedCardIds = testUncompletedCardIds3;
     }
 
     @Override

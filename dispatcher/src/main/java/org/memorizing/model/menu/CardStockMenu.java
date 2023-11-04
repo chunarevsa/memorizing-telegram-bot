@@ -23,7 +23,7 @@ public class CardStockMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-//                {"X start studying"},
+                {"start studying"},
                 {"show cards"},
                 {"update card stock"},
                 {"delete card stock"},
