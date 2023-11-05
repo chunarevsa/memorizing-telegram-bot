@@ -35,8 +35,7 @@ public class CardMenu extends AMenu {
         return getKeyboardByButtons(new String[][]{
                 {"update card"},
                 {"delete card"},
-                {"info"},
-                {"back"},
+                {"info", "back"}
         });
     }
 

@@ -2,10 +2,13 @@ package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.memorizing.model.menu.EMenu;
-import org.memorizing.utils.IntegerArrayConverter;
+import org.memorizing.utils.StudyingStateConverter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class UserState {
@@ -20,8 +23,8 @@ public class UserState {
     private Integer cardStockId;
     private Integer cardId;
 
-    @Convert(converter = IntegerArrayConverter.class)
-    private List<Integer> testUncompletedCardIds;
+    @Convert(converter = StudyingStateConverter.class)
+    private Map<String, List<Integer>> studyingState = new HashMap<>();
 
     public UserState() {
     }
@@ -31,6 +34,17 @@ public class UserState {
         this.currentMenu = EMenu.MAIN;
         this.cardStockId = null;
         this.cardId = null;
+
+        studyingState.put("forward  testing mode", new ArrayList<>());
+        studyingState.put("backward testing mode", new ArrayList<>());
+        studyingState.put("forward  self-check mode", new ArrayList<>());
+        studyingState.put("backward self-check mode", new ArrayList<>());
+        studyingState.put("forward  memorizing mode", new ArrayList<>());
+        studyingState.put("backward memorizing mode", new ArrayList<>());
+    }
+
+    public EMenu getLastMenu() {
+        return this.currentMenu.getLastMenu();
     }
 
     public Integer getId() {
@@ -73,12 +87,16 @@ public class UserState {
         this.cardId = cardId;
     }
 
-    public List<Integer> getTestUncompletedCardIds() {
-        return testUncompletedCardIds;
+    public Map<String, List<Integer>> getStudyingState() {
+        return studyingState;
     }
 
-    public void setTestUncompletedCardIds(List<Integer> testUncompletedCardIds3) {
-        this.testUncompletedCardIds = testUncompletedCardIds3;
+    public void setStudyingState(Map<String, List<Integer>> map) {
+        this.studyingState = map;
+    }
+
+    public void updateStudyingStateIds(String mode, List<Integer> ids) {
+        this.studyingState.put(mode, ids);
     }
 
     @Override
@@ -89,9 +107,5 @@ public class UserState {
                 ", cardStockId=" + cardStockId +
                 ", cardId=" + cardId +
                 '}';
-    }
-
-    public EMenu getLastMenu() {
-        return this.currentMenu.getLastMenu();
     }
 }

@@ -14,6 +14,8 @@ public class UserStateService {
     }
 
     public void updateUserStateByMenu(UserState userState, MenuFactory menu) {
+        if (menu == null) return;
+
         userState.setCurrentMenu(menu.getCurrentMenu());
 
         if (menu instanceof CardStocksMenu) {
@@ -27,6 +29,7 @@ public class UserStateService {
 
         } else if (menu instanceof TestMenu) {
             TestMenu testMenu = (TestMenu) menu;
+            userState.updateStudyingStateIds(testMenu.getMode(), testMenu.getIds());
             userState.setCardId(null);
 
         } else if (menu instanceof CardsMenu) {

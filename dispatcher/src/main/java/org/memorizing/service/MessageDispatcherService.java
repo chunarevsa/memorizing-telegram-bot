@@ -87,7 +87,7 @@ public class MessageDispatcherService {
      * @return
      */
 
-    public DispatcherResponse getResponseByCallback(Long chatId, String messageText) throws Exception {
+    public DispatcherResponse getResponseByCallback(Long chatId, String messageText) {
         log.debug("getResponseByCallback. req:" + chatId + ", " + messageText);
         User user = usersRepo.findByChatId(chatId);
         UserState userState = user.getUserState();
@@ -95,7 +95,7 @@ public class MessageDispatcherService {
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 
-    public DispatcherResponse getResponseByPlaceholder(Long chatId, String text) throws Exception {
+    public DispatcherResponse getResponseByPlaceholder(Long chatId, String text) {
         log.debug("getResponseByPlaceholder req:" + chatId + ", " + text);
         User user = usersRepo.findByChatId(chatId);
         Integer storageId = user.getStorageId();
@@ -160,12 +160,12 @@ public class MessageDispatcherService {
 
             // TODO delete it after creating user-service
             Integer storageId;
-            StorageDto storage = storageResource.getStorageByUserId(Math.toIntExact(chatId));
+            StorageDto storage = storageResource.getStorageByUserId(chatId);
 
             if (storage != null) {
                 storageId = storage.getId();
             } else {
-                storageId = storageResource.createStorage(new StorageFieldsDto(Math.toIntExact(chatId), userName)).getId();
+                storageId = storageResource.createStorage(new StorageFieldsDto(chatId, userName)).getId();
             }
 
             User user = new User(chatId, userName, storageId);
@@ -246,4 +246,8 @@ public class MessageDispatcherService {
         return SUCCESSFULLY;
     }
 
+    public boolean isUserCurrentMenuStudying(Long chatId) {
+        EMenu currentMenu = usersRepo.findByChatId(chatId).getUserState().getCurrentMenu();
+        return EMenu.getOnlyStudyingMenu().stream().anyMatch(it -> it == currentMenu);
+    }
 }

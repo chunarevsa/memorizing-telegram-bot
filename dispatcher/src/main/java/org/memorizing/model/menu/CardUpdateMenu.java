@@ -23,8 +23,7 @@ public class CardUpdateMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"info"},
-                {"back"},
+                {"info", "back"}
         });
     }
 

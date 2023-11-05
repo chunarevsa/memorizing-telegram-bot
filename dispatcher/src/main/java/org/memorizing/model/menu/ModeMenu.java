@@ -1,8 +1,16 @@
 package org.memorizing.model.menu;
 
+import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class ModeMenu extends AMenu {
+
+    CardStockDto cardStock;
+
+    public ModeMenu(CardStockDto cardStock) {
+        this.cardStock = cardStock;
+    }
+
 
     @Override
     public EMenu getCurrentMenu() {
@@ -11,13 +19,32 @@ public class ModeMenu extends AMenu {
 
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
-        return getKeyboardByButtons(new String[][]{
-                {"start testing mode"},
-                {"start self-check mode"},
-                {"start memorizing mode"},
-                {"info"},
-                {"back"},
-        });
+        String[] testLine = null;
+        String[] selfCheckLine;
+        String[] memorizingLine;
+        String[] commonLine;
+
+        if (cardStock.getTestModeIsAvailable()) {
+            testLine = new String[]{"forward  testing mode"};
+            if (!cardStock.getOnlyFromKey()) {
+                testLine = new String[]{"forward  testing mode", "backward testing mode"};
+            }
+        }
+
+        if (!cardStock.getOnlyFromKey()) {
+            selfCheckLine = new String[]{"forward  self-check mode", "backward self-check mode"};
+        } else selfCheckLine = new String[]{"forward  self-check mode"};
+
+        if (!cardStock.getOnlyFromKey()) {
+            memorizingLine = new String[]{"forward  memorizing mode", "backward memorizing mode"};
+        } else memorizingLine = new String[]{"forward  memorizing mode"};
+
+        commonLine = new String[]{"info", "back"};
+
+        if (testLine == null) {
+            return getKeyboardByButtons(new String[][]{selfCheckLine, memorizingLine, commonLine});
+        } else return getKeyboardByButtons(new String[][]{testLine, selfCheckLine, memorizingLine, commonLine});
+
     }
 
     @Override
@@ -35,9 +62,9 @@ public class ModeMenu extends AMenu {
                 "f you need Backward mod, specify it when you create card stock or turn of it mode by updating card stock\n" +
                 "\n" +
                 "Whichever mode you choose, the status and amount of point will change.\n" +
-                "HARD status means that your last answer was incorrect\n"+
-                "NORMAL status you didn't make mistakes \n"+
-                "COMPLETED status means that you didn't make mistakes \n"+
+                "HARD status means that your last answer was incorrect\n" +
+                "NORMAL status you didn't make mistakes \n" +
+                "COMPLETED status means that you didn't make mistakes \n" +
                 "If your answer will be correct your card increase a point and your card status will become `NORMAL`\n" +
                 "If your answer won't be correct your card decrease a point  and your card status will become `HARD`\n" +
                 "Status NORMAL can have only positive numbers. Status HARD can have only negative numbers\n" +

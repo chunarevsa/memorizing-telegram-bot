@@ -14,7 +14,7 @@ public class CardWebClientBuilder {
     private static final String serviceName = "";
 
     // /storage
-    public StorageDto getStorageByUserId(Integer userId) {
+    public StorageDto getStorageByUserId(Long userId) {
         log.debug("getStorageByUserId with req: " + userId);
         try {
             StorageDto req = new StorageDto(null, userId, null);

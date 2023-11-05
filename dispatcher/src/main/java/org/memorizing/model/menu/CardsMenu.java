@@ -25,8 +25,7 @@ public class CardsMenu extends AMenu {
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
                 {"add card"},
-                {"info"},
-                {"back"}
+                {"info", "back"}
         });
     }
 

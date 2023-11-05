@@ -37,8 +37,7 @@ public class MenuService { //TODO: Add interface
                 if (cardStocks != null && !cardStocks.isEmpty()) {
                     cardStockTypes = new String[1][cardStocks.size()];
                     for (int i = 0; i < cardStocks.size(); i++) {
-                        CardStockDto cardStock = cardStocks.get(i);
-                        cardStockTypes[0][i] = cardStock.getCardStockName();
+                        cardStockTypes[0][i] = cardStocks.get(i).getCardStockName();
                     }
                 }
                 menuFactory = new CardStocksMenu(cardStockTypes);
@@ -47,33 +46,46 @@ public class MenuService { //TODO: Add interface
                 menuFactory = new CardStockAddMenu();
                 break;
             case CARD_STOCK:
-                CardStockDto cardStock = storageResource.getCardStockById(state.getCardStockId());
-                menuFactory = new CardStockMenu(cardStock);
+                menuFactory = new CardStockMenu(storageResource.getCardStockById(state.getCardStockId()));
                 break;
             case MODE:
-                menuFactory = new ModeMenu();
+                menuFactory = new ModeMenu(storageResource.getCardStockById(state.getCardStockId()));
                 break;
-            case TESTING:
-                if (state.getTestUncompletedCardIds() == null) {
+            case FORWARD_TESTING:
+            case BACKWARD_TESTING:
+                // TODO: add EMode
+                List<Integer> ids;
+                String mode;
+
+                if (menu == EMenu.FORWARD_TESTING) {
+                    mode = "forward  testing mode";
+                } else {
+                    mode = "backward testing mode";
+                }
+                ids = state.getStudyingState().get(mode);
+
+                if (ids.isEmpty()) {
                     // if it is the first iteration
                     List<CardDto> allCards = storageResource.getCardsByCardStockId(state.getCardStockId());
                     if (!allCards.isEmpty()) {
-                        List<Integer> ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
+                        ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
                         Collections.shuffle(ids);
-                        state.setTestUncompletedCardIds(ids);
                     }
                 }
 
-                CardDto cardById = storageResource.getCardById(state.getTestUncompletedCardIds().get(0));
-                menuFactory = new TestMenu(cardById);
-
+                Optional<Integer> firstId = ids.stream().findFirst();
+                if (firstId.isPresent()) {
+                    CardDto card = storageResource.getCardById(firstId.get());
+                    menuFactory = new TestMenu(card, menu == EMenu.FORWARD_TESTING, mode, ids);
+                }
                 break;
-            case SELF_CHECK:
-            case MEMORIZING:
+            case FORWARD_SELF_CHECK:
+            case BACKWARD_SELF_CHECK:
+            case FORWARD_MEMORIZING:
+            case BACKWARD_MEMORIZING:
                 break;
             case CARD_STOCK_UPDATE:
-                CardStockDto oldCardStock = storageResource.getCardStockById(state.getCardStockId());
-                menuFactory = new CardStockUpdateMenu(oldCardStock);
+                menuFactory = new CardStockUpdateMenu(storageResource.getCardStockById(state.getCardStockId()));
                 break;
             case CARDS:
                 List<CardDto> cards = storageResource.getCardsByCardStockId(state.getCardStockId());
@@ -91,13 +103,11 @@ public class MenuService { //TODO: Add interface
                 menuFactory = new CardAddMenu();
                 break;
             case CARD:
-                CardDto card = storageResource.getCardById(state.getCardId());
                 int maxPoint = storageResource.getCardStockById(state.getCardStockId()).getMaxPoint();
-                menuFactory = new CardMenu(state.getCardStockId(), maxPoint, card);
+                menuFactory = new CardMenu(state.getCardStockId(), maxPoint, storageResource.getCardById(state.getCardId()));
                 break;
             case CARD_UPDATE:
-                CardDto oldCard = storageResource.getCardById(state.getCardId());
-                menuFactory = new CardUpdateMenu(oldCard);
+                menuFactory = new CardUpdateMenu(storageResource.getCardById(state.getCardId()));
                 break;
             default:
                 break;
@@ -107,7 +117,7 @@ public class MenuService { //TODO: Add interface
         return menuFactory;
     }
 
-    public MenuFactory createMenuByCallback(Integer storageId, UserState userState, EMenu currentMenu, String callback) throws Exception {
+    public MenuFactory createMenuByCallback(Integer storageId, UserState userState, EMenu currentMenu, String callback) {
         log.debug("createMenuByCallback. req:" + storageId + ", " + userState + ", " + currentMenu.name());
         List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(storageId);
         MenuFactory menuFactory = null;

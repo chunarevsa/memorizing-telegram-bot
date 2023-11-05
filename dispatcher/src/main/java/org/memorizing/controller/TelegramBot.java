@@ -121,6 +121,16 @@ public class TelegramBot extends TelegramLongPollingBot {
                     }
 
                     executeSending(chatId, resp.getMenu(), resp.getStatus());
+                } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
+                    // skip
+                    // обеспечивать
+                    // info
+                    // back
+                    //
+
+                    DispatcherResponse resp = messageDispatcherService.getResponseByStudyingMenu();
+
+
                 } else {
                     DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
 
