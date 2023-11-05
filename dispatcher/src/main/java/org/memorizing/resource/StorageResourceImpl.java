@@ -17,7 +17,7 @@ public class StorageResourceImpl implements StorageResource {
     // /storage
 
     @Override
-    public StorageDto getStorageByUserId(Integer userId) {
+    public StorageDto getStorageByUserId(Long userId) {
         return cardWebClientBuilder.getStorageByUserId(userId);
     }
 

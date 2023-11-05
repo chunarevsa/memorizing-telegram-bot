@@ -1,19 +1,19 @@
 package org.memorizing.resource.cardApi;
 
 public class StorageFieldsDto {
-    private Integer userId;
+    private Long userId;
     private String storageName;
 
-    public StorageFieldsDto(Integer userId, String storageName) {
+    public StorageFieldsDto(Long userId, String storageName) {
         this.userId = userId;
         this.storageName = storageName;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

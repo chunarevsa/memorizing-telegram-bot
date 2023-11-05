@@ -3,10 +3,10 @@ package org.memorizing.resource.cardApi;
 // TODO: add it to separated module
 public class StorageDto {
     private Integer id;
-    private Integer userId;
+    private Long userId;
     private String storageName;
 
-    public StorageDto(Integer id, Integer userId, String storageName) {
+    public StorageDto(Integer id, Long userId, String storageName) {
         this.id = id;
         this.userId = userId;
         this.storageName = storageName;
@@ -23,11 +23,11 @@ public class StorageDto {
         this.id = id;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

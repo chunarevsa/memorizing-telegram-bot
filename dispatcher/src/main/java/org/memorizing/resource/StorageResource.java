@@ -7,7 +7,7 @@ import java.util.List;
 public interface StorageResource {
 
     // /storage
-    StorageDto getStorageByUserId(Integer userId);
+    StorageDto getStorageByUserId(Long userId);
 
     // /cardStock
     List<CardStockDto> getCardStocksByStorageId(Integer storageId);
