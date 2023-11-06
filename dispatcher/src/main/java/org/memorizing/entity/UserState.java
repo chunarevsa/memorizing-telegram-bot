@@ -2,7 +2,7 @@ package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.memorizing.model.menu.EMenu;
-import org.memorizing.model.menu.EMode;
+import org.memorizing.model.EMode;
 import org.memorizing.utils.StudyingStateConverter;
 
 import javax.persistence.*;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.memorizing.model.menu.EMode.*;
+import static org.memorizing.model.EMode.*;
 
 @Entity
 public class UserState {

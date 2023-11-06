@@ -1,9 +1,13 @@
 package org.memorizing.model.menu;
 
+import org.memorizing.model.EMode;
+import org.memorizing.resource.cardApi.CardDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-import static org.memorizing.model.menu.EKeyboardCommand.*;
+import java.util.List;
+
+import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class CardStocksMenu extends AMenu {
 
@@ -67,5 +71,55 @@ public class CardStocksMenu extends AMenu {
             return String.format("You have %s card stocks", size);
         } else return "You don't have card stocks. " +
                 "Push the button `add card stock`";
+    }
+
+    public static class MemorizingMenu extends AMenu {
+
+        private final CardDto card;
+        private final EMode mode;
+        private final List<Integer> ids;
+
+        public MemorizingMenu(CardDto card, EMode mode, List<Integer> ids) {
+            this.card = card;
+            this.mode = mode;
+            this.ids = ids;
+        }
+
+        public CardDto getCard() {
+            return card;
+        }
+
+        public EMode getMode() {
+            return mode;
+        }
+
+        public List<Integer> getIds() {
+            return ids;
+        }
+
+        @Override
+        public EMenu getCurrentMenu() {
+            return null;
+        }
+
+        @Override
+        public ReplyKeyboardMarkup getKeyboard() {
+            return null;
+        }
+
+        @Override
+        public String getInfoText() {
+            return null;
+        }
+
+        @Override
+        public String getText() {
+            return null;
+        }
+
+        @Override
+        public String getTitle() {
+            return null;
+        }
     }
 }

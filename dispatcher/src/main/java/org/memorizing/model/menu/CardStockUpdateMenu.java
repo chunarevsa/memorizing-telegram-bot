@@ -3,8 +3,8 @@ package org.memorizing.model.menu;
 import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-import static org.memorizing.model.menu.EKeyboardCommand.GET_INFO;
-import static org.memorizing.model.menu.EKeyboardCommand.GO_BACK;
+import static org.memorizing.model.command.EKeyboardCommand.GET_INFO;
+import static org.memorizing.model.command.EKeyboardCommand.GO_BACK;
 
 public class CardStockUpdateMenu extends AMenu {
 

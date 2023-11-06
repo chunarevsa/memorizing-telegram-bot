@@ -3,7 +3,7 @@ package org.memorizing.model.menu;
 import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-import static org.memorizing.model.menu.EKeyboardCommand.*;
+import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class ModeMenu extends AMenu {
 

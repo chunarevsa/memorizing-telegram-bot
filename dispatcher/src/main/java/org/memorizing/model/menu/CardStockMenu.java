@@ -4,7 +4,7 @@ import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-import static org.memorizing.model.menu.EKeyboardCommand.*;
+import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class CardStockMenu extends AMenu {
     private final CardStockDto cardStock;

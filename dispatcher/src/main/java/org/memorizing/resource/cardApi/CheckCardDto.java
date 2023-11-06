@@ -1,4 +1,4 @@
-package org.memorizing.resource;
+package org.memorizing.resource.cardApi;
 
 public class CheckCardDto {
     private final Integer cardStockId;

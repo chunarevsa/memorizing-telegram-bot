@@ -1,4 +1,4 @@
-package org.memorizing.model.menu;
+package org.memorizing.model.command;
 
 import org.memorizing.resource.cardApi.CardFieldsDto;
 import org.memorizing.resource.cardApi.CardStockFieldsDto;

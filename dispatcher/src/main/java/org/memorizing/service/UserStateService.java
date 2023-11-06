@@ -1,6 +1,7 @@
 package org.memorizing.service;
 
 import org.memorizing.entity.UserState;
+import org.memorizing.model.command.ECommand;
 import org.memorizing.model.menu.*;
 import org.memorizing.repository.UserStateRepository;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,8 @@ public class UserStateService {
             userState.setCardStockId(cardStockMenu.getCardStock().getId());
             userState.setCardId(null);
 
-        } else if (menu instanceof TestMenu) {
-            TestMenu testMenu = (TestMenu) menu;
+        } else if (menu instanceof ECommand.TestMenu) {
+            ECommand.TestMenu testMenu = (ECommand.TestMenu) menu;
             userState.updateStudyingStateIds(testMenu.getMode(), testMenu.getIds());
             userState.setCardId(null);
 

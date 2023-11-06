@@ -1,4 +1,6 @@
-package org.memorizing.model.menu;
+package org.memorizing.model;
+
+import org.memorizing.model.menu.EMenu;
 
 public enum EMode {
     FORWARD_TESTING(true),

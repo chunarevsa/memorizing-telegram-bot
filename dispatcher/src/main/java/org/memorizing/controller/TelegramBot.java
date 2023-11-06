@@ -2,9 +2,9 @@ package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
 import org.memorizing.model.ERegularMessages;
-import org.memorizing.model.menu.ECommand;
-import org.memorizing.model.menu.EKeyboardCommand;
-import org.memorizing.model.menu.EPlaceholderCommand;
+import org.memorizing.model.command.ECommand;
+import org.memorizing.model.command.EKeyboardCommand;
+import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.UserResource;

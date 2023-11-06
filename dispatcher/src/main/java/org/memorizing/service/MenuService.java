@@ -2,6 +2,9 @@ package org.memorizing.service;
 
 import org.apache.log4j.Logger;
 import org.memorizing.entity.UserState;
+import org.memorizing.model.EMode;
+import org.memorizing.model.command.ECommand;
+import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.menu.*;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.cardApi.CardDto;
@@ -62,7 +65,7 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new TestMenu(card, mode, ids);
+                    menuFactory = new ECommand.TestMenu(card, mode, ids);
                 }
                 break;
             case FORWARD_SELF_CHECK:
@@ -73,7 +76,7 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new SelfCheckMenu(card, mode, ids);
+                    menuFactory = new EKeyboardCommand.SelfCheckMenu(card, mode, ids);
                 }
                 break;
             case FORWARD_MEMORIZING:
@@ -84,7 +87,7 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new MemorizingMenu(card, mode, ids);
+                    menuFactory = new CardStocksMenu.MemorizingMenu(card, mode, ids);
                 }
                 break;
 

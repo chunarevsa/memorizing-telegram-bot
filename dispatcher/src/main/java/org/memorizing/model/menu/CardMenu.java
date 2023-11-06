@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 
 import java.util.Objects;
 
-import static org.memorizing.model.menu.EKeyboardCommand.*;
+import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class CardMenu extends AMenu {
     private final Integer cardStockId;
