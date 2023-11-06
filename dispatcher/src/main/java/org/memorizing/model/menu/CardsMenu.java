@@ -3,6 +3,8 @@ package org.memorizing.model.menu;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import static org.memorizing.model.menu.EKeyboardCommand.*;
+
 public class CardsMenu extends AMenu {
     private final Integer cardStockId;
     private final InlineKeyboardMarkup inlineKeyboard;
@@ -24,8 +26,8 @@ public class CardsMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"add card"},
-                {"info", "back"}
+                {ADD_CARD.getButtonText()},
+                {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
         });
     }
 

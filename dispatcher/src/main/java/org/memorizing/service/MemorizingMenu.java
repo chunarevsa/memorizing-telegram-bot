@@ -8,14 +8,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 
 import java.util.List;
 
-import static org.memorizing.model.menu.EKeyboardCommand.*;
+public class MemorizingMenu extends AMenu {
 
-public class TestMenu extends AMenu {
     private final CardDto card;
     private final EMode mode;
     private final List<Integer> ids;
 
-    public TestMenu(CardDto card, EMode mode, List<Integer> ids) {
+    public MemorizingMenu(CardDto card, EMode mode, List<Integer> ids) {
         this.card = card;
         this.mode = mode;
         this.ids = ids;
@@ -35,31 +34,26 @@ public class TestMenu extends AMenu {
 
     @Override
     public EMenu getCurrentMenu() {
-        return EMenu.FORWARD_TESTING;
+        return null;
     }
 
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
-        return getKeyboardByButtons(new String[][]{
-                {SKIP_WORD.getButtonText()},
-                {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
-        });
+        return null;
     }
 
     @Override
     public String getInfoText() {
-        return "Some info text from Test menu";
+        return null;
     }
 
     @Override
     public String getText() {
-        if (mode.isFromKeyMode()) {
-            return card.getCardKey();
-        } else return card.getCardValue();
+        return null;
     }
 
     @Override
     public String getTitle() {
-        return "*Test menu*\n";
+        return null;
     }
 }

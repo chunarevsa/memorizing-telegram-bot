@@ -1,7 +1,10 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
-import org.memorizing.model.RegularMessages;
+import org.memorizing.model.ERegularMessages;
+import org.memorizing.model.menu.ECommand;
+import org.memorizing.model.menu.EKeyboardCommand;
+import org.memorizing.model.menu.EPlaceholderCommand;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.UserResource;
@@ -23,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.memorizing.model.RegularMessages.*;
+import static org.memorizing.model.ERegularMessages.*;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -87,9 +90,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             try {
                 if (hasCallback) {
                     DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
-                    executeSending(chatId, resp.getMenu(), resp.getStatus());
+                    executeSendingNew(chatId, resp);
 
-                } else if (!users.containsKey(chatId) || data.equals("/start")) {
+                } else if (!users.containsKey(chatId)) {
                     // TODO: Add registration via auth-service, when it will be completed
                     // adding new user
                     messageDispatcherService.registerIfAbsent(chatId, userName);
@@ -98,100 +101,170 @@ public class TelegramBot extends TelegramLongPollingBot {
                     // Send welcome message
                     SendMessage welcomeMessage = SendMessage.builder()
                             .chatId(chatId)
-                            .text((WELCOME + HOW_IT_WORKS.toString()).replaceAll("\\{name}", userName))
+                            .text((WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName))
                             .build();
                     welcomeMessage.enableMarkdown(true);
                     execute(welcomeMessage);
 
                     menu = messageDispatcherService.getFirstMenu(chatId);
-                    executeSending(chatId, menu, SUCCESSFULLY);
-                } else if (data.startsWith("#")) {
-                    // TODO: for test
-                    if (data.startsWith("#test")) {
-                        startEcho(chatId, data);
-                        return;
-                    }
+                    executeSendingNew(chatId, new DispatcherResponse(menu, SUCCESSFULLY));
 
-                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholder(chatId, data);
-                    if (resp.getStatus() == SUCCESSFULLY) {
-                        execute(SendMessage.builder()
-                                .chatId(chatId)
-                                .text(SUCCESSFULLY.toString())
-                                .build());
-                    }
+                } else if (ECommand.getCommandByMessage(data) != null) {
+                    // обработка команд из основной менюшки
+                    ECommand command = ECommand.getCommandByMessage(data);
 
-                    executeSending(chatId, resp.getMenu(), resp.getStatus());
-                } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
-                    // skip
-                    // обеспечивать
-                    // info
-                    // back
-                    //
+                    SendMessage commandMessage = SendMessage.builder()
+                            .chatId(chatId)
+                            .text(command.getMessageText().replaceAll("\\{name}", userName))
+                            .build();
+                    commandMessage.enableMarkdown(true);
 
-                    DispatcherResponse resp = messageDispatcherService.getResponseByStudyingMenu();
+                    execute(commandMessage);
+                    executeSendingNew(chatId, messageDispatcherService.getResponseByCommand(chatId, command));
 
+                } else if (EPlaceholderCommand.getPlaceholderCommandByPref(data) != null) {
+                    // Обработка входящего изменения
 
-                } else {
-                    DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
+                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, data);
+                    executeSendingNew(chatId, resp);
 
-                    if ((data.equals("info") || data.equals("/info")) && resp.getMenu() != null) {
+                } else if (EKeyboardCommand.getKeyboardCommandByMessage(data) != null) {
+                    // обработка с основной клавиатуры
+                    EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(data);
+
+                    DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
+                    if (command == EKeyboardCommand.GET_INFO) {
                         SendMessage infoText = SendMessage.builder()
                                 .chatId(chatId)
                                 .text(resp.getMenu().getInfoText())
                                 .build();
                         infoText.enableMarkdown(true);
-                        // send only info text
                         execute(infoText);
-                        return;
-                    } else if ((data.equals("howitworks") || data.equals("/howitworks")) && resp.getMenu() != null) {
-                        SendMessage helpText = SendMessage.builder()
-                                .chatId(chatId)
-                                .text(HOW_IT_WORKS.toString())
-                                .build();
-                        helpText.enableMarkdown(true);
-                        // Send help text and current menu
-                        execute(helpText);
-                    } else if ((data.equals("help") || data.equals("/help")) && resp.getMenu() != null) {
-                        SendMessage helpText = SendMessage.builder()
-                                .chatId(chatId)
-                                .text(HELP.toString())
-                                .build();
-                        helpText.enableMarkdown(true);
-                        // Send help text and current menu
-                        execute(helpText);
                     }
+                    executeSendingNew(chatId, resp);
 
-                    executeSending(chatId, resp.getMenu(), resp.getStatus());
+                } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
+                    // возможно это ответ на тест
+                    log.debug("Test");
+
+                } else {
+                    executeSendingNew(chatId, new DispatcherResponse(null, BAD_REQUEST, true));
                 }
+
+//                else if (data.startsWith("#")) {
+//
+//                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholder(chatId, data);
+//                    if (resp.getStatus() == SUCCESSFULLY) {
+//                        execute(SendMessage.builder()
+//                                .chatId(chatId)
+//                                .text(SUCCESSFULLY.toString())
+//                                .build());
+//                    }
+//
+//                    executeSending(chatId, resp.getMenu(), resp.getStatus());
+//                } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
+//                    // skip
+//                    // обеспечивать
+//                    // info
+//                    // back
+//                    //
+//
+//                    DispatcherResponse resp = messageDispatcherService.getResponseByStudyingMenu();
+//
+//
+//                } else {
+//                    DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
+//
+//                    if ((data.equals("info") || data.equals("/info")) && resp.getMenu() != null) {
+//                        SendMessage infoText = SendMessage.builder()
+//                                .chatId(chatId)
+//                                .text(resp.getMenu().getInfoText())
+//                                .build();
+//                        infoText.enableMarkdown(true);
+//                        // send only info text
+//                        execute(infoText);
+//                        return;
+//                    } else if ((data.equals("howitworks") || data.equals("/howitworks")) && resp.getMenu() != null) {
+//                        SendMessage helpText = SendMessage.builder()
+//                                .chatId(chatId)
+//                                .text(HOW_IT_WORKS.toString())
+//                                .build();
+//                        helpText.enableMarkdown(true);
+//                        // Send help text and current menu
+//                        execute(helpText);
+//                    } else if ((data.equals("help") || data.equals("/help")) && resp.getMenu() != null) {
+//                        SendMessage helpText = SendMessage.builder()
+//                                .chatId(chatId)
+//                                .text(HELP.toString())
+//                                .build();
+//                        helpText.enableMarkdown(true);
+//                        // Send help text and current menu
+//                        execute(helpText);
+//                    }
+//
+//                    executeSending(chatId, resp.getMenu(), resp.getStatus());
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void executeSending(Long chatId, MenuFactory menu, RegularMessages status) throws TelegramApiException {
-        if (status != null && status != SUCCESSFULLY) {
+//    private void executeSending(Long chatId, MenuFactory menu, RegularMessages status) throws TelegramApiException {
+//        if (status != null && status != SUCCESSFULLY) {
+//            execute(SendMessage.builder()
+//                    .chatId(chatId)
+//                    .text(status.toString())
+//                    .build());
+//        }
+//
+//        if (menu == null) {
+//            execute(SendMessage.builder()
+//                    .chatId(chatId)
+//                    .text(BAD_REQUEST.toString())
+//                    .build());
+//            return;
+//        }
+//
+//        SendMessage messageWithKeyboard = SendMessage.builder()
+//                .chatId(chatId)
+//                .replyMarkup(menu.getKeyboard())
+//                .text(menu.getTitle())
+//                .build();
+//        messageWithKeyboard.enableMarkdown(true);
+//        execute(messageWithKeyboard);
+//
+//        SendMessage messageWithInlineKeyboard = SendMessage.builder()
+//                .chatId(chatId)
+//                .replyMarkup(menu.getInlineKeyboard())
+//                .text(menu.getText())
+//                .build();
+//        messageWithInlineKeyboard.enableMarkdown(true);
+//        execute(messageWithInlineKeyboard);
+//    }
+
+    private void executeSendingNew(Long chatId, DispatcherResponse resp) throws TelegramApiException {
+        ERegularMessages status = resp.getStatus();
+        MenuFactory menu = resp.getMenu();
+
+        if (resp.isNeedSendStatus()) {
             execute(SendMessage.builder()
                     .chatId(chatId)
-                    .text(status.toString())
+                    .text(status.getText())
                     .build());
         }
 
-        if (menu == null) {
-            execute(SendMessage.builder()
-                    .chatId(chatId)
-                    .text(BAD_REQUEST.toString())
-                    .build());
-            return;
-        }
+        if (menu == null) return;
 
-        SendMessage messageWithKeyboard = SendMessage.builder()
-                .chatId(chatId)
-                .replyMarkup(menu.getKeyboard())
-                .text(menu.getTitle())
-                .build();
-        messageWithKeyboard.enableMarkdown(true);
-        execute(messageWithKeyboard);
+        if (resp.isNeedSendTitle()) {
+            SendMessage messageWithKeyboard = SendMessage.builder()
+                    .chatId(chatId)
+                    .replyMarkup(menu.getKeyboard())
+                    .text(menu.getTitle())
+                    .build();
+            messageWithKeyboard.enableMarkdown(true);
+            execute(messageWithKeyboard);
+        }
 
         SendMessage messageWithInlineKeyboard = SendMessage.builder()
                 .chatId(chatId)
@@ -201,6 +274,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         messageWithInlineKeyboard.enableMarkdown(true);
         execute(messageWithInlineKeyboard);
     }
+
 
     // For testing "Styled" text
     private void startEcho(Long chatId, String data) throws TelegramApiException {

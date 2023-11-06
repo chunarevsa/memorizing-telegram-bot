@@ -80,4 +80,15 @@ public class StorageResourceImpl implements StorageResource {
     public StorageDto createStorage(StorageFieldsDto req) {
         return cardWebClientBuilder.createStorage(req);
     }
+
+    public TestResultDto checkCard(Integer cardStockId, Integer cardId, String userValue, boolean fromKeyMode) {
+        int maxPoint = cardWebClientBuilder.getCardStockById(cardStockId).getMaxPoint();
+        CheckCardDto req = new CheckCardDto(cardStockId, userValue, fromKeyMode, maxPoint);
+        return cardWebClientBuilder.checkCard(cardId, req);
+    }
+
+    @Override
+    public void skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode) {
+        checkCard(cardStockId, cardId, "!!!", fromKeyMode);
+    }
 }

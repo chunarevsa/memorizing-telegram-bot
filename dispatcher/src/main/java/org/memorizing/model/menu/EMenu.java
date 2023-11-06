@@ -1,35 +1,20 @@
 package org.memorizing.model.menu;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public enum EMenu {
     MAIN,
-    CARD_STOCKS,
-    CARD_STOCK_ADD("add card stock"),
-    CARD_STOCK,
-    MODE("start studying"),
-    FORWARD_TESTING("forward  testing mode"),
-    BACKWARD_TESTING("backward testing mode"),
-    FORWARD_SELF_CHECK("forward  self-check mode"),
-    BACKWARD_SELF_CHECK("backward self-check mode"),
-    FORWARD_MEMORIZING("forward  memorizing mode"),
-    BACKWARD_MEMORIZING("backward memorizing mode"),
-    CARD_STOCK_UPDATE("update card stock"),
-    CARDS("show cards"),
-    CARD_ADD("add card"),
-    CARD,
-    CARD_UPDATE("update card"),
-    ;
-    private String callButton;
+    CARD_STOCKS, CARD_STOCK, CARD_STOCK_ADD, CARD_STOCK_UPDATE,
+    MODE,
+    FORWARD_TESTING,
+    BACKWARD_TESTING,
+    FORWARD_SELF_CHECK,
+    BACKWARD_SELF_CHECK,
+    FORWARD_MEMORIZING,
+    BACKWARD_MEMORIZING,
 
-    EMenu(String callButton) {
-        this.callButton = callButton;
-    }
-
-    EMenu() {
-    }
+    CARDS, CARD, CARD_ADD, CARD_UPDATE;
 
     public EMenu getLastMenu() {
         switch (this) {
@@ -42,6 +27,9 @@ public enum EMenu {
             case FORWARD_TESTING:
             case FORWARD_SELF_CHECK:
             case FORWARD_MEMORIZING:
+            case BACKWARD_TESTING:
+            case BACKWARD_SELF_CHECK:
+            case BACKWARD_MEMORIZING:
                 return EMenu.CARD_STOCK;
             case CARD:
             case CARD_ADD:
@@ -52,13 +40,6 @@ public enum EMenu {
             default:
                 return EMenu.MAIN;
         }
-    }
-
-    public static EMenu getMenuByCallButton(String callButton) {
-        return Arrays.stream(EMenu.values())
-                .filter(it -> it.callButton != null && it.callButton.equals(callButton))
-                .findFirst().orElse(null);
-
     }
 
     public static List<EMenu> getOnlyStudyingMenu() {

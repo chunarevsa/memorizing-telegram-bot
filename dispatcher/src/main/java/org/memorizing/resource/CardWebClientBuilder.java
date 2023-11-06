@@ -205,4 +205,20 @@ public class CardWebClientBuilder {
         }
         return null;
     }
+
+    public TestResultDto checkCard(Integer cardId, CheckCardDto req) {
+        try {
+            log.debug("checkCard req: " + req);
+            return WebClient.create(baseUrl)
+                    .post()
+                    .uri(serviceName + "/card/" + cardId + "/check")
+                    .bodyValue(req)
+                    .retrieve()
+                    .bodyToFlux(TestResultDto.class)
+                    .blockFirst();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

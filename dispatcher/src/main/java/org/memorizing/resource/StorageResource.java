@@ -28,4 +28,9 @@ public interface StorageResource {
     void deleteCard(Integer cardId);
 
     StorageDto createStorage(StorageFieldsDto storageFieldsDto);
+
+    TestResultDto checkCard(Integer cardStockId, Integer cardId, String userValue, boolean fromKeyMode);
+
+    void skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode);
+
 }

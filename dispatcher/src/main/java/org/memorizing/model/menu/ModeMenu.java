@@ -3,6 +3,8 @@ package org.memorizing.model.menu;
 import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import static org.memorizing.model.menu.EKeyboardCommand.*;
+
 public class ModeMenu extends AMenu {
 
     CardStockDto cardStock;
@@ -10,7 +12,6 @@ public class ModeMenu extends AMenu {
     public ModeMenu(CardStockDto cardStock) {
         this.cardStock = cardStock;
     }
-
 
     @Override
     public EMenu getCurrentMenu() {
@@ -25,21 +26,21 @@ public class ModeMenu extends AMenu {
         String[] commonLine;
 
         if (cardStock.getTestModeIsAvailable()) {
-            testLine = new String[]{"forward  testing mode"};
+            testLine = new String[]{START_FORWARD_TESTING.getButtonText()};
             if (!cardStock.getOnlyFromKey()) {
-                testLine = new String[]{"forward  testing mode", "backward testing mode"};
+                testLine = new String[]{START_FORWARD_TESTING.getButtonText(), START_BACKWARD_TESTING.getButtonText()};
             }
         }
 
         if (!cardStock.getOnlyFromKey()) {
-            selfCheckLine = new String[]{"forward  self-check mode", "backward self-check mode"};
-        } else selfCheckLine = new String[]{"forward  self-check mode"};
+            selfCheckLine = new String[]{START_FORWARD_SELF_CHECK.getButtonText(), START_BACKWARD_SELF_CHECK.getButtonText()};
+        } else selfCheckLine = new String[]{START_FORWARD_SELF_CHECK.getButtonText()};
 
         if (!cardStock.getOnlyFromKey()) {
-            memorizingLine = new String[]{"forward  memorizing mode", "backward memorizing mode"};
-        } else memorizingLine = new String[]{"forward  memorizing mode"};
+            memorizingLine = new String[]{START_FORWARD_MEMORIZING.getButtonText(), START_BACKWARD_MEMORIZING.getButtonText()};
+        } else memorizingLine = new String[]{START_FORWARD_MEMORIZING.getButtonText()};
 
-        commonLine = new String[]{"info", "back"};
+        commonLine = new String[]{GET_INFO.getButtonText(), GO_BACK.getButtonText()};
 
         if (testLine == null) {
             return getKeyboardByButtons(new String[][]{selfCheckLine, memorizingLine, commonLine});

@@ -2,6 +2,7 @@ package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.memorizing.model.menu.EMenu;
+import org.memorizing.model.menu.EMode;
 import org.memorizing.utils.StudyingStateConverter;
 
 import javax.persistence.*;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.memorizing.model.menu.EMode.*;
 
 @Entity
 public class UserState {
@@ -35,12 +38,12 @@ public class UserState {
         this.cardStockId = null;
         this.cardId = null;
 
-        studyingState.put("forward  testing mode", new ArrayList<>());
-        studyingState.put("backward testing mode", new ArrayList<>());
-        studyingState.put("forward  self-check mode", new ArrayList<>());
-        studyingState.put("backward self-check mode", new ArrayList<>());
-        studyingState.put("forward  memorizing mode", new ArrayList<>());
-        studyingState.put("backward memorizing mode", new ArrayList<>());
+        studyingState.put(FORWARD_TESTING.name(), new ArrayList<>());
+        studyingState.put(FORWARD_SELF_CHECK.name(), new ArrayList<>());
+        studyingState.put(FORWARD_MEMORIZING.name(), new ArrayList<>());
+        studyingState.put(BACKWARD_TESTING.name(), new ArrayList<>());
+        studyingState.put(BACKWARD_SELF_CHECK.name(), new ArrayList<>());
+        studyingState.put(BACKWARD_MEMORIZING.name(), new ArrayList<>());
     }
 
     public EMenu getLastMenu() {
@@ -95,8 +98,8 @@ public class UserState {
         this.studyingState = map;
     }
 
-    public void updateStudyingStateIds(String mode, List<Integer> ids) {
-        this.studyingState.put(mode, ids);
+    public void updateStudyingStateIds(EMode mode, List<Integer> ids) {
+        this.studyingState.put(mode.name(), ids);
     }
 
     @Override

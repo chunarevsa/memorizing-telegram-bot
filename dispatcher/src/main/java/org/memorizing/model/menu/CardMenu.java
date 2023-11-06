@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 
 import java.util.Objects;
 
+import static org.memorizing.model.menu.EKeyboardCommand.*;
+
 public class CardMenu extends AMenu {
     private final Integer cardStockId;
     private final CardDto card;
@@ -33,9 +35,8 @@ public class CardMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"update card"},
-                {"delete card"},
-                {"info", "back"}
+                {UPDATE_CARD.getButtonText(), DELETE_CARD.getButtonText()},
+                {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
         });
     }
 

@@ -1,6 +1,6 @@
 package org.memorizing.model;
 
-public enum RegularMessages {
+public enum ERegularMessages {
 
     WELCOME("Welcome, {name}!\n" +
             "Let's start memorizing\n" +
@@ -40,9 +40,8 @@ public enum RegularMessages {
 
     HELP("Bot commands:\n" +
             "/start\n" +
-            "/back\n" +
-            "/info\n" +
-            "/report\n" +
+            "/help\n"+
+            "#report {your problem}\n" +
             "\n" +
             "Main menus:\n" +
             "▪️*Card stocks* - your list of card stocks\n" +
@@ -57,20 +56,19 @@ public enum RegularMessages {
             "▪️*Updating card* - updating your existing card\n" +
             "\n" +
             "If you found bug, please, send message to @chunarevsea in telegram or use command:\n" +
-            "`/report  <your problem>`"),
+            "`#report  <your problem>`"),
 
     BAD_REQUEST("❌ Bad request."),
     SOMETHING_WENT_WRONG("❌ Sorry, something went wrong. We try to manage it rapidly"),
     SUCCESSFULLY("✅ Success ");
 
-    private final String value;
+    private final String text;
 
-    RegularMessages(String s) {
-        this.value = s;
+    ERegularMessages(String text) {
+        this.text = text;
     }
 
-    @Override
-    public String toString() {
-        return this.value;
+    public String getText() {
+        return text;
     }
 }

@@ -28,6 +28,9 @@ public class MenuService { //TODO: Add interface
     public MenuFactory createMenu(Integer storageId, UserState state, EMenu menu) {
         log.debug("createMenu. req:" + storageId + ", " + state + ", " + menu.name());
         MenuFactory menuFactory = null;
+        EMode mode;
+        List<Integer> ids;
+        Optional<Integer> firstId;
 
         switch (menu) {
             case MAIN:
@@ -53,37 +56,38 @@ public class MenuService { //TODO: Add interface
                 break;
             case FORWARD_TESTING:
             case BACKWARD_TESTING:
-                // TODO: add EMode
-                List<Integer> ids;
-                String mode;
+                mode = EMode.getModeByMenu(menu);
+                ids = getCardIdsForStudying(mode, state);
 
-                if (menu == EMenu.FORWARD_TESTING) {
-                    mode = "forward  testing mode";
-                } else {
-                    mode = "backward testing mode";
-                }
-                ids = state.getStudyingState().get(mode);
-
-                if (ids.isEmpty()) {
-                    // if it is the first iteration
-                    List<CardDto> allCards = storageResource.getCardsByCardStockId(state.getCardStockId());
-                    if (!allCards.isEmpty()) {
-                        ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
-                        Collections.shuffle(ids);
-                    }
-                }
-
-                Optional<Integer> firstId = ids.stream().findFirst();
+                firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new TestMenu(card, menu == EMenu.FORWARD_TESTING, mode, ids);
+                    menuFactory = new TestMenu(card, mode, ids);
                 }
                 break;
             case FORWARD_SELF_CHECK:
             case BACKWARD_SELF_CHECK:
+                mode = EMode.getModeByMenu(menu);
+                ids = getCardIdsForStudying(mode, state);
+
+                firstId = ids.stream().findFirst();
+                if (firstId.isPresent()) {
+                    CardDto card = storageResource.getCardById(firstId.get());
+                    menuFactory = new SelfCheckMenu(card, mode, ids);
+                }
+                break;
             case FORWARD_MEMORIZING:
             case BACKWARD_MEMORIZING:
+                mode = EMode.getModeByMenu(menu);
+                ids = getCardIdsForStudying(mode, state);
+
+                firstId = ids.stream().findFirst();
+                if (firstId.isPresent()) {
+                    CardDto card = storageResource.getCardById(firstId.get());
+                    menuFactory = new MemorizingMenu(card, mode, ids);
+                }
                 break;
+
             case CARD_STOCK_UPDATE:
                 menuFactory = new CardStockUpdateMenu(storageResource.getCardStockById(state.getCardStockId()));
                 break;
@@ -115,6 +119,20 @@ public class MenuService { //TODO: Add interface
 
         userStateService.updateUserStateByMenu(state, menuFactory);
         return menuFactory;
+    }
+
+    private List<Integer> getCardIdsForStudying(EMode mode, UserState state) {
+        List<Integer> ids = state.getStudyingState().get(mode.name());
+
+        if (ids.isEmpty()) {
+            // if it is the first iteration
+            List<CardDto> allCards = storageResource.getCardsByCardStockId(state.getCardStockId());
+            if (!allCards.isEmpty()) {
+                ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
+                Collections.shuffle(ids);
+            }
+        }
+        return ids;
     }
 
     public MenuFactory createMenuByCallback(Integer storageId, UserState userState, EMenu currentMenu, String callback) {
@@ -157,4 +175,6 @@ public class MenuService { //TODO: Add interface
         }
         return menuFactory;
     }
+
+
 }

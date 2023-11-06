@@ -4,6 +4,8 @@ import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import static org.memorizing.model.menu.EKeyboardCommand.*;
+
 public class CardStockMenu extends AMenu {
     private final CardStockDto cardStock;
 
@@ -23,11 +25,10 @@ public class CardStockMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-                {"start studying"},
-                {"show cards"},
-                {"update card stock"},
-                {"delete card stock"},
-                {"info", "back"}
+                {START_STUDYING.getButtonText()},
+                {SHOW_CARDS.getButtonText()},
+                {UPDATE_CARD_STOCK.getButtonText(), DELETE_CARD_STOCK.getButtonText()},
+                {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
         });
     }
 
