@@ -10,6 +10,7 @@ public enum ERegularMessages {
             "This service has two basic entities: Card stock and card\n" +
             "\n" +
             "Card stock is a card storage with one topic.\n" +
+            "\n" +
             "For example:\n" +
             "The card stock \"English words\" will have\n" +
             "`keyType` = \"English word\"\n" +
@@ -19,13 +20,14 @@ public enum ERegularMessages {
             "`key` = \"memory\"\n" +
             "`value` = \"память\"\n" +
             "\n" +
-            "After that, you can start to learn your card stok\n" +
+            "After that, you can start to learn your card stock\n" +
             "\n" +
-            "You can use 3 mods:\n" +
+            "You can use 3 modes:\n" +
             "▪ *Memorizing*\n" +
             "▪ *Self-check*\n" +
             "▪ *Testing*\n" +
-            "Lastly has 2 submods:\n" +
+            "\n" +
+            "Lastly has 2 submodes:\n" +
             "▪ *Forward* or *FromKey* (key -> value)\n" +
             "Bot show you key. You should send value\n" +
             "▪ *Backward* or *ToKey* (value -> key)\n" +
@@ -60,7 +62,8 @@ public enum ERegularMessages {
 
     BAD_REQUEST("❌ Bad request."),
     SOMETHING_WENT_WRONG("❌ Sorry, something went wrong. We try to manage it rapidly"),
-    SUCCESSFULLY("✅ Success ");
+    SUCCESSFULLY("✅ Success "),
+    COMPLETE_SET("✅ You made the list!");
 
     private final String text;
 
