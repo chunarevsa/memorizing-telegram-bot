@@ -5,9 +5,12 @@ import org.memorizing.model.ERegularMessages;
 import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
+import org.memorizing.model.menu.AStudyingMenu;
 import org.memorizing.model.menu.MenuFactory;
+import org.memorizing.model.menu.SelfCheckMenu;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.UserResource;
+import org.memorizing.resource.cardApi.CardDto;
 import org.memorizing.service.DispatcherResponse;
 import org.memorizing.service.MessageDispatcherService;
 import org.springframework.beans.factory.annotation.Value;
@@ -90,7 +93,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             try {
                 if (hasCallback) {
                     DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
-                    executeSendingNew(chatId, resp);
+                    executeSending(chatId, resp);
 
                 } else if (!users.containsKey(chatId)) {
                     // TODO: Add registration via auth-service, when it will be completed
@@ -107,7 +110,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     execute(welcomeMessage);
 
                     menu = messageDispatcherService.getFirstMenu(chatId);
-                    executeSendingNew(chatId, new DispatcherResponse(menu, SUCCESSFULLY));
+                    executeSending(chatId, new DispatcherResponse(menu, SUCCESSFULLY));
 
                 } else if (ECommand.getCommandByMessage(data) != null) {
                     // обработка команд из основной менюшки
@@ -120,13 +123,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                     commandMessage.enableMarkdown(true);
 
                     execute(commandMessage);
-                    executeSendingNew(chatId, messageDispatcherService.getResponseByCommand(chatId, command));
+                    executeSending(chatId, messageDispatcherService.getResponseByCommand(chatId, command));
 
                 } else if (EPlaceholderCommand.getPlaceholderCommandByPref(data) != null) {
                     // Обработка входящего изменения
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, data);
-                    executeSendingNew(chatId, resp);
+                    executeSending(chatId, resp);
 
                 } else if (EKeyboardCommand.getKeyboardCommandByMessage(data) != null) {
                     // обработка с основной клавиатуры
@@ -141,109 +144,119 @@ public class TelegramBot extends TelegramLongPollingBot {
                         infoText.enableMarkdown(true);
                         execute(infoText);
                     }
-                    executeSendingNew(chatId, resp);
+
+                    if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
+                        SendMessage nextCardMessage = SendMessage.builder()
+                                .chatId(chatId)
+                                .replyMarkup(resp.getMenu().getKeyboard())
+                                .text(resp.getMenu().getText())
+                                .build();
+                        nextCardMessage.enableMarkdownV2(true);
+                        execute(nextCardMessage);
+                        if (resp.isNeedSendStatus()) {
+                            execute(SendMessage.builder()
+                                    .chatId(chatId)
+                                    .text(resp.getStatus().getText())
+                                    .build());
+                        }
+
+                    } else if (command == EKeyboardCommand.SKIP) {
+                        String correctAnswer;
+                        CardDto card = resp.getTestResult().getCard();
+
+                        // We can't show last card in a correct queue because we have only next menu
+                        if (resp.getMenu() instanceof AStudyingMenu) {
+                            AStudyingMenu studyingMenu = (AStudyingMenu) resp.getMenu();
+                            correctAnswer = studyingMenu.getMode().isFromKeyMode()
+                                    ? card.getCardKey() + " : " + card.getCardValue()
+                                    : card.getCardValue() + " : " + card.getCardKey();
+
+                        } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
+
+                        SendMessage correctAnswerMessage = SendMessage.builder()
+                                .chatId(chatId)
+                                .text("❗" + correctAnswer + "❗")
+                                .build();
+                        correctAnswerMessage.enableMarkdown(true);
+                        execute(correctAnswerMessage);
+
+                        if (resp.isNeedSendStatus()) {
+                            execute(SendMessage.builder()
+                                    .chatId(chatId)
+                                    .text(resp.getStatus().getText())
+                                    .build());
+                        }
+
+                        SendMessage nextCardMessage = SendMessage.builder()
+                                .chatId(chatId)
+                                .replyMarkup(resp.getMenu().getKeyboard())
+                                .text(resp.getMenu().getText())
+                                .build();
+                        nextCardMessage.enableMarkdown(true);
+                        execute(nextCardMessage);
+
+                    } else executeSending(chatId, resp);
 
                 } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
-                    // возможно это ответ на тест
-                    log.debug("Test");
+                    // may be, it is user test answer
+                    DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, data);
+
+                    if (!resp.getTestResult().getRightAnswer()) {
+                        // Create correct answer
+                        String correctAnswer;
+                        CardDto card = resp.getTestResult().getCard();
+
+                        // We can't show last card in a correct queue because we have only next menu
+                        if (resp.getMenu() instanceof AStudyingMenu) {
+                            AStudyingMenu studyingMenu = (AStudyingMenu) resp.getMenu();
+                            correctAnswer = studyingMenu.getMode().isFromKeyMode()
+                                    ? card.getCardKey() + " : " + card.getCardValue()
+                                    : card.getCardValue() + " : " + card.getCardKey();
+
+                        } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
+                        // TODO: edit old message
+                        // send correct answer
+                        SendMessage correctAnswerMessage = SendMessage.builder()
+                                .chatId(chatId)
+                                .text("❗" + correctAnswer + "❗")
+                                .build();
+                        correctAnswerMessage.enableMarkdown(true);
+                        execute(correctAnswerMessage);
+                    }
+
+                    // If we continue testing
+                    if (resp.getMenu() instanceof AStudyingMenu) {
+                        SendMessage nextCardMessage = SendMessage.builder()
+                                .chatId(chatId)
+                                .replyMarkup(resp.getMenu().getKeyboard())
+                                .text(resp.getMenu().getText())
+                                .build();
+                        nextCardMessage.enableMarkdown(true);
+                        execute(nextCardMessage);
+
+                    } else {
+                        SendMessage nextCardMessage = SendMessage.builder()
+                                .chatId(chatId)
+                                .replyMarkup(resp.getMenu().getKeyboard())
+                                .text(COMPLETE_SET.getText())
+                                .build();
+                        nextCardMessage.enableMarkdown(true);
+                        execute(nextCardMessage);
+
+                        executeSending(chatId, resp);
+                    }
 
                 } else {
-                    executeSendingNew(chatId, new DispatcherResponse(null, BAD_REQUEST, true));
+                    executeSending(chatId, new DispatcherResponse(null, BAD_REQUEST, true));
                 }
 
-//                else if (data.startsWith("#")) {
-//
-//                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholder(chatId, data);
-//                    if (resp.getStatus() == SUCCESSFULLY) {
-//                        execute(SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text(SUCCESSFULLY.toString())
-//                                .build());
-//                    }
-//
-//                    executeSending(chatId, resp.getMenu(), resp.getStatus());
-//                } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
-//                    // skip
-//                    // обеспечивать
-//                    // info
-//                    // back
-//                    //
-//
-//                    DispatcherResponse resp = messageDispatcherService.getResponseByStudyingMenu();
-//
-//
-//                } else {
-//                    DispatcherResponse resp = messageDispatcherService.getResponseByRegularMessage(chatId, data);
-//
-//                    if ((data.equals("info") || data.equals("/info")) && resp.getMenu() != null) {
-//                        SendMessage infoText = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text(resp.getMenu().getInfoText())
-//                                .build();
-//                        infoText.enableMarkdown(true);
-//                        // send only info text
-//                        execute(infoText);
-//                        return;
-//                    } else if ((data.equals("howitworks") || data.equals("/howitworks")) && resp.getMenu() != null) {
-//                        SendMessage helpText = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text(HOW_IT_WORKS.toString())
-//                                .build();
-//                        helpText.enableMarkdown(true);
-//                        // Send help text and current menu
-//                        execute(helpText);
-//                    } else if ((data.equals("help") || data.equals("/help")) && resp.getMenu() != null) {
-//                        SendMessage helpText = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text(HELP.toString())
-//                                .build();
-//                        helpText.enableMarkdown(true);
-//                        // Send help text and current menu
-//                        execute(helpText);
-//                    }
-//
-//                    executeSending(chatId, resp.getMenu(), resp.getStatus());
-//                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-//    private void executeSending(Long chatId, MenuFactory menu, RegularMessages status) throws TelegramApiException {
-//        if (status != null && status != SUCCESSFULLY) {
-//            execute(SendMessage.builder()
-//                    .chatId(chatId)
-//                    .text(status.toString())
-//                    .build());
-//        }
-//
-//        if (menu == null) {
-//            execute(SendMessage.builder()
-//                    .chatId(chatId)
-//                    .text(BAD_REQUEST.toString())
-//                    .build());
-//            return;
-//        }
-//
-//        SendMessage messageWithKeyboard = SendMessage.builder()
-//                .chatId(chatId)
-//                .replyMarkup(menu.getKeyboard())
-//                .text(menu.getTitle())
-//                .build();
-//        messageWithKeyboard.enableMarkdown(true);
-//        execute(messageWithKeyboard);
-//
-//        SendMessage messageWithInlineKeyboard = SendMessage.builder()
-//                .chatId(chatId)
-//                .replyMarkup(menu.getInlineKeyboard())
-//                .text(menu.getText())
-//                .build();
-//        messageWithInlineKeyboard.enableMarkdown(true);
-//        execute(messageWithInlineKeyboard);
-//    }
-
-    private void executeSendingNew(Long chatId, DispatcherResponse resp) throws TelegramApiException {
+    private void executeSending(Long chatId, DispatcherResponse resp) throws TelegramApiException {
         ERegularMessages status = resp.getStatus();
         MenuFactory menu = resp.getMenu();
 
@@ -272,6 +285,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 .text(menu.getText())
                 .build();
         messageWithInlineKeyboard.enableMarkdown(true);
+        if (menu instanceof SelfCheckMenu) messageWithInlineKeyboard.enableMarkdownV2(true);
         execute(messageWithInlineKeyboard);
     }
 
@@ -318,6 +332,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         trueMDList.add("*innerText*");
         trueMDList.add("#Inner text");
         trueMDList.add("_Inner text_");
+
+        trueMDList.add("|Inner text|");
+        trueMDList.add("||Inner text||");
         trueMDList.forEach(message -> {
             try {
                 sendMessage.setText(message + " MD");
@@ -335,6 +352,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         trueMDV2List.add("_Inner text_");
         trueMDV2List.add("~Inner text~");
         trueMDV2List.add("__Inner text__");
+
+        trueMDV2List.add("||Inner text||");
+        trueMDV2List.add("|Inner text|");
         trueMDV2List.forEach(message -> {
             try {
                 sendMessage.setText(message + " MDV2");

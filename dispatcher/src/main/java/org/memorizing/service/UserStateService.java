@@ -28,8 +28,8 @@ public class UserStateService {
             userState.setCardStockId(cardStockMenu.getCardStock().getId());
             userState.setCardId(null);
 
-        } else if (menu instanceof ECommand.TestMenu) {
-            ECommand.TestMenu testMenu = (ECommand.TestMenu) menu;
+        } else if (menu instanceof AStudyingMenu) {
+            AStudyingMenu testMenu = (AStudyingMenu) menu;
             userState.updateStudyingStateIds(testMenu.getMode(), testMenu.getIds());
             userState.setCardId(null);
 

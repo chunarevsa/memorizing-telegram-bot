@@ -65,7 +65,7 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new ECommand.TestMenu(card, mode, ids);
+                    menuFactory = new TestMenu(card, mode, ids);
                 }
                 break;
             case FORWARD_SELF_CHECK:
@@ -76,7 +76,7 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new EKeyboardCommand.SelfCheckMenu(card, mode, ids);
+                    menuFactory = new SelfCheckMenu(card, mode, ids);
                 }
                 break;
             case FORWARD_MEMORIZING:
@@ -87,7 +87,11 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new CardStocksMenu.MemorizingMenu(card, mode, ids);
+
+                    if (card == null) {
+
+                    }
+                    menuFactory = new MemorizingMenu(card, mode, ids);
                 }
                 break;
 

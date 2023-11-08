@@ -9,7 +9,8 @@ import org.memorizing.model.ERegularMessages;
 import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
-import org.memorizing.model.menu.*;
+import org.memorizing.model.menu.EMenu;
+import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.UserResource;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.ProtocolException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.memorizing.model.ERegularMessages.*;
@@ -37,6 +39,9 @@ public class MessageDispatcherService {
     }
 
     // TODO: обработка ошибок, когда основной сервис не доступен сервис не доступен
+    // TODO: не отображать start studyin если нет карточек
+    // TODO: Отображать количество оставшихся карточек когда заходишь в обучение
+    // TODO: отображать количество карточек в cardStock menu и cards
 
     public DispatcherResponse getResponseByCallback(Long chatId, String messageText) {
         log.debug("getResponseByCallback. req:" + chatId + ", " + messageText);
@@ -51,7 +56,10 @@ public class MessageDispatcherService {
         User user = usersRepo.findByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
-        MenuFactory menu = menuService.createMenu(storageId, userState, userState.getCurrentMenu());
+        EMenu menuType = userState.getCurrentMenu();
+        if (command == ECommand.START) menuType = EMenu.CARD_STOCKS;
+
+        MenuFactory menu = menuService.createMenu(storageId, userState, menuType);
         // TODO: Add logic when something went wrong (need try catch in createMenu)
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
@@ -65,8 +73,26 @@ public class MessageDispatcherService {
 
         ERegularMessages status = executeRequest(command, data, userState);
 
+        if (command == EPlaceholderCommand.DELETE_CARD_STOCK) userState.setCardStockId(null);
+        if (command == EPlaceholderCommand.DELETE_CARD) userState = deleteCardIdFromSessionAndGet(userState);
+
         MenuFactory menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
         return new DispatcherResponse(menu, status, true);
+    }
+
+    private UserState deleteCardIdFromSessionAndGet(UserState userState) {
+        Map<String, List<Integer>> studyingState = userState.getStudyingState();
+        Integer cardId = userState.getCardId();
+
+        studyingState.keySet().stream()
+                .filter(key -> studyingState.get(key).stream().anyMatch(it -> it.equals(cardId)))
+                .forEach(key -> {
+                    List<Integer> ids = studyingState.get(key);
+                    ids.remove(cardId);
+                    userState.updateStudyingStateIds(EMode.valueOf(key), ids);
+                });
+        userState.setCardId(null);
+        return userState;
     }
 
     public DispatcherResponse getResponseByKeyboardCommand(Long chatId, EKeyboardCommand command) {
@@ -76,20 +102,44 @@ public class MessageDispatcherService {
         UserState userState = user.getUserState();
 
         EMenu nextMenu = command.getNextMenu();
+        EMode mode;
+        List<Integer> ids;
+        DispatcherResponse resp = new DispatcherResponse();
         if (nextMenu == null) {
             switch (command) {
                 case GET_INFO:
-                case SKIP_WORD:
                     nextMenu = userState.getCurrentMenu();
-                    EMode mode = EMode.getModeByMenu(nextMenu);
+                    break;
+                case SKIP:
+                    nextMenu = userState.getCurrentMenu();
+                    mode = EMode.getModeByMenu(nextMenu);
+                    ids = userState.getStudyingState().get(mode.name());
 
-                    List<Integer> ids = userState.getStudyingState().get(mode.name());
+                    resp.setTestResult(storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
 
-                    storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode());
                     ids.remove(0);
                     userState.updateStudyingStateIds(mode, ids);
+
                     // If it was last card
-                    if(ids.isEmpty()) nextMenu = nextMenu.getLastMenu();
+                    if (ids.isEmpty()) {
+                        nextMenu = nextMenu.getLastMenu();
+                        resp.setStatus(COMPLETE_SET);
+                        resp.setNeedSendStatus(true);
+                    }
+                    break;
+                case NEXT:
+                    nextMenu = userState.getCurrentMenu();
+                    mode = EMode.getModeByMenu(nextMenu);
+                    ids = userState.getStudyingState().get(mode.name());
+                    ids.remove(0);
+                    userState.updateStudyingStateIds(mode, ids);
+
+                    // If it was last card
+                    if (ids.isEmpty()) {
+                        nextMenu = nextMenu.getLastMenu();
+                        resp.setStatus(COMPLETE_SET);
+                        resp.setNeedSendStatus(true);
+                    }
                     break;
                 case GO_BACK:
                     nextMenu = userState.getLastMenu();
@@ -99,10 +149,11 @@ public class MessageDispatcherService {
                 case DELETE_CARD:
                     return getResponseByPlaceholderCommand(chatId, "#delete-Card");
             }
-        } // TODO ELSE
+        }
 
         if (nextMenu != null) {
-            return new DispatcherResponse(menuService.createMenu(storageId, userState, nextMenu), SUCCESSFULLY);
+            resp.setMenu(menuService.createMenu(storageId, userState, nextMenu));
+            return resp;
         } else return new DispatcherResponse(null, SOMETHING_WENT_WRONG);
 
     }
@@ -111,6 +162,25 @@ public class MessageDispatcherService {
         log.debug("isUserCurrentMenuStudying. req:" + chatId);
         EMenu currentMenu = usersRepo.findByChatId(chatId).getUserState().getCurrentMenu();
         return EMenu.getOnlyStudyingMenu().stream().anyMatch(it -> it == currentMenu);
+    }
+
+    public DispatcherResponse checkAnswer(Long chatId, String data) {
+        log.debug("checkAnswer. req:" + chatId + ", " + data);
+        User user = usersRepo.findByChatId(chatId);
+        UserState userState = user.getUserState();
+
+        EMenu nextMenu = userState.getCurrentMenu();
+        EMode mode = EMode.getModeByMenu(nextMenu);
+        List<Integer> ids = userState.getStudyingState().get(mode.name());
+
+        TestResultDto testResultDto = storageResource.checkCard(userState.getCardStockId(), ids.get(0), data, mode.isFromKeyMode());
+        ids.remove(0);
+        userState.updateStudyingStateIds(mode, ids);
+
+        // If it was last card
+        if (ids.isEmpty()) nextMenu = nextMenu.getLastMenu();
+
+        return new DispatcherResponse(menuService.createMenu(user.getStorageId(), userState, nextMenu), SUCCESSFULLY, testResultDto);
     }
 
     public MenuFactory getFirstMenu(Long chatId) {
@@ -153,11 +223,13 @@ public class MessageDispatcherService {
         log.debug("executeRequest. req:" + command + ", " + userState);
 
         IMappable entity = command.getNewEntity();
-        String body;
         if (!Objects.equals(command.getMethod(), "delete")) {
 
             try {
-                body = data.substring(data.indexOf("{")).replace("\n", "").replace("*", "").replace("`", "");
+                String body = data.substring(data.indexOf("{"))
+                        .replace("\n", "")
+                        .replace("*", "")
+                        .replace("`", "");
 
                 entity = mapper.readValue(body, entity.getClass());
             } catch (JsonProcessingException e) {

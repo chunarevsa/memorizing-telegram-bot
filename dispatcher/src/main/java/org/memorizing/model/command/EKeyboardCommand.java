@@ -16,14 +16,15 @@ public enum EKeyboardCommand {
 
     START_STUDYING("start studying", EMenu.MODE),
 
-    START_FORWARD_TESTING("start forward testing", EMenu.FORWARD_TESTING),
-    START_BACKWARD_TESTING("start backward testing", EMenu.BACKWARD_TESTING),
-    START_FORWARD_SELF_CHECK("start forward self-checking", EMenu.FORWARD_SELF_CHECK),
-    START_BACKWARD_SELF_CHECK("start backward self-checking", EMenu.BACKWARD_SELF_CHECK),
-    START_FORWARD_MEMORIZING("start forward memorizing", EMenu.FORWARD_MEMORIZING),
-    START_BACKWARD_MEMORIZING("start backward memorizing", EMenu.BACKWARD_MEMORIZING),
+    START_FORWARD_TESTING("forward testing", EMenu.FORWARD_TESTING),
+    START_BACKWARD_TESTING("backward testing", EMenu.BACKWARD_TESTING),
+    START_FORWARD_SELF_CHECK("forward self-checking", EMenu.FORWARD_SELF_CHECK),
+    START_BACKWARD_SELF_CHECK("backward self-checking", EMenu.BACKWARD_SELF_CHECK),
+    START_FORWARD_MEMORIZING("forward memorizing", EMenu.FORWARD_MEMORIZING),
+    START_BACKWARD_MEMORIZING("backward memorizing", EMenu.BACKWARD_MEMORIZING),
 
-    SKIP_WORD("skip", null),
+    SKIP("skip", null),
+    NEXT("next", null),
 
     SHOW_CARDS("show cards", EMenu.CARDS),
 
@@ -54,54 +55,5 @@ public enum EKeyboardCommand {
         return Arrays.stream(EKeyboardCommand.values())
                 .filter(it -> it.buttonText.equals(message))
                 .findFirst().orElse(null);
-    }
-
-    public static class SelfCheckMenu extends AMenu {
-        private final CardDto card;
-        private final EMode mode;
-        private final List<Integer> ids;
-
-        public SelfCheckMenu(CardDto card, EMode mode, List<Integer> ids) {
-            this.card = card;
-            this.mode = mode;
-            this.ids = ids;
-        }
-
-        public CardDto getCard() {
-            return card;
-        }
-
-        public EMode getMode() {
-            return mode;
-        }
-
-        public List<Integer> getIds() {
-            return ids;
-        }
-
-        @Override
-        public EMenu getCurrentMenu() {
-            return null;
-        }
-
-        @Override
-        public ReplyKeyboardMarkup getKeyboard() {
-            return null;
-        }
-
-        @Override
-        public String getInfoText() {
-            return null;
-        }
-
-        @Override
-        public String getText() {
-            return null;
-        }
-
-        @Override
-        public String getTitle() {
-            return null;
-        }
     }
 }
