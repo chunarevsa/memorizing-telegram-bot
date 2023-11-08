@@ -2,12 +2,14 @@ package org.memorizing.service;
 
 import org.memorizing.model.ERegularMessages;
 import org.memorizing.model.menu.MenuFactory;
+import org.memorizing.resource.cardApi.TestResultDto;
 
 public class DispatcherResponse {
     private MenuFactory menu;
     private ERegularMessages status;
     private boolean isNeedSendStatus = false;
     private boolean isNeedSendTitle = true;
+    private TestResultDto testResult;
 
     public DispatcherResponse(MenuFactory menu, ERegularMessages status) {
         this.menu = menu;
@@ -19,6 +21,14 @@ public class DispatcherResponse {
         this.status = status;
         this.isNeedSendStatus = isNeedSendStatus;
     }
+
+    public DispatcherResponse(MenuFactory menu, ERegularMessages status, TestResultDto testResult) {
+        this.menu = menu;
+        this.status = status;
+        this.testResult = testResult;
+    }
+
+    public DispatcherResponse() {}
 
     public MenuFactory getMenu() {
         return menu;
@@ -52,6 +62,14 @@ public class DispatcherResponse {
         isNeedSendTitle = needSendTitle;
     }
 
+    public TestResultDto getTestResult() {
+        return testResult;
+    }
+
+    public void setTestResult(TestResultDto testResult) {
+        this.testResult = testResult;
+    }
+
     @Override
     public String toString() {
         return "DispatcherResponse{" +
@@ -59,6 +77,7 @@ public class DispatcherResponse {
                 ", status=" + status +
                 ", isNeedSendStatus=" + isNeedSendStatus +
                 ", isNeedSendTitle=" + isNeedSendTitle +
+                ", testResult=" + testResult +
                 '}';
     }
 }

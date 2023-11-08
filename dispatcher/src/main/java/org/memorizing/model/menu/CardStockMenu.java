@@ -34,7 +34,7 @@ public class CardStockMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "You can start testing this card stock" +
+        return "You can start testing this card stock\n" +
                 "You also can update or delete this card stock";
 
     }
