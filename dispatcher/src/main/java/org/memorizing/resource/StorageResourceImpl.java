@@ -88,7 +88,7 @@ public class StorageResourceImpl implements StorageResource {
     }
 
     @Override
-    public void skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode) {
-        checkCard(cardStockId, cardId, "!!!", fromKeyMode);
+    public TestResultDto skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode) {
+        return checkCard(cardStockId, cardId, "!!!", fromKeyMode);
     }
 }

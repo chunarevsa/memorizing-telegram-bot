@@ -1,49 +1,49 @@
 package org.memorizing.resource.cardApi;
 
 public class TestResultDto {
-    private Boolean isRightAnswer;
-    private Boolean isAnswerToOtherCard;
-    private String cardKey;
+    private Boolean rightAnswer;
+    private Boolean answerToOtherCard;
+    private CardDto card;
 
-    public TestResultDto(Boolean isRightAnswer, Boolean isAnswerToOtherCard, String cardKey) {
-        this.isRightAnswer = isRightAnswer;
-        this.isAnswerToOtherCard = isAnswerToOtherCard;
-        this.cardKey = cardKey;
+    public TestResultDto(Boolean rightAnswer, Boolean answerToOtherCard, CardDto card) {
+        this.rightAnswer = rightAnswer;
+        this.answerToOtherCard = answerToOtherCard;
+        this.card = card;
     }
 
     public TestResultDto() {
     }
 
-    public Boolean getRightAnswer() {
-        return isRightAnswer;
-    }
-
     public void setRightAnswer(Boolean rightAnswer) {
-        isRightAnswer = rightAnswer;
-    }
-
-    public Boolean getAnswerToOtherCard() {
-        return isAnswerToOtherCard;
+        this.rightAnswer = rightAnswer;
     }
 
     public void setAnswerToOtherCard(Boolean answerToOtherCard) {
-        isAnswerToOtherCard = answerToOtherCard;
+        this.answerToOtherCard = answerToOtherCard;
     }
 
-    public String getCardKey() {
-        return cardKey;
+    public CardDto getCard() {
+        return card;
     }
 
-    public void setCardKey(String cardKey) {
-        this.cardKey = cardKey;
+    public void setCard(CardDto card) {
+        this.card = card;
+    }
+
+    public Boolean getRightAnswer() {
+        return rightAnswer;
+    }
+
+    public Boolean getAnswerToOtherCard() {
+        return answerToOtherCard;
     }
 
     @Override
     public String toString() {
         return "TestResultDto{" +
-                "isRightAnswer=" + isRightAnswer +
-                ", isAnswerToOtherCard=" + isAnswerToOtherCard +
-                ", cardKey='" + cardKey + '\'' +
+                "rightAnswer=" + rightAnswer +
+                ", answerToOtherCard=" + answerToOtherCard +
+                ", card=" + card +
                 '}';
     }
 }

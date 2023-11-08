@@ -31,6 +31,6 @@ public interface StorageResource {
 
     TestResultDto checkCard(Integer cardStockId, Integer cardId, String userValue, boolean fromKeyMode);
 
-    void skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode);
+    TestResultDto skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode);
 
 }
