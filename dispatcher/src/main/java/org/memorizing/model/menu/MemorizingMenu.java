@@ -34,9 +34,14 @@ public class MemorizingMenu extends AStudyingMenu {
 
     @Override
     public String getText() {
+        String key = getCard().getCardKey();
+        String value = getCard().getCardValue();
+
         return getMode().isFromKeyMode()
-                ? (getCard().getCardKey() + " : " + getCard().getCardValue())
-                : (getCard().getCardValue() + " : " + getCard().getCardKey());
+                ? (key + "\n" +
+                value)
+                : (value + "\n" +
+                key);
     }
 
     @Override

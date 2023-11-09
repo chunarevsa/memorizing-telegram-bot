@@ -212,11 +212,84 @@ public class MessageDispatcherService {
                 storageId = storage.getId();
             } else {
                 storageId = storageResource.createStorage(new StorageFieldsDto(chatId, userName)).getId();
+                addFirstData(storageId);
             }
 
             User user = new User(chatId, userName, storageId);
             usersRepo.save(user);
         }
+    }
+
+    private void addFirstData(Integer storageId) {
+        CardStockFieldsDto firstReq = new CardStockFieldsDto(
+                storageId,
+                "English words",
+                "All words I should remember",
+                "ENG",
+                "RUS",
+                5,
+                true,
+                false
+        );
+        Integer firstCardStockId = storageResource.createCardStock(firstReq).getId();
+        storageResource.createCard(
+                new CardFieldsDto(firstCardStockId,"provide","предоставлять",false)
+                );
+        storageResource.createCard(
+                new CardFieldsDto(firstCardStockId,"memory","память",false)
+        );
+        storageResource.createCard(
+                new CardFieldsDto(firstCardStockId,"coffee","кофе",false)
+        );
+
+        CardStockFieldsDto secondReq = new CardStockFieldsDto(
+                storageId,
+                "Interview",
+                "Only provocation questions",
+                "Question",
+                "Answer",
+                5,
+                false,
+                true
+        );
+        Integer secondCardStockId = storageResource.createCardStock(secondReq).getId();
+        storageResource.createCard(
+                new CardFieldsDto(
+                        secondCardStockId,
+                        "What three words do your co-workers use to describe you?",
+                        "curious, scrupulous, conscientious",
+                        true)
+        );
+        storageResource.createCard(
+                new CardFieldsDto(
+                        secondCardStockId,
+                        "Do you prefer working alone or with a team or colleagues?",
+                        "I like to work efficiently and it takes both to do that.",
+                        true)
+        );
+
+
+        CardStockFieldsDto thirdReq = new CardStockFieldsDto(
+                storageId,
+                "IT terms",
+                "Only IT terms in English",
+                "ENG term",
+                "translation",
+                5,
+                true,
+                false
+        );
+        Integer thirdCardStockId = storageResource.createCardStock(thirdReq).getId();
+        storageResource.createCard(
+                new CardFieldsDto(thirdCardStockId,"instance","экземпляр'",false)
+        );
+        storageResource.createCard(
+                new CardFieldsDto(thirdCardStockId,"Inheritance","наследование",false)
+        );
+        storageResource.createCard(
+                new CardFieldsDto(thirdCardStockId,"return","вернуть",false)
+        );
+
     }
 
     private ERegularMessages executeRequest(EPlaceholderCommand command, String data, UserState userState) {

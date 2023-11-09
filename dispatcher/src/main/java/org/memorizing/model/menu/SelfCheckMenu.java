@@ -34,13 +34,24 @@ public class SelfCheckMenu extends AStudyingMenu {
 
     @Override
     public String getText() {
+        String key = getTextForMDV2(getCard().getCardKey());
+        String value = getTextForMDV2(getCard().getCardValue());
+
         return getMode().isFromKeyMode()
-                ? (getCard().getCardKey() + " : ||" + getCard().getCardValue()) + "||"
-                : (getCard().getCardValue() + " : ||" + getCard().getCardKey()) + "||";
+                ? (key + "\n" +
+                "||" + value) + "||"
+                : (value + "\n" +
+                "||" + key)   + "||";
     }
 
     @Override
     public String getTitle() {
         return "*Self-check menu*\n";
+    }
+
+    public String getTextForMDV2(String str) {
+        return str
+                .replaceAll("-", " ")
+                .replaceAll("\\.", " ");
     }
 }
