@@ -1,13 +1,10 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.model.EMode;
-import org.memorizing.resource.cardApi.CardDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-import java.util.List;
-
-import static org.memorizing.model.command.EKeyboardCommand.*;
+import static org.memorizing.model.command.EKeyboardCommand.ADD_CARD_STOCK;
+import static org.memorizing.model.command.EKeyboardCommand.GET_INFO;
 
 public class CardStocksMenu extends AMenu {
 
@@ -42,13 +39,13 @@ public class CardStocksMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Card stock is a card storage with one topic.\n" +
+        return "The Card stock is a card storage with a one topic.\n" +
                 "For example:\n" +
                 "The card stock \"English words\"  will have\n" +
                 "`keyType` = \"English word\"\n" +
                 "`valueType` = \"Russian translations\"\n" +
                 "\n" +
-                "We can add card\n" +
+                "You can add a Card to this Card stock\n" +
                 "`key` = \"memory\"\n" +
                 "`value` = \"память\"\n" +
                 "\n" +
@@ -56,7 +53,7 @@ public class CardStocksMenu extends AMenu {
                 "`keyType` = \"Question\"\n" +
                 "`valueType` = \"Answer\"\n" +
                 "\n" +
-                "We can add card\n" +
+                "You can add a Card to this Card stock\n" +
                 "`key` = \"Why do you leave your last job?\"\n" +
                 "`value` = \"Your some interesting answer \"\n" +
                 "etc.\n" +
@@ -69,7 +66,7 @@ public class CardStocksMenu extends AMenu {
         if (!inlineKeyboard.getKeyboard().isEmpty()) {
             int size = inlineKeyboard.getKeyboard().get(0).size();
             return String.format("You have %s card stocks", size);
-        } else return "You don't have card stocks. " +
+        } else return "You don't have a card stocks. " +
                 "Push the button `add card stock`";
     }
 }

@@ -42,19 +42,19 @@ public class CardMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Card is your `key` and `value` in chosen card stock\n" +
+        return "The Card is your `key` and `value` in chosen the card stock\n" +
                 "For example:\n" +
-                "Card \"memory\" have two properties\n" +
+                "The Card \"memory\" has two properties\n" +
                 "`key` = \"memory\"\n" +
                 "`value` = \"память\"" +
                 "\n" +
                 "Statuses\n" +
-                "▪ `HARD` status means that your last answer was incorrect\n"+
-                "▪ `NORMAL` status you didn't make mistakes \n"+
-                "▪ `COMPLETED` status means that you didn't make mistakes \n"
-                +maxCardStockPoint+" times (`max point` in this card stock) and you're good!\n"+
-                "This card won't show you in test mode\n"+
-                "If you have `HARD` status in this card, Let's start test";
+                "▪ `HARD` status means that your last answer was incorrect.\n"+
+                "▪ `NORMAL` status means you didn't make mistakes.\n"+
+                "▪ `COMPLETED` status means that you increase points\n" +
+                "to card stock’s maxPoint ("+maxCardStockPoint+") and you're good!\n"+
+                "This card won’t show you during a studying.\n"+
+                "If you have `HARD` status in this card, Let's start studying!";
     }
 
     @Override

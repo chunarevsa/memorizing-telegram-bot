@@ -50,31 +50,36 @@ public class ModeMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "▪ *Memorizing* - bot show you card key (\"memory\") and card value (\"память\").\n" +
+        return "▪ *Memorizing* - bot shows you a card key (\"memory\") and a card value (\"память\").\n" +
                 "You try to remember it and go to the next.\n" +
                 "\n" +
-                "▪ *Self-check* - bot show you card key (\"memory\") and hidden translation. You have to remember translation, push the hidden text and check it by your-self\n" +
+                "▪ *Self-check* - bot shows you a card key (\"memory\") and a hidden translation.\n" +
+                "You have to remember the translation, push the hidden text and check it by your-self\n" +
                 "\n" +
-                "▪ *Testing* - bot show you only card key (\"memory\") and you have to remember translation. You send it (\"память\"). Bot check out It, update status and point for this card and  show you next card key.\n" +
-                "This mode have 2 submodes\n" +
+                "▪ *Testing* - bot shows you only a card key (\"memory\").\n" +
+                "You have to remember a translation and send it (\"память\").\n" +
+                "Bot check out it, updates the status and points for this card and shows you the next card key.\n" +
+                "This mode has 2 submodes\n" +
                 "\n" +
-                "▪ *Forward* or *FromKey* (key -> value) - bot show you key.\n" +
-                "You should send value\n" +
-                "▪ *Backward* or *ToKey* (value -> key) - bot show you value.\n" +
-                "You should send key\n" +
+                "▪ *Forward* or *FromKey* (key -> value) - bot shows you the key.\n" +
+                "You should send the value\n" +
+                "▪ *Backward* or *ToKey* (value -> key) - bot shows you the value.\n" +
+                "You should send the key\n" +
                 "\n" +
-                "If you need *Backward* mod, specify it when you create card stock or turn of it mode by updating card stock\n" +
+                "If you need the *Backward* submode, specify it when you create a card stock or turn on this submode by updating the card stock\n" +
                 "\n" +
-                "Whichever mode you choose, the status and amount of point will change.\n" +
-                "▪ `HARD` status means that your last answer was incorrect\n" +
-                "▪ `NORMAL` status you didn't make mistakes \n" +
-                "▪ `COMPLETED` status means that you didn't make mistakes \n" +
-                "If your answer is corrected your card increase a point and set status `NORMAL`\n" +
-                "If your answer isn't corrected your card decrease a point and set status `HARD`\n" +
-                "Status `NORMAL` can have only positive numbers. Status `HARD` can have only negative numbers\n" +
-                "If you got a correct answer to card with `HARD` status (point = -5) \n" +
-                "This card become `NORMAL` and will have point = 1. It works the other way, too.\n" +
-                "Card have two statuses and points for a both submodes";
+                "The Card has two statuses and points for a both submodes.\n" +
+                "\n" +
+                "▪ `HARD` status means your last answer was incorrect.\n" +
+                "▪ `NORMAL` status means you didn't make mistakes.\n" +
+                "▪ `COMPLETED` status means that you increase points to card stock’s maxPoints and you're good!\n" +
+                "This card won’t  be to show you during a studying \n" +
+                "If your answer is correct this card increase points and set the status `NORMAL`\n" +
+                "If your answer isn't correct this card decrease points and set the status `HARD`\n" +
+                "The status `NORMAL` can have only positive numbers whilst the status HARD can have only negative numbers\n" +
+                "\n" +
+                "If you got a correct answer to card with `HARD` status (points = -5)\n" +
+                "this card become `NORMAL` and will have points = 1. It works the other way, too.\n";
     }
 
     @Override

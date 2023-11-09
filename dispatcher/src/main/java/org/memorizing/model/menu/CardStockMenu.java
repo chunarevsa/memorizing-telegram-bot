@@ -34,8 +34,8 @@ public class CardStockMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "You can start testing this card stock\n" +
-                "You also can update or delete this card stock";
+        return "You can start studying this card stock.\n" +
+                "You also can update or delete this card stock.";
 
     }
 
@@ -46,14 +46,14 @@ public class CardStockMenu extends AMenu {
 
         if (cardStock.getTestModeIsAvailable()) {
             testModeIsAvailable = "is";
-            if (!cardStock.getOnlyFromKey()) testBackwardIsAvailable = "▪ You can learn it backwards";
+            if (!cardStock.getOnlyFromKey()) testBackwardIsAvailable = "▪ You can learn it backwards.";
         }
 
         return "*"+cardStock.getCardStockName()+"*" + "\n" +
                 cardStock.getDescription() + "\n" +
                 "▪ Key and value: " + cardStock.getKeyType() + "/" + cardStock.getValueType() + "\n" +
-                "▪ Your card is complete when it have "+ cardStock.getMaxPoint() + " points" + "\n" +
-                "▪ This card stock "+testModeIsAvailable+" available for test"+ "\n" +
+                "▪ Your card is complete when it has "+ cardStock.getMaxPoint() + " points." + "\n" +
+                "▪ This card stock "+testModeIsAvailable+" available for testing mode."+ "\n" +
                 testBackwardIsAvailable +
                 "\n";
     }

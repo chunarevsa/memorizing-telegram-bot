@@ -33,9 +33,9 @@ public class CardsMenu extends AMenu {
 
     @Override
     public String getInfoText() {
-        return "Card is your `key` and `value` in chosen card stock\n" +
+        return "The Card is your `key` and `value` in chosen the card stock.\n" +
                 "For example:\n" +
-                "Card \"memory\" have two properties\n" +
+                "Card \"memory\" has two properties\n" +
                 "`key` = \"memory\"\n" +
                 "`value` = \"память\"\n" +
                 "\n" +
