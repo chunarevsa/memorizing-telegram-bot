@@ -14,6 +14,7 @@ import java.util.Map;
 import static org.memorizing.model.EMode.*;
 
 @Entity
+@Table(name = "user_state")
 public class UserState {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
