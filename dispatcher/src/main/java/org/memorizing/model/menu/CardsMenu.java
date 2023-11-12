@@ -3,15 +3,17 @@ package org.memorizing.model.menu;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import java.util.List;
+
 import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class CardsMenu extends AMenu {
     private final Integer cardStockId;
     private final InlineKeyboardMarkup inlineKeyboard;
 
-    public CardsMenu(Integer cardStockId, String[][] strings) {
+    public CardsMenu(Integer cardStockId, List<String> keys) {
         this.cardStockId = cardStockId;
-        this.inlineKeyboard = createInlineKeyboard(strings);
+        this.inlineKeyboard = createInlineKeyboard(keys);
     }
 
     public Integer getCardStockId() {

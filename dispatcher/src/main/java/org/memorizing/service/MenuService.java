@@ -11,10 +11,7 @@ import org.memorizing.resource.cardApi.CardDto;
 import org.memorizing.resource.cardApi.CardStockDto;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,14 +36,18 @@ public class MenuService { //TODO: Add interface
             case MAIN:
             case CARD_STOCKS:
                 List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(storageId);
-                String[][] cardStockTypes = new String[0][];
-                if (cardStocks != null && !cardStocks.isEmpty()) {
-                    cardStockTypes = new String[1][cardStocks.size()];
-                    for (int i = 0; i < cardStocks.size(); i++) {
-                        cardStockTypes[0][i] = cardStocks.get(i).getCardStockName();
-                    }
+//                String[][] cardStockTypes = new String[0][];
+//                if (cardStocks != null && !cardStocks.isEmpty()) {
+//                    cardStockTypes = new String[1][cardStocks.size()];
+//                    for (int i = 0; i < cardStocks.size(); i++) {
+//                        cardStockTypes[0][i] = cardStocks.get(i).getCardStockName();
+//                    }
+//                }
+                List<String> names = new ArrayList<>();
+                if (cardStocks != null) {
+                    names = cardStocks.stream().map(CardStockDto::getCardStockName).collect(Collectors.toList());
                 }
-                menuFactory = new CardStocksMenu(cardStockTypes);
+                menuFactory = new CardStocksMenu(names);
                 break;
             case CARD_STOCK_ADD:
                 menuFactory = new CardStockAddMenu();
@@ -87,10 +88,6 @@ public class MenuService { //TODO: Add interface
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
                     CardDto card = storageResource.getCardById(firstId.get());
-
-                    if (card == null) {
-
-                    }
                     menuFactory = new MemorizingMenu(card, mode, ids);
                 }
                 break;
@@ -100,15 +97,17 @@ public class MenuService { //TODO: Add interface
                 break;
             case CARDS:
                 List<CardDto> cards = storageResource.getCardsByCardStockId(state.getCardStockId());
-                String[][] cardKeys = new String[0][];
-                if (cards != null && !cards.isEmpty()) {
-                    cardKeys = new String[1][cards.size()];
-                    for (int i = 0; i < cards.size(); i++) {
-                        CardDto card = cards.get(i);
-                        cardKeys[0][i] = card.getCardKey();
-                    }
-                }
-                menuFactory = new CardsMenu(state.getCardStockId(), cardKeys);
+//                String[][] cardKeys = new String[0][];
+//                if (cards != null && !cards.isEmpty()) {
+//                    cardKeys = new String[1][cards.size()];
+//                    for (int i = 0; i < cards.size(); i++) {
+//                        CardDto card = cards.get(i);
+//                        cardKeys[0][i] = card.getCardKey();
+//                    }
+//                }
+
+                List<String> keys = cards.stream().map(CardDto::getCardKey).collect(Collectors.toList());
+                menuFactory = new CardsMenu(state.getCardStockId(), keys);
                 break;
             case CARD_ADD:
                 menuFactory = new CardAddMenu();

@@ -3,6 +3,8 @@ package org.memorizing.model.menu;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import java.util.List;
+
 public interface MenuFactory {
 
     EMenu getLastMenu();
@@ -15,7 +17,7 @@ public interface MenuFactory {
 
     InlineKeyboardMarkup getInlineKeyboard();
 
-    InlineKeyboardMarkup createInlineKeyboard(String[][] cardStockTypes);
+    InlineKeyboardMarkup createInlineKeyboard(List<String> strings);
 
     String getTitle();
 }

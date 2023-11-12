@@ -5,9 +5,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AMenu implements MenuFactory {
 
@@ -16,24 +15,56 @@ public abstract class AMenu implements MenuFactory {
         return this.getCurrentMenu().getLastMenu();
     }
 
-    public InlineKeyboardMarkup createInlineKeyboard(String[][] strings) {
+    public InlineKeyboardMarkup createInlineKeyboard(List<String> strings) {
+        if (strings == null || strings.isEmpty()) return null;
+
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
 
-        for (String[] ss : strings) {
-            List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
-            for (String s : ss) {
-                InlineKeyboardButton inlineKeyboardButton = InlineKeyboardButton.builder()
-                        .text(s)
-                        .callbackData(s)
-                        .build();
-                keyboardButtonsRow.add(inlineKeyboardButton);
+        for (String name : strings) {
+
+            if (!isEnoughSpaceInKeyboardButtonRow(keyboardButtonsRow, name)) {
+                // create next line
+                rowList.add(keyboardButtonsRow);
+                keyboardButtonsRow = new ArrayList<>();
             }
-            rowList.add(keyboardButtonsRow);
+
+            InlineKeyboardButton inlineKeyboardButton = InlineKeyboardButton.builder()
+                    .text(name)
+                    .callbackData(name)
+                    .build();
+            keyboardButtonsRow.add(inlineKeyboardButton);
+
         }
+        rowList.add(keyboardButtonsRow);
 
         inlineKeyboardMarkup.setKeyboard(rowList);
         return inlineKeyboardMarkup;
+    }
+
+    private boolean isEnoughSpaceInKeyboardButtonRow(List<InlineKeyboardButton> keyboardButtonsRow, String name) {
+        if (keyboardButtonsRow.isEmpty()) return true;
+        if (keyboardButtonsRow.size() >= 5) return false;
+
+        List<String> names = keyboardButtonsRow.stream().map(InlineKeyboardButton::getText).collect(Collectors.toList());
+        names.add(name);
+
+        int maxOneRowSize;
+        if (names.size() == 1) {
+            maxOneRowSize = 30;
+        } else if (names.size() == 2) {
+            maxOneRowSize = 26;
+        } else if (names.size() == 3) {
+            maxOneRowSize = 17;
+        } else if (names.size() == 4) {
+            maxOneRowSize = 12;
+        } else {
+            maxOneRowSize = 7;
+        }
+
+        int maxLengthNewNames = names.stream().mapToInt(String::length).max().getAsInt();
+        return maxLengthNewNames <= maxOneRowSize;
     }
 
     protected ReplyKeyboardMarkup getKeyboardByButtons(String[][] strings) {
