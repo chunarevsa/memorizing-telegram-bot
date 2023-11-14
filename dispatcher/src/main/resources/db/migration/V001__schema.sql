@@ -14,7 +14,7 @@ create table user_state
     card_id        int4,
     card_stock_id  int4,
     current_menu   varchar(255),
-    studying_state varchar(255),
+    studying_state TEXT,
     primary key (id)
 );
 

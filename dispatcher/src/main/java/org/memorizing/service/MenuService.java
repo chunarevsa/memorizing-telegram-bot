@@ -36,13 +36,6 @@ public class MenuService { //TODO: Add interface
             case MAIN:
             case CARD_STOCKS:
                 List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(storageId);
-//                String[][] cardStockTypes = new String[0][];
-//                if (cardStocks != null && !cardStocks.isEmpty()) {
-//                    cardStockTypes = new String[1][cardStocks.size()];
-//                    for (int i = 0; i < cardStocks.size(); i++) {
-//                        cardStockTypes[0][i] = cardStocks.get(i).getCardStockName();
-//                    }
-//                }
                 List<String> names = new ArrayList<>();
                 if (cardStocks != null) {
                     names = cardStocks.stream().map(CardStockDto::getCardStockName).collect(Collectors.toList());
@@ -97,15 +90,6 @@ public class MenuService { //TODO: Add interface
                 break;
             case CARDS:
                 List<CardDto> cards = storageResource.getCardsByCardStockId(state.getCardStockId());
-//                String[][] cardKeys = new String[0][];
-//                if (cards != null && !cards.isEmpty()) {
-//                    cardKeys = new String[1][cards.size()];
-//                    for (int i = 0; i < cards.size(); i++) {
-//                        CardDto card = cards.get(i);
-//                        cardKeys[0][i] = card.getCardKey();
-//                    }
-//                }
-
                 List<String> keys = cards.stream().map(CardDto::getCardKey).collect(Collectors.toList());
                 menuFactory = new CardsMenu(state.getCardStockId(), keys);
                 break;
