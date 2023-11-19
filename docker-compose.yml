@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5401:5432"
+    environment:
+      POSTGRES_DB: telegram-bot-service
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    networks:
+        - postgres-db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8096:8096"
+    volumes:
+      - telegram_bot_service_db_data:/var/lib/postgres
+      - telegram_bot_service_db_config:/etc/postgres/conf.d
+    depends_on:
+      - postgres
+    networks:
+      - postgres-db
+
+volumes:
+  telegram_bot_service_db_data:
+  telegram_bot_service_db_config:
+
+networks:
+  postgres-db:
+    driver: bridge
