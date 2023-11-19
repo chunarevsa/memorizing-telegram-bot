@@ -2,16 +2,11 @@ package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.memorizing.model.menu.EMenu;
-import org.memorizing.model.EMode;
-import org.memorizing.utils.StudyingStateConverter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.memorizing.model.EMode.*;
+import java.util.Optional;
 
 @Entity
 @Table(name = "user_state")
@@ -23,32 +18,26 @@ public class UserState {
     @OneToOne(optional = false, mappedBy = "userState")
     private User user;
     @Enumerated(EnumType.STRING)
-    private EMenu currentMenu;
-    private Integer cardStockId;
-    private Integer cardId;
+    private EMenu currentMenu = EMenu.MAIN;
+    private Integer cardStockId = null;
+    private Integer cardId = null;
 
-    @Convert(converter = StudyingStateConverter.class)
-    private Map<String, List<Integer>> studyingState = new HashMap<>();
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<CardStockHistory> studyingHistory = new ArrayList<>();
 
     public UserState() {
     }
 
     public UserState(User user) {
         this.user = user;
-        this.currentMenu = EMenu.MAIN;
-        this.cardStockId = null;
-        this.cardId = null;
-
-        studyingState.put(FORWARD_TESTING.name(), new ArrayList<>());
-        studyingState.put(FORWARD_SELF_CHECK.name(), new ArrayList<>());
-        studyingState.put(FORWARD_MEMORIZING.name(), new ArrayList<>());
-        studyingState.put(BACKWARD_TESTING.name(), new ArrayList<>());
-        studyingState.put(BACKWARD_SELF_CHECK.name(), new ArrayList<>());
-        studyingState.put(BACKWARD_MEMORIZING.name(), new ArrayList<>());
     }
 
     public EMenu getLastMenu() {
         return this.currentMenu.getLastMenu();
+    }
+
+    public void addStudyingHistory(CardStockHistory history) {
+        this.studyingHistory.add(history);
     }
 
     public Integer getId() {
@@ -91,16 +80,12 @@ public class UserState {
         this.cardId = cardId;
     }
 
-    public Map<String, List<Integer>> getStudyingState() {
-        return studyingState;
+    public List<CardStockHistory> getStudyingHistory() {
+        return studyingHistory;
     }
 
-    public void setStudyingState(Map<String, List<Integer>> map) {
-        this.studyingState = map;
-    }
-
-    public void updateStudyingStateIds(EMode mode, List<Integer> ids) {
-        this.studyingState.put(mode.name(), ids);
+    public void setStudyingHistory(List<CardStockHistory> cardStockIds) {
+        this.studyingHistory = cardStockIds;
     }
 
     @Override

@@ -3,8 +3,6 @@ package org.memorizing.service;
 import org.apache.log4j.Logger;
 import org.memorizing.entity.UserState;
 import org.memorizing.model.EMode;
-import org.memorizing.model.command.ECommand;
-import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.menu.*;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.cardApi.CardDto;
@@ -54,7 +52,11 @@ public class MenuService { //TODO: Add interface
             case FORWARD_TESTING:
             case BACKWARD_TESTING:
                 mode = EMode.getModeByMenu(menu);
-                ids = getCardIdsForStudying(mode, state);
+
+                ids = userStateService.getCardIdsByMode(state, mode.name());
+                if (ids.isEmpty()) {
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId());
+                }
 
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
@@ -65,7 +67,11 @@ public class MenuService { //TODO: Add interface
             case FORWARD_SELF_CHECK:
             case BACKWARD_SELF_CHECK:
                 mode = EMode.getModeByMenu(menu);
-                ids = getCardIdsForStudying(mode, state);
+
+                ids = userStateService.getCardIdsByMode(state, mode.name());
+                if (ids.isEmpty()) {
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId());
+                }
 
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
@@ -76,7 +82,11 @@ public class MenuService { //TODO: Add interface
             case FORWARD_MEMORIZING:
             case BACKWARD_MEMORIZING:
                 mode = EMode.getModeByMenu(menu);
-                ids = getCardIdsForStudying(mode, state);
+
+                ids = userStateService.getCardIdsByMode(state, mode.name());
+                if (ids.isEmpty()) {
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId());
+                }
 
                 firstId = ids.stream().findFirst();
                 if (firstId.isPresent()) {
@@ -111,16 +121,12 @@ public class MenuService { //TODO: Add interface
         return menuFactory;
     }
 
-    private List<Integer> getCardIdsForStudying(EMode mode, UserState state) {
-        List<Integer> ids = state.getStudyingState().get(mode.name());
-
-        if (ids.isEmpty()) {
-            // if it is the first iteration
-            List<CardDto> allCards = storageResource.getCardsByCardStockId(state.getCardStockId());
-            if (!allCards.isEmpty()) {
-                ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
-                Collections.shuffle(ids);
-            }
+    private List<Integer> getCardIdsForStudyingByRequest(Integer cardStockId) {
+        List<Integer> ids = new ArrayList<>();
+        List<CardDto> allCards = storageResource.getCardsByCardStockId(cardStockId);
+        if (!allCards.isEmpty()) {
+            ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
+            Collections.shuffle(ids);
         }
         return ids;
     }
