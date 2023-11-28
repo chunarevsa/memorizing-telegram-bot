@@ -19,16 +19,14 @@ services:
     ports:
       - "8096:8096"
     volumes:
-      - telegram_bot_service_db_data:/var/lib/postgres
-      - telegram_bot_service_db_config:/etc/postgres/conf.d
+      - telegram-bot-service-db-data:/var/lib/postgresql/data
     depends_on:
       - postgres
     networks:
       - postgres-db
 
 volumes:
-  telegram_bot_service_db_data:
-  telegram_bot_service_db_config:
+  telegram-bot-service-db-data:
 
 networks:
   postgres-db:
