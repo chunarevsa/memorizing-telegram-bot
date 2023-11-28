@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class CardWebClientBuilder {
     private static final Logger log = Logger.getLogger(CardWebClientBuilder.class);
-    private static final String baseUrl = "http://192.168.0.106:8095/";
+    private static final String baseUrl = "http://192.168.1.76:8095/";
     private static final String serviceName = "";
 
     // /storage
