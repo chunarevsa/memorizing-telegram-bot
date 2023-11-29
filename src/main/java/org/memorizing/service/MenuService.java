@@ -34,11 +34,11 @@ public class MenuService { //TODO: Add interface
             case MAIN:
             case CARD_STOCKS:
                 List<CardStockDto> cardStocks = storageResource.getCardStocksByStorageId(storageId);
-                List<String> names = new ArrayList<>();
+                Map<Integer, String> map1 = new HashMap();
                 if (cardStocks != null) {
-                    names = cardStocks.stream().map(CardStockDto::getCardStockName).collect(Collectors.toList());
+                    cardStocks.forEach(cardStock -> map1.put(cardStock.getId(), cardStock.getCardStockName()));
                 }
-                menuFactory = new CardStocksMenu(names);
+                menuFactory = new CardStocksMenu(map1);
                 break;
             case CARD_STOCK_ADD:
                 menuFactory = new CardStockAddMenu();
@@ -100,8 +100,11 @@ public class MenuService { //TODO: Add interface
                 break;
             case CARDS:
                 List<CardDto> cards = storageResource.getCardsByCardStockId(state.getCardStockId());
-                List<String> keys = cards.stream().map(CardDto::getCardKey).collect(Collectors.toList());
-                menuFactory = new CardsMenu(state.getCardStockId(), keys);
+                Map<Integer, String> map = new HashMap();
+                cards.forEach(card ->  {
+                    map.put(card.getId(), card.getCardKey());
+                });
+                menuFactory = new CardsMenu(state.getCardStockId(), map);
                 break;
             case CARD_ADD:
                 menuFactory = new CardAddMenu();
@@ -141,8 +144,9 @@ public class MenuService { //TODO: Add interface
             case CARD_STOCKS:
                 Optional<CardStockDto> cardStock = Optional.empty();
                 if (!cardStocks.isEmpty()) {
+                    Integer cardStockId = Integer.valueOf(callback);
                     cardStock = cardStocks.stream()
-                            .filter(cardStockDto -> Objects.equals(cardStockDto.getCardStockName(), callback))
+                            .filter(cardStockDto -> Objects.equals(cardStockDto.getId(), cardStockId))
                             .findFirst();
                 }
 
@@ -155,8 +159,9 @@ public class MenuService { //TODO: Add interface
                 List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
                 Optional<CardDto> card = Optional.empty();
                 if (!cards.isEmpty()) {
+                    Integer cardId = Integer.valueOf(callback);
                     card = cards.stream()
-                            .filter(it -> Objects.equals(it.getCardKey(), callback))
+                            .filter(it -> Objects.equals(it.getId(), cardId))
                             .findFirst();
                 }
 

@@ -15,29 +15,44 @@ public abstract class AMenu implements MenuFactory {
         return this.getCurrentMenu().getLastMenu();
     }
 
-    public InlineKeyboardMarkup createInlineKeyboard(List<String> strings) {
-        if (strings == null || strings.isEmpty()) return null;
+    public InlineKeyboardMarkup createInlineKeyboard(Map<Integer, String> map) {
+        if (map == null || map.isEmpty()) return null;
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
-        List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
+        final List<InlineKeyboardButton>[] keyboardButtonsRow = new List[]{new ArrayList<>()};
 
-        for (String name : strings) {
+        map.forEach((key, value) -> {
 
-            if (!isEnoughSpaceInKeyboardButtonRow(keyboardButtonsRow, name)) {
+            if (!isEnoughSpaceInKeyboardButtonRow(keyboardButtonsRow[0], value)) {
                 // create next line
-                rowList.add(keyboardButtonsRow);
-                keyboardButtonsRow = new ArrayList<>();
+                rowList.add(keyboardButtonsRow[0]);
+                keyboardButtonsRow[0] = new ArrayList<>();
             }
 
             InlineKeyboardButton inlineKeyboardButton = InlineKeyboardButton.builder()
-                    .text(name)
-                    .callbackData(name)
+                    .text(value.length() > 40 ? value.substring(0, 40) + "..." : value)
+                    .callbackData(key.toString())
                     .build();
-            keyboardButtonsRow.add(inlineKeyboardButton);
+            keyboardButtonsRow[0].add(inlineKeyboardButton);
+        });
 
-        }
-        rowList.add(keyboardButtonsRow);
+//        for (String name : strings) {
+//
+//            if (!isEnoughSpaceInKeyboardButtonRow(keyboardButtonsRow, name)) {
+//                // create next line
+//                rowList.add(keyboardButtonsRow);
+//                keyboardButtonsRow = new ArrayList<>();
+//            }
+//            // TODO: Переделать. Передавать в callbackData Id
+//            InlineKeyboardButton inlineKeyboardButton = InlineKeyboardButton.builder()
+//                    .text(name.length() > 40 ? name.substring(0, 40) + "..." : name)
+//                    .callbackData(name)
+//                    .build();
+//            keyboardButtonsRow.add(inlineKeyboardButton);
+//
+//        }
+        rowList.add(keyboardButtonsRow[0]);
 
         inlineKeyboardMarkup.setKeyboard(rowList);
         return inlineKeyboardMarkup;
@@ -48,11 +63,12 @@ public abstract class AMenu implements MenuFactory {
         if (keyboardButtonsRow.size() >= 5) return false;
 
         List<String> names = keyboardButtonsRow.stream().map(InlineKeyboardButton::getText).collect(Collectors.toList());
+        if (name.length() > 40 ) name = name.substring(0, 40) + "...";
         names.add(name);
 
         int maxOneRowSize;
         if (names.size() == 1) {
-            maxOneRowSize = 30;
+            maxOneRowSize = 40;
         } else if (names.size() == 2) {
             maxOneRowSize = 26;
         } else if (names.size() == 3) {

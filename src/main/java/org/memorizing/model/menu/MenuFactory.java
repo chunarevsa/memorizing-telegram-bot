@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MenuFactory {
 
@@ -17,7 +18,7 @@ public interface MenuFactory {
 
     InlineKeyboardMarkup getInlineKeyboard();
 
-    InlineKeyboardMarkup createInlineKeyboard(List<String> strings);
+    InlineKeyboardMarkup createInlineKeyboard(Map<Integer, String> map);
 
     String getTitle();
 }

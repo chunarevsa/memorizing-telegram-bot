@@ -48,11 +48,11 @@ public class MessageDispatcherService {
     // TODO: Отображать количество оставшихся карточек когда заходишь в обучение
     // TODO: отображать количество карточек в cardStock menu и cards
 
-    public DispatcherResponse getResponseByCallback(Long chatId, String messageText) {
-        log.debug("getResponseByCallback. req:" + chatId + ", " + messageText);
+    public DispatcherResponse getResponseByCallback(Long chatId, String data) {
+        log.debug("getResponseByCallback. req:" + chatId + ", " + data);
         User user = usersRepo.findByChatId(chatId);
         UserState userState = user.getUserState();
-        MenuFactory menu = menuService.createMenuByCallback(user.getStorageId(), userState, userState.getCurrentMenu(), messageText);
+        MenuFactory menu = menuService.createMenuByCallback(user.getStorageId(), userState, userState.getCurrentMenu(), data);
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 

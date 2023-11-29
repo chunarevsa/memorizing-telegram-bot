@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.memorizing.model.command.EKeyboardCommand.ADD_CARD_STOCK;
 import static org.memorizing.model.command.EKeyboardCommand.GET_INFO;
@@ -12,8 +13,8 @@ public class CardStocksMenu extends AMenu {
 
     InlineKeyboardMarkup inlineKeyboard;
 
-    public CardStocksMenu(List<String> names) {
-        this.inlineKeyboard = createInlineKeyboard(names);
+    public CardStocksMenu(Map<Integer, String> map) {
+        this.inlineKeyboard = createInlineKeyboard(map);
     }
 
     @Override

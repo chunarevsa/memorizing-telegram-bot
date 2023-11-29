@@ -68,6 +68,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         log.info("onUpdateReceived:" + update + "\n---");
 
         Message message = null;
+        String text = null;
         String data = null;
         boolean hasCallback = false,
                 hasRegularMessage = false;
@@ -78,10 +79,11 @@ public class TelegramBot extends TelegramLongPollingBot {
             CallbackQuery callbackQuery = update.getCallbackQuery();
             message = callbackQuery.getMessage();
             data = callbackQuery.getData();
+            text = callbackQuery.getData();
         } else if (update.hasMessage()) {
             hasRegularMessage = true;
             message = update.getMessage();
-            data = message.getText();
+            text = message.getText();
         }
 
         if (hasCallback || hasRegularMessage) {
@@ -112,9 +114,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                     menu = messageDispatcherService.getFirstMenu(chatId);
                     executeSending(chatId, new DispatcherResponse(menu, SUCCESSFULLY));
 
-                } else if (ECommand.getCommandByMessage(data) != null) {
+                } else if (ECommand.getCommandByMessage(text) != null) {
                     // обработка команд из основной менюшки
-                    ECommand command = ECommand.getCommandByMessage(data);
+                    ECommand command = ECommand.getCommandByMessage(text);
 
                     SendMessage commandMessage = SendMessage.builder()
                             .chatId(chatId)
@@ -125,15 +127,15 @@ public class TelegramBot extends TelegramLongPollingBot {
                     execute(commandMessage);
                     executeSending(chatId, messageDispatcherService.getResponseByCommand(chatId, command));
 
-                } else if (EPlaceholderCommand.getPlaceholderCommandByPref(data) != null) {
+                } else if (EPlaceholderCommand.getPlaceholderCommandByPref(text) != null) {
                     // Обработка входящего изменения
 
-                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, data);
+                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, text);
                     executeSending(chatId, resp);
 
-                } else if (EKeyboardCommand.getKeyboardCommandByMessage(data) != null) {
+                } else if (EKeyboardCommand.getKeyboardCommandByMessage(text) != null) {
                     // обработка с основной клавиатуры
-                    EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(data);
+                    EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
                     if (command == EKeyboardCommand.GET_INFO) {
@@ -199,7 +201,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
                     // may be, it is user test answer
-                    DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, data);
+                    DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, text);
 
                     if (!resp.getTestResult().getRightAnswer()) {
                         // Create correct answer
