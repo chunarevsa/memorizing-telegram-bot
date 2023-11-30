@@ -229,6 +229,16 @@ public class MessageDispatcherService {
         }
     }
 
+    public DispatcherResponse getLastMenu(Long chatId) {
+        log.debug("getLastMenu req:" + chatId );
+        User user = usersRepo.findByChatId(chatId);
+        Integer storageId = user.getStorageId();
+        UserState userState = user.getUserState();
+
+        MenuFactory menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
+        return new DispatcherResponse(menu, SUCCESSFULLY);
+    }
+
     private void addFirstData(Integer storageId) {
         CardStockFieldsDto firstReq = new CardStockFieldsDto(
                 storageId,
@@ -372,5 +382,4 @@ public class MessageDispatcherService {
 
         return SUCCESSFULLY;
     }
-
 }
