@@ -1,13 +1,13 @@
 package org.memorizing.model.command;
 
-import org.memorizing.model.ERegularMessages;
-
 import java.util.Arrays;
 
+import static org.memorizing.model.ERegularMessages.*;
+
 public enum ECommand {
-    START("/start", (ERegularMessages.WELCOME.getText() + ERegularMessages.HOW_IT_WORKS.getText())),
-    HELP("/help", ERegularMessages.HELP.getText()),
-    HOW_IT_WORKS("/howitworks", ERegularMessages.HOW_IT_WORKS.getText()),
+    START_COMMAND("/start", (WELCOME.getText() + HOW_IT_WORKS.getText())),
+    HELP_COMMAND("/help", HELP.getText()),
+    HOW_IT_WORKS_COMMAND("/howitworks", HOW_IT_WORKS.getText()),
     ;
 
     private final String buttonText;

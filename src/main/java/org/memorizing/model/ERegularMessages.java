@@ -61,12 +61,7 @@ public enum ERegularMessages {
             "▪️*Updating card* - updating your existing card\n" +
             "\n" +
             "If you found a bug, please, send the message to @chunarevsea in telegram or use the command:\n" +
-            "`#report  <your problem>`"),
-
-    BAD_REQUEST("❌ Bad request."),
-    SOMETHING_WENT_WRONG("❌ Sorry, something went wrong. We try to manage it rapidly"),
-    SUCCESSFULLY("✅ Success "),
-    COMPLETE_SET("✅ You made this list!");
+            "`#report  <your problem>`");
 
     private final String text;
 

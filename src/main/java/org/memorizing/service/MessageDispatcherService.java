@@ -6,7 +6,7 @@ import org.memorizing.entity.CardStockHistory;
 import org.memorizing.entity.User;
 import org.memorizing.entity.UserState;
 import org.memorizing.model.EMode;
-import org.memorizing.model.ERegularMessages;
+import org.memorizing.model.EStatus;
 import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.memorizing.model.ERegularMessages.*;
+import static org.memorizing.model.EStatus.*;
 
 @Service
 public class MessageDispatcherService {
@@ -62,7 +62,7 @@ public class MessageDispatcherService {
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
         EMenu menuType = userState.getCurrentMenu();
-        if (command == ECommand.START) menuType = EMenu.CARD_STOCKS;
+        if (command == ECommand.START_COMMAND) menuType = EMenu.CARD_STOCKS;
 
         MenuFactory menu = menuService.createMenu(storageId, userState, menuType);
         // TODO: Add logic when something went wrong (need try catch in createMenu)
@@ -76,7 +76,7 @@ public class MessageDispatcherService {
         UserState userState = user.getUserState();
         EPlaceholderCommand command = EPlaceholderCommand.getPlaceholderCommandByPref(data);
 
-        ERegularMessages status = executeRequest(command, data, userState);
+        EStatus status = executeRequest(command, data, userState);
 
         if (command == EPlaceholderCommand.DELETE_CARD_STOCK) {
             userState = userStateService.deleteCardStockIdFromSessionAndGet(userState);
@@ -301,7 +301,7 @@ public class MessageDispatcherService {
 
     }
 
-    private ERegularMessages executeRequest(EPlaceholderCommand command, String data, UserState userState) {
+    private EStatus executeRequest(EPlaceholderCommand command, String data, UserState userState) {
         log.debug("executeRequest. req:" + command + ", " + userState);
 
         IMappable entity = command.getNewEntity();
