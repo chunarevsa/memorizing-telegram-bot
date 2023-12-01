@@ -7,6 +7,7 @@ import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.AStudyingMenu;
 import org.memorizing.model.menu.MenuFactory;
+import org.memorizing.model.menu.SelfCheckMenu;
 import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.UserResource;
 import org.memorizing.resource.cardApi.CardDto;
@@ -146,12 +147,9 @@ public class TelegramBot extends TelegramLongPollingBot {
             String userName = Optional.ofNullable(message.getFrom().getUserName())
                     .orElse(message.getFrom().getFirstName() + " " + message.getFrom().getLastName());
 
-            MenuFactory menu;
             try {
                 if (hasCallback) {
-                    // TODO: Send Title(+inline) + next menu
                     DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
-//                    executeSending(chatId, resp);
                     sendMenu(chatId, resp.getMenu());
 
                 } else if (!users.containsKey(chatId)) {
@@ -159,45 +157,21 @@ public class TelegramBot extends TelegramLongPollingBot {
                     // adding new user
                     messageDispatcherService.registerIfAbsent(chatId, userName);
                     users.put(chatId, LocalDate.now());
-
-                    // TODO: Send Regular
-                    // Send welcome message
-//                    SendMessage welcomeMessage = SendMessage.builder()
-//                            .chatId(chatId)
-//                            .text((WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName))
-//                            .build();
-//                    welcomeMessage.enableMarkdown(true);
-//                    execute(welcomeMessage);
                     String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
                     executeSendingMessage(chatId, welcomeMessage);
 
-                    // TODO: Send Title(+inline) + Main(CardStocksMenu)
-//                    executeSending(chatId, new DispatcherResponse(menu, SUCCESSFULLY));
                     sendMenu(chatId, messageDispatcherService.getFirstMenu(chatId));
 
                 } else if (ECommand.getCommandByMessage(text) != null) {
                     // обработка команд из основной менюшки
                     ECommand command = ECommand.getCommandByMessage(text);
 
-                    // TODO: Send: Regular
-//                    SendMessage commandMessage = SendMessage.builder()
-//                            .chatId(chatId)
-//                            .text(command.getMessageText().replaceAll("\\{name}", userName))
-//                            .build();
-//                    commandMessage.enableMarkdown(true);
-//                    execute(commandMessage);
                     executeSendingMessage(chatId, command.getMessageText().replaceAll("\\{name}", userName));
 
-
-                    // TODO: Если Start -> Send: Title(+inline) + MAIN(CARD_STOCKS)
-                    // TODO: Если other -> Send: Title(+inline) + CURRENT
-//                    executeSending(chatId, messageDispatcherService.getResponseByCommand(chatId, command));
                     sendMenu(chatId, messageDispatcherService.getResponseByCommand(chatId, command).getMenu());
                 } else if (EPlaceholderCommand.getPlaceholderCommandByPref(text) != null) {
                     // Обработка входящего изменения
-                    // TODO: Send: Status -> Title(+inline) + LASTMENU
                     DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, text);
-//                    executeSending(chatId, resp);
                     executeSendingMessage(chatId, resp.getStatus().getText());
                     sendMenu(chatId, resp.getMenu());
 
@@ -206,36 +180,17 @@ public class TelegramBot extends TelegramLongPollingBot {
                     EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
-                    if (command == EKeyboardCommand.GET_INFO) {
-                        // TODO: Send: Menu Info
-//                        SendMessage infoText = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text(resp.getMenu().getInfoText())
-//                                .build();
-//                        infoText.enableMarkdown(true);
-//                        execute(infoText);
-                        executeSendingMessage(chatId, resp.getMenu().getInfoText());
-                    }
+                    if (command == EKeyboardCommand.GET_INFO) executeSendingMessage(chatId, resp.getMenu().getInfoText());
 
-                    if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
-                        // TODO: Send: Menu Text(MDV2)
-//                        SendMessage nextCardMessage = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .replyMarkup(resp.getMenu().getKeyboard())
-//                                .text(resp.getMenu().getText())
-//                                .build();
-//                        nextCardMessage.enableMarkdownV2(true);
-//                        execute(nextCardMessage);
+                    if (resp.getMenu() instanceof SelfCheckMenu) {
+
                         sendMenuWithoutTitleAndWithMDV2(chatId, resp.getMenu());
+                        if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
-                        if (resp.isNeedSendStatus()) {
-                            // TODO: Send: Status
-//                            execute(SendMessage.builder()
-//                                    .chatId(chatId)
-//                                    .text(resp.getStatus().getText())
-//                                    .build());
-                            executeSendingMessage(chatId, resp.getStatus().getText());
-                        }
+                    } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
+
+                        sendMenuWithoutTitle(chatId, resp.getMenu());
+                        if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.SKIP) {
                         String correctAnswer;
@@ -250,35 +205,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                         } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
 
-                        // TODO: Send: correct answer
-//                        SendMessage correctAnswerMessage = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text("❗" + correctAnswer + "❗")
-//                                .build();
-//                        correctAnswerMessage.enableMarkdown(true);
-//                        execute(correctAnswerMessage);
                         executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
-
-                        if (resp.isNeedSendStatus()) {
-                            // TODO: Send: status
-//                            execute(SendMessage.builder()
-//                                    .chatId(chatId)
-//                                    .text(resp.getStatus().getText())
-//                                    .build());
-                            executeSendingMessage(chatId, resp.getStatus().getText());
-                        }
-
-                        // TODO: Send: Menu text + keyboard
-//                        SendMessage nextCardMessage = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .replyMarkup(resp.getMenu().getKeyboard())
-//                                .text(resp.getMenu().getText())
-//                                .build();
-//                        nextCardMessage.enableMarkdown(true);
-//                        execute(nextCardMessage);
+                        if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
                         sendMenuWithoutTitle(chatId, resp.getMenu());
 
-                    } else sendMenu(chatId, resp.getMenu()); //TODO: Send
+                    } else sendMenu(chatId, resp.getMenu());
 
                 } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
                     // may be, it is user test answer
@@ -297,47 +228,19 @@ public class TelegramBot extends TelegramLongPollingBot {
                                     : card.getCardValue() + " : " + card.getCardKey();
 
                         } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
-                        // TODO: edit old message
-                        // TODO: Send correct answer
-//                        SendMessage correctAnswerMessage = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text("❗" + correctAnswer + "❗")
-//                                .build();
-//                        correctAnswerMessage.enableMarkdown(true);
-//                        execute(correctAnswerMessage);
+
                         executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
                     }
 
                     // If we continue testing
                     if (resp.getMenu() instanceof AStudyingMenu) {
-                        // TODO: Send Menu text(+keyboard)
-//                        SendMessage nextCardMessage = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .replyMarkup(resp.getMenu().getKeyboard())
-//                                .text(resp.getMenu().getText())
-//                                .build();
-//                        nextCardMessage.enableMarkdown(true);
-//                        execute(nextCardMessage);
                         sendMenu(chatId, resp.getMenu());
-
                     } else {
-                        // TODO: Send Regular(+keyboard)
-//                        SendMessage nextCardMessage = SendMessage.builder()
-//                                .chatId(chatId)
-//                                .text(COMPLETE_SET.getText())
-//                                .build();
-//                        nextCardMessage.enableMarkdown(true);
-//                        execute(nextCardMessage);
                         executeSendingMessage(chatId, COMPLETE_SET.getText());
-
-                        // TODO: Send Menu text(+keyboard)
                         sendMenu(chatId, resp.getMenu());
-//                        executeSending(chatId, resp);
                     }
 
                 } else {
-                    // TODO: Send status
-//                    executeSending(chatId, new DispatcherResponse(null, BAD_REQUEST, true));
                     executeSendingMessage(chatId, BAD_REQUEST.getText());
                     DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
                     sendMenu(chatId, resp.getMenu());
@@ -409,40 +312,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
     }
-
-    private void executeSending(Long chatId, DispatcherResponse resp) throws TelegramApiException {
-        EStatus status = resp.getStatus();
-        MenuFactory menu = resp.getMenu();
-
-        if (resp.isNeedSendStatus()) {
-            execute(SendMessage.builder()
-                    .chatId(chatId)
-                    .text(status.getText())
-                    .build());
-        }
-
-        if (menu == null) return;
-
-        if (resp.isNeedSendTitle()) {
-            SendMessage messageWithKeyboard = SendMessage.builder()
-                    .chatId(chatId)
-                    .replyMarkup(menu.getKeyboard())
-                    .text(menu.getTitle())
-                    .build();
-            messageWithKeyboard.enableMarkdown(true);
-            execute(messageWithKeyboard);
-        }
-
-        SendMessage messageWithInlineKeyboard = SendMessage.builder()
-                .chatId(chatId)
-                .replyMarkup(menu.getInlineKeyboard())
-                .text(menu.getText())
-                .build();
-        messageWithInlineKeyboard.enableMarkdown(true);
-//        if (menu instanceof SelfCheckMenu) messageWithInlineKeyboard.enableMarkdownV2(true);
-        execute(messageWithInlineKeyboard);
-    }
-
 
     // For testing "Styled" text
     private void startEcho(Long chatId, String data) throws TelegramApiException {
