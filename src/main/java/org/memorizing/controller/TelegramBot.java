@@ -1,18 +1,16 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
-import org.memorizing.model.EStatus;
 import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.AStudyingMenu;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.model.menu.SelfCheckMenu;
-import org.memorizing.repository.UsersRepo;
-import org.memorizing.resource.UserResource;
 import org.memorizing.resource.cardApi.CardDto;
 import org.memorizing.service.DispatcherResponse;
 import org.memorizing.service.MessageDispatcherService;
+import org.memorizing.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -22,41 +20,30 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static org.memorizing.model.ERegularMessages.*;
+import static org.memorizing.model.ERegularMessages.HOW_IT_WORKS;
+import static org.memorizing.model.ERegularMessages.WELCOME;
 import static org.memorizing.model.EStatus.*;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = Logger.getLogger(TelegramBot.class);
     private final String botName;
-    private final UsersRepo usersRepo;
+    private final UserService userService;
     private final MessageDispatcherService messageDispatcherService;
-    public static ConcurrentHashMap<Long, LocalDate> users = new ConcurrentHashMap<>();
 
     public TelegramBot(
             @Value("${telegram.bot.token}") String botToken,
             @Value("${telegram.bot.name}") String botName,
-            UsersRepo usersRepo,
-            UserResource userResource,
+            UserService userService,
             MessageDispatcherService messageDispatcherService) {
         super(botToken);
         this.botName = botName;
-        this.usersRepo = usersRepo;
+        this.userService = userService;
         this.messageDispatcherService = messageDispatcherService;
-    }
-
-    @PostConstruct
-    void init() {
-        // TODO: add finding user in user-service, when it will be completed
-        usersRepo.findAll().forEach(user -> users.put(user.getChatId(), LocalDate.now()));
-        log.debug("Users:" + users.toString());
     }
 
     @Override
@@ -67,55 +54,54 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     /**
      * hasCallback
-     *      1) Title(+inline)
-     *      2) next menu(+keyboard)
-     *
+     * 1) Title(+inline)
+     * 2) next menu(+keyboard)
+     * <p>
      * !users.containsKey(chatId)
-     *      1) Regular
-     *      2) Title(+inline)
-     *      3) CardStocksMenu text(+keyboard)
-     *
+     * 1) Regular
+     * 2) Title(+inline)
+     * 3) CardStocksMenu text(+keyboard)
+     * <p>
      * /start /help /howitworks
-     *      1) Regular
-     *          2) Если Start -> Send: Title(+inline) + MAIN(CARD_STOCKS)
-     *          2) Если other -> Send: Title(+inline) + CURRENT
-     *
+     * 1) Regular
+     * 2) Если Start -> Send: Title(+inline) + MAIN(CARD_STOCKS)
+     * 2) Если other -> Send: Title(+inline) + CURRENT
+     * <p>
      * #add-CardStock ...
-     *      1) Status
-     *      2) Title(+inline)
-     *      3) Last menu text (+keyboard)
-     *
+     * 1) Status
+     * 2) Title(+inline)
+     * 3) Last menu text (+keyboard)
+     * <p>
      * Keyboard buttons
-     *      GET_INFO
-     *      1) Info text
-     *      2) Title(+inline)
-     *      3) Menu text(+keyboard)
-     *
-     *      NEXT
-     *      1) Menu text(+keyboard) (MDV2)
-     *          2) Если resp.isNeedSendStatus() Status
-     *
-     *      SKIP
-     *      1) Correct answer
-     *          2) Если resp.isNeedSendStatus() Status
-     *      3) Menu text(+keyboard)
-     *
-     *      OTHER
-     *      1) Title(+inline)
-     *      2) Menu text(+keyboard)
-     *
+     * GET_INFO
+     * 1) Info text
+     * 2) Title(+inline)
+     * 3) Menu text(+keyboard)
+     * <p>
+     * NEXT
+     * 1) Menu text(+keyboard) (MDV2)
+     * 2) Если resp.isNeedSendStatus() Status
+     * <p>
+     * SKIP
+     * 1) Correct answer
+     * 2) Если resp.isNeedSendStatus() Status
+     * 3) Menu text(+keyboard)
+     * <p>
+     * OTHER
+     * 1) Title(+inline)
+     * 2) Menu text(+keyboard)
+     * <p>
      * isUserCurrentMenuStudying
-     *      1) Correct answer
-     *          2) Если NEXT == AStudyingMenu -> Menu text(+keyboard)
-     *          2) Если NEXT != AStudyingMenu -> Regular
-     *              3) Title(+inline)
-     *              4) Menu text(+keyboard)
-     *
+     * 1) Correct answer
+     * 2) Если NEXT == AStudyingMenu -> Menu text(+keyboard)
+     * 2) Если NEXT != AStudyingMenu -> Regular
+     * 3) Title(+inline)
+     * 4) Menu text(+keyboard)
+     * <p>
      * else
-     *      1) Status
-     *      2) Title(+inline)
-     *      3) Menu text(+keyboard)
-     *
+     * 1) Status
+     * 2) Title(+inline)
+     * 3) Menu text(+keyboard)
      */
 
     @Override
@@ -152,11 +138,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                     DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
                     sendMenu(chatId, resp.getMenu());
 
-                } else if (!users.containsKey(chatId)) {
+                } else if (userService.isUserExistsByChatId(chatId)) {
                     // TODO: Add registration via auth-service, when it will be completed
                     // adding new user
                     messageDispatcherService.registerIfAbsent(chatId, userName);
-                    users.put(chatId, LocalDate.now());
                     String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
                     executeSendingMessage(chatId, welcomeMessage);
 
@@ -180,7 +165,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                     EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
-                    if (command == EKeyboardCommand.GET_INFO) executeSendingMessage(chatId, resp.getMenu().getInfoText());
+                    if (command == EKeyboardCommand.GET_INFO)
+                        executeSendingMessage(chatId, resp.getMenu().getInfoText());
 
                     if (resp.getMenu() instanceof SelfCheckMenu) {
 
@@ -258,6 +244,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void sendMenuWithoutTitleAndWithMDV2(Long chatId, MenuFactory menu) {
         executeSendingMenu2(chatId, menu, false, true);
     }
+
     private void sendMenuWithoutTitle(Long chatId, MenuFactory menu) {
         executeSendingMenu2(chatId, menu, false, false);
     }

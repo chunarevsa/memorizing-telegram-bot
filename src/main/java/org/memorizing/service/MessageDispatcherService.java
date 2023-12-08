@@ -12,7 +12,6 @@ import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.EMenu;
 import org.memorizing.model.menu.MenuFactory;
-import org.memorizing.repository.UsersRepo;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.cardApi.*;
 import org.springframework.stereotype.Service;
@@ -27,30 +26,30 @@ import static org.memorizing.model.EStatus.*;
 @Service
 public class MessageDispatcherService {
     private static final Logger log = Logger.getLogger(MessageDispatcherService.class);
-    private final UsersRepo usersRepo;
+    private final UserService userService;
     private final StorageResource storageResource;
     private final MenuService menuService;
     private final UserStateService userStateService;
     private final JsonObjectMapper mapper = new JsonObjectMapper();
 
     public MessageDispatcherService(
-            UsersRepo usersRepo,
+            UserService userService,
             StorageResource storageResource,
             MenuService menuService, UserStateService userStateService) {
-        this.usersRepo = usersRepo;
+        this.userService = userService;
         this.storageResource = storageResource;
         this.menuService = menuService;
         this.userStateService = userStateService;
     }
 
     // TODO: обработка ошибок, когда основной сервис не доступен сервис не доступен
-    // TODO: не отображать start studyin если нет карточек
+    // TODO: не отображать start studying если нет карточек
     // TODO: Отображать количество оставшихся карточек когда заходишь в обучение
     // TODO: отображать количество карточек в cardStock menu и cards
 
     public DispatcherResponse getResponseByCallback(Long chatId, String data) {
         log.debug("getResponseByCallback. req:" + chatId + ", " + data);
-        User user = usersRepo.findByChatId(chatId);
+        User user = userService.getByChatId(chatId);
         UserState userState = user.getUserState();
         MenuFactory menu = menuService.createMenuByCallback(user.getStorageId(), userState, userState.getCurrentMenu(), data);
         return new DispatcherResponse(menu, SUCCESSFULLY);
@@ -58,7 +57,7 @@ public class MessageDispatcherService {
 
     public DispatcherResponse getResponseByCommand(Long chatId, ECommand command) {
         log.debug("getResponseByCommand. req:" + chatId + ", " + command);
-        User user = usersRepo.findByChatId(chatId);
+        User user = userService.getByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
         EMenu menuType = userState.getCurrentMenu();
@@ -71,7 +70,7 @@ public class MessageDispatcherService {
 
     public DispatcherResponse getResponseByPlaceholderCommand(Long chatId, String data) {
         log.debug("getResponseByPlaceholderCommand req:" + chatId + ", " + data);
-        User user = usersRepo.findByChatId(chatId);
+        User user = userService.getByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
         EPlaceholderCommand command = EPlaceholderCommand.getPlaceholderCommandByPref(data);
@@ -90,7 +89,7 @@ public class MessageDispatcherService {
 
     public DispatcherResponse getResponseByKeyboardCommand(Long chatId, EKeyboardCommand command) {
         log.debug("getResponseByKeyboardCommand req:" + chatId + ", " + command);
-        User user = usersRepo.findByChatId(chatId);
+        User user = userService.getByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
 
@@ -160,13 +159,14 @@ public class MessageDispatcherService {
 
     public boolean isUserCurrentMenuStudying(Long chatId) {
         log.debug("isUserCurrentMenuStudying. req:" + chatId);
-        EMenu currentMenu = usersRepo.findByChatId(chatId).getUserState().getCurrentMenu();
+        EMenu currentMenu = userService.getByChatId(chatId).getUserState().getCurrentMenu();
         return EMenu.getOnlyStudyingMenu().stream().anyMatch(it -> it == currentMenu);
     }
 
     public DispatcherResponse checkAnswer(Long chatId, String data) {
         log.debug("checkAnswer. req:" + chatId + ", " + data);
-        User user = usersRepo.findByChatId(chatId);
+        User user = userService.getByChatId(chatId);
+        ;
         UserState userState = user.getUserState();
 
         EMenu nextMenu = userState.getCurrentMenu();
@@ -194,7 +194,8 @@ public class MessageDispatcherService {
 
     public MenuFactory getFirstMenu(Long chatId) {
         log.debug("getFirstMenu. req:" + chatId);
-        User user = usersRepo.findByChatId(chatId);
+        User user = userService.getByChatId(chatId);
+        ;
         UserState state = user.getUserState();
 
         // TODO: Temp. Clear it after adding auth
@@ -210,7 +211,7 @@ public class MessageDispatcherService {
      */
     public void registerIfAbsent(Long chatId, String userName) {
         log.debug("registerIfAbsent. req:" + chatId + ", " + userName);
-        if (!usersRepo.existsByChatId(chatId)) {
+        if (!userService.isUserExistsByChatId(chatId)) {
 //            UserDto userDto = userResource.getUserByChatId(chatId);
 
             // TODO delete it after creating user-service
@@ -225,13 +226,13 @@ public class MessageDispatcherService {
             }
 
             User user = new User(chatId, userName, storageId);
-            usersRepo.save(user);
+            userService.save(user);
         }
     }
 
     public DispatcherResponse getLastMenu(Long chatId) {
-        log.debug("getLastMenu req:" + chatId );
-        User user = usersRepo.findByChatId(chatId);
+        log.debug("getLastMenu req:" + chatId);
+        User user = userService.getByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
 
