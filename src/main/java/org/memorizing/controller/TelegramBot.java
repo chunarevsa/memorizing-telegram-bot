@@ -8,6 +8,7 @@ import org.memorizing.model.menu.AStudyingMenu;
 import org.memorizing.model.menu.MenuFactory;
 import org.memorizing.model.menu.SelfCheckMenu;
 import org.memorizing.resource.cardApi.CardDto;
+import org.memorizing.resource.cardApi.TestResultDto;
 import org.memorizing.service.DispatcherResponse;
 import org.memorizing.service.MessageDispatcherService;
 import org.memorizing.service.UserService;
@@ -90,8 +91,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                     // adding new user
                     messageDispatcherService.registerIfAbsent(chatId, userName);
                     String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
-                    executeSendingMessage(chatId, welcomeMessage);
 
+                    executeSendingMessage(chatId, welcomeMessage);
                     sendMenu(chatId, messageDispatcherService.getFirstMenu(chatId));
 
                 } else if (ECommand.getCommandByMessage(text) != null) {
@@ -99,11 +100,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                     ECommand command = ECommand.getCommandByMessage(text);
 
                     executeSendingMessage(chatId, command.getMessageText().replaceAll("\\{name}", userName));
-
                     sendMenu(chatId, messageDispatcherService.getResponseByCommand(chatId, command).getMenu());
+
                 } else if (EPlaceholderCommand.getPlaceholderCommandByPref(text) != null) {
                     // Обработка входящего изменения
                     DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, text);
+
                     executeSendingMessage(chatId, resp.getStatus().getText());
                     sendMenu(chatId, resp.getMenu());
 
@@ -116,12 +118,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                     if (resp.getMenu() instanceof SelfCheckMenu) {
 
-                        if (command != EKeyboardCommand.NEXT) {
-                            executeSendingMenu(chatId, resp.getMenu(), true,true);
-                        } else {
-                            executeSendingMenu(chatId, resp.getMenu(), false, true);
-                        }
-
+                        executeSendingMenu(chatId, resp.getMenu(), command != EKeyboardCommand.NEXT,true);
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
@@ -130,25 +127,12 @@ public class TelegramBot extends TelegramLongPollingBot {
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.NEXT && !(resp.getMenu() instanceof AStudyingMenu)) {
+
                         executeSendingMessage(chatId, resp.getStatus().getText());
                         sendMenu(chatId, resp.getMenu());
 
                     } else if (command == EKeyboardCommand.SKIP) {
-                        String correctAnswer;
-                        CardDto card = resp.getTestResult().getCard();
-
-                        // We can't show last card in a correct queue because we have only next menu
-                        if (resp.getMenu() instanceof AStudyingMenu) {
-                            AStudyingMenu studyingMenu = (AStudyingMenu) resp.getMenu();
-                            correctAnswer = studyingMenu.getMode().isFromKeyMode()
-                                    ? card.getCardKey() + " : " + card.getCardValue()
-                                    : card.getCardValue() + " : " + card.getCardKey();
-
-                        } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
-
-                        executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
-                        if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
-                        executeSendingMenu(chatId, resp.getMenu(), false, false);
+                        sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
 
                     } else sendMenu(chatId, resp.getMenu());
 
@@ -156,29 +140,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                     // may be, it is user test answer
                     DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, text);
 
-                    if (!resp.getTestResult().getRightAnswer()) {
-                        // Create correct answer
-                        String correctAnswer;
-                        CardDto card = resp.getTestResult().getCard();
-
-                        // We can't show last card in a correct queue because we have only next menu
-                        if (resp.getMenu() instanceof AStudyingMenu) {
-                            AStudyingMenu studyingMenu = (AStudyingMenu) resp.getMenu();
-                            correctAnswer = studyingMenu.getMode().isFromKeyMode()
-                                    ? card.getCardKey() + " : " + card.getCardValue()
-                                    : card.getCardValue() + " : " + card.getCardKey();
-
-                        } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
-
-                        executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
-                    }
+                    if (!resp.getTestResult().getRightAnswer()) sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
 
                     // If we continue testing
                     if (resp.getMenu() instanceof AStudyingMenu) {
-                        sendMenu(chatId, resp.getMenu());
+                        executeSendingMenu(chatId, resp.getMenu(), false, false);
                     } else {
                         executeSendingMessage(chatId, COMPLETE_SET.getText());
-                        sendMenu(chatId, resp.getMenu());
+                        executeSendingMenu(chatId, resp.getMenu(), true, false);
                     }
 
                 } else {
@@ -254,7 +223,22 @@ public class TelegramBot extends TelegramLongPollingBot {
             sendMenu(chatId, resp.getMenu());
             e.printStackTrace();
         }
+    }
 
+    private void sendCorrectAnswer(Long chatId, MenuFactory menu, TestResultDto result) {
+        String correctAnswer;
+        CardDto card = result.getCard();
+
+        // We can't show last card in a correct queue because we have only next menu
+        if (menu instanceof AStudyingMenu) {
+            AStudyingMenu studyingMenu = (AStudyingMenu) menu;
+            correctAnswer = studyingMenu.getMode().isFromKeyMode()
+                    ? card.getCardKey() + " : " + card.getCardValue()
+                    : card.getCardValue() + " : " + card.getCardKey();
+
+        } else correctAnswer = card.getCardKey() + " : " + card.getCardValue();
+
+        executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
     }
 
     // For testing "Styled" text
