@@ -51,59 +51,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         return botName;
     }
 
-
-    /**
-     * hasCallback
-     * 1) Title(+inline)
-     * 2) next menu(+keyboard)
-     * <p>
-     * !users.containsKey(chatId)
-     * 1) Regular
-     * 2) Title(+inline)
-     * 3) CardStocksMenu text(+keyboard)
-     * <p>
-     * /start /help /howitworks
-     * 1) Regular
-     * 2) Если Start -> Send: Title(+inline) + MAIN(CARD_STOCKS)
-     * 2) Если other -> Send: Title(+inline) + CURRENT
-     * <p>
-     * #add-CardStock ...
-     * 1) Status
-     * 2) Title(+inline)
-     * 3) Last menu text (+keyboard)
-     * <p>
-     * Keyboard buttons
-     * GET_INFO
-     * 1) Info text
-     * 2) Title(+inline)
-     * 3) Menu text(+keyboard)
-     * <p>
-     * NEXT
-     * 1) Menu text(+keyboard) (MDV2)
-     * 2) Если resp.isNeedSendStatus() Status
-     * <p>
-     * SKIP
-     * 1) Correct answer
-     * 2) Если resp.isNeedSendStatus() Status
-     * 3) Menu text(+keyboard)
-     * <p>
-     * OTHER
-     * 1) Title(+inline)
-     * 2) Menu text(+keyboard)
-     * <p>
-     * isUserCurrentMenuStudying
-     * 1) Correct answer
-     * 2) Если NEXT == AStudyingMenu -> Menu text(+keyboard)
-     * 2) Если NEXT != AStudyingMenu -> Regular
-     * 3) Title(+inline)
-     * 4) Menu text(+keyboard)
-     * <p>
-     * else
-     * 1) Status
-     * 2) Title(+inline)
-     * 3) Menu text(+keyboard)
-     */
-
     @Override
     public void onUpdateReceived(Update update) {
 
@@ -138,7 +85,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
                     sendMenu(chatId, resp.getMenu());
 
-                } else if (userService.isUserExistsByChatId(chatId)) {
+                } else if (!userService.isUserExistsByChatId(chatId)) {
                     // TODO: Add registration via auth-service, when it will be completed
                     // adding new user
                     messageDispatcherService.registerIfAbsent(chatId, userName);
@@ -165,18 +112,26 @@ public class TelegramBot extends TelegramLongPollingBot {
                     EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
-                    if (command == EKeyboardCommand.GET_INFO)
-                        executeSendingMessage(chatId, resp.getMenu().getInfoText());
+                    if (command == EKeyboardCommand.GET_INFO) executeSendingMessage(chatId, resp.getMenu().getInfoText());
 
                     if (resp.getMenu() instanceof SelfCheckMenu) {
 
-                        sendMenuWithoutTitleAndWithMDV2(chatId, resp.getMenu());
+                        if (command != EKeyboardCommand.NEXT) {
+                            executeSendingMenu(chatId, resp.getMenu(), true,true);
+                        } else {
+                            executeSendingMenu(chatId, resp.getMenu(), false, true);
+                        }
+
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
 
-                        sendMenuWithoutTitle(chatId, resp.getMenu());
+                        executeSendingMenu(chatId, resp.getMenu(), false, false);
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
+
+                    } else if (command == EKeyboardCommand.NEXT && !(resp.getMenu() instanceof AStudyingMenu)) {
+                        executeSendingMessage(chatId, resp.getStatus().getText());
+                        sendMenu(chatId, resp.getMenu());
 
                     } else if (command == EKeyboardCommand.SKIP) {
                         String correctAnswer;
@@ -193,7 +148,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                         executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
-                        sendMenuWithoutTitle(chatId, resp.getMenu());
+                        executeSendingMenu(chatId, resp.getMenu(), false, false);
 
                     } else sendMenu(chatId, resp.getMenu());
 
@@ -241,38 +196,40 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendMenuWithoutTitleAndWithMDV2(Long chatId, MenuFactory menu) {
-        executeSendingMenu2(chatId, menu, false, true);
-    }
-
-    private void sendMenuWithoutTitle(Long chatId, MenuFactory menu) {
-        executeSendingMenu2(chatId, menu, false, false);
-    }
-
     private void sendMenu(Long chatId, MenuFactory menu) {
-        executeSendingMenu2(chatId, menu, true, false);
+        executeSendingMenu(chatId, menu, true, false);
     }
 
-    private void executeSendingMenu2(Long chatId, MenuFactory menu, Boolean needSendTitle, Boolean enableMDV2) {
+    private void executeSendingMenu(Long chatId, MenuFactory menu, Boolean needSendTitle, Boolean enableMDV2) {
         try {
             if (needSendTitle) {
-                SendMessage messageWithKeyboard = SendMessage.builder()
+                SendMessage titleMessage = SendMessage.builder()
                         .chatId(chatId)
                         .replyMarkup(menu.getKeyboard())
                         .text(menu.getTitle())
                         .build();
-                messageWithKeyboard.enableMarkdown(true);
-                execute(messageWithKeyboard);
+                titleMessage.enableMarkdown(true);
+                execute(titleMessage);
             }
 
-            SendMessage messageWithInlineKeyboard = SendMessage.builder()
+            SendMessage textMessage = SendMessage.builder()
                     .chatId(chatId)
-                    .replyMarkup(menu.getInlineKeyboard())
+                    .replyMarkup(needSendTitle ? menu.getInlineKeyboard() : menu.getKeyboard())
                     .text(menu.getText())
                     .build();
-            messageWithInlineKeyboard.enableMarkdown(true);
-            if (enableMDV2) messageWithInlineKeyboard.enableMarkdownV2(true);
-            execute(messageWithInlineKeyboard);
+
+            if (enableMDV2) {
+                String str = menu.getText()
+                        .replaceAll("-", ":")
+                        .replaceAll("\\(", "[")
+                        .replaceAll("\\)", "]")
+                        .replaceAll("\\.", ";");
+                textMessage.setText(str);
+
+                textMessage.enableMarkdownV2(true);
+            } else textMessage.enableMarkdown(true);
+
+            execute(textMessage);
 
         } catch (TelegramApiException e) {
             executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
