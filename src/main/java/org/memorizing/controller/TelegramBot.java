@@ -117,22 +117,20 @@ public class TelegramBot extends TelegramLongPollingBot {
                     if (command == EKeyboardCommand.GET_INFO) executeSendingMessage(chatId, resp.getMenu().getInfoText());
 
                     if (resp.getMenu() instanceof SelfCheckMenu) {
-
                         executeSendingMenu(chatId, resp.getMenu(), command != EKeyboardCommand.NEXT,true);
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
-
                         executeSendingMenu(chatId, resp.getMenu(), false, false);
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.NEXT && !(resp.getMenu() instanceof AStudyingMenu)) {
-
                         executeSendingMessage(chatId, resp.getStatus().getText());
                         sendMenu(chatId, resp.getMenu());
 
                     } else if (command == EKeyboardCommand.SKIP) {
                         sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
+                        executeSendingMenu(chatId, resp.getMenu(), false, false);
 
                     } else sendMenu(chatId, resp.getMenu());
 
@@ -194,9 +192,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                         .replaceAll("\\)", "]")
                         .replaceAll("\\.", ";");
                 textMessage.setText(str);
-
                 textMessage.enableMarkdownV2(true);
-            } else textMessage.enableMarkdown(true);
+            }
 
             execute(textMessage);
 
