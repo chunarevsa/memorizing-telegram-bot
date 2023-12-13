@@ -34,8 +34,8 @@ public class SelfCheckMenu extends AStudyingMenu {
 
     @Override
     public String getText() {
-        String key = getTextForMDV2(getCard().getCardKey());
-        String value = getTextForMDV2(getCard().getCardValue());
+        String key = getCard().getCardKey();
+        String value = getCard().getCardValue();
 
         return getMode().isFromKeyMode()
                 ? (key + "\n" +
@@ -51,7 +51,9 @@ public class SelfCheckMenu extends AStudyingMenu {
 
     public String getTextForMDV2(String str) {
         return str
-                .replaceAll("-", " ")
-                .replaceAll("\\.", " ");
+                .replaceAll("-", ":")
+                .replaceAll("\\(", "[")
+                .replaceAll("\\)", "]")
+                .replaceAll("\\.", ";");
     }
 }
