@@ -18,7 +18,7 @@ public class UserWebClientBuilder {
     public UserDto getUserByChatId(Long chatId) {
         try {
             UserDto req = new UserDto(null, chatId);
-            log.debug("retrieve req to serviceName + \"/user/getByChatId\" with req: " + req);
+            log.debug("retrieve req to " + serviceName +" /user/getByChatId with req: " + req);
 //            return WebClient.create(baseUrl)
 //                    .post()
 //                    .uri(serviceName + "/user/getByChatId")
@@ -36,7 +36,7 @@ public class UserWebClientBuilder {
 
     public List<UserDto> getChatIdListWithUserId() {
         try {
-            log.debug("retrieve req to serviceName + \"/user/getChatIdListWithUserId\" with req: ");
+            log.debug("retrieve req to " + serviceName + " /user/getChatIdListWithUserId with req: ");
 
 //            return WebClient.create(baseUrl)
 //                    .post()
