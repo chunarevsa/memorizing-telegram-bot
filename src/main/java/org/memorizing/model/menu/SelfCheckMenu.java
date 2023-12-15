@@ -29,7 +29,7 @@ public class SelfCheckMenu extends AStudyingMenu {
 
     @Override
     public String getInfoText() {
-        return "Some info text from Self-check menu";
+        return "Amount of cards:" + getIds().size();
     }
 
     @Override
@@ -46,14 +46,8 @@ public class SelfCheckMenu extends AStudyingMenu {
 
     @Override
     public String getTitle() {
-        return "*Self-check menu*\n";
+        return "*Self-check menu*\n" +
+                "Amount of cards:" + getIds().size();
     }
 
-    public String getTextForMDV2(String str) {
-        return str
-                .replaceAll("-", ":")
-                .replaceAll("\\(", "[")
-                .replaceAll("\\)", "]")
-                .replaceAll("\\.", ";");
-    }
 }

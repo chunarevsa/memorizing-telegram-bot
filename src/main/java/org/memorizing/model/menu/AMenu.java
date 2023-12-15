@@ -37,21 +37,6 @@ public abstract class AMenu implements MenuFactory {
             keyboardButtonsRow[0].add(inlineKeyboardButton);
         });
 
-//        for (String name : strings) {
-//
-//            if (!isEnoughSpaceInKeyboardButtonRow(keyboardButtonsRow, name)) {
-//                // create next line
-//                rowList.add(keyboardButtonsRow);
-//                keyboardButtonsRow = new ArrayList<>();
-//            }
-//            // TODO: Переделать. Передавать в callbackData Id
-//            InlineKeyboardButton inlineKeyboardButton = InlineKeyboardButton.builder()
-//                    .text(name.length() > 40 ? name.substring(0, 40) + "..." : name)
-//                    .callbackData(name)
-//                    .build();
-//            keyboardButtonsRow.add(inlineKeyboardButton);
-//
-//        }
         rowList.add(keyboardButtonsRow[0]);
 
         inlineKeyboardMarkup.setKeyboard(rowList);

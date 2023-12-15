@@ -29,7 +29,7 @@ public class TestMenu extends AStudyingMenu {
 
     @Override
     public String getInfoText() {
-        return "Some info text from Test menu";
+        return "Amount of cards:" + getIds().size();
     }
 
     @Override
@@ -39,6 +39,7 @@ public class TestMenu extends AStudyingMenu {
 
     @Override
     public String getTitle() {
-        return "*Test menu*\n";
+        return "*Test menu*\n" +
+                "Amount of cards:" + getIds().size();
     }
 }
