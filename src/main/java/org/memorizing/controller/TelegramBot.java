@@ -114,10 +114,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                     EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
 
                     DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
-                    if (command == EKeyboardCommand.GET_INFO) executeSendingMessage(chatId, resp.getMenu().getInfoText());
+                    if (command == EKeyboardCommand.GET_INFO)
+                        executeSendingMessage(chatId, resp.getMenu().getInfoText());
 
                     if (resp.getMenu() instanceof SelfCheckMenu) {
-                        executeSendingMenu(chatId, resp.getMenu(), command != EKeyboardCommand.NEXT,true);
+                        executeSendingMenu(chatId, resp.getMenu(), command != EKeyboardCommand.NEXT, true);
                         if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
 
                     } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
@@ -138,7 +139,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                     // may be, it is user test answer
                     DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, text);
 
-                    if (!resp.getTestResult().getRightAnswer()) sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
+                    if (!resp.getTestResult().getRightAnswer())
+                        sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
 
                     // If we continue testing
                     if (resp.getMenu() instanceof AStudyingMenu) {
@@ -168,52 +170,67 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void executeSendingMenu(Long chatId, MenuFactory menu, Boolean needSendTitle, Boolean enableMDV2) {
-        try {
-            if (needSendTitle) {
-                SendMessage titleMessage = SendMessage.builder()
-                        .chatId(chatId)
-                        .replyMarkup(menu.getKeyboard())
-                        .text(menu.getTitle())
-                        .build();
-                titleMessage.enableMarkdown(true);
-                execute(titleMessage);
-            }
 
-            SendMessage textMessage = SendMessage.builder()
+        if (needSendTitle) {
+            SendMessage titleMessage = SendMessage.builder()
                     .chatId(chatId)
-                    .replyMarkup(needSendTitle ? menu.getInlineKeyboard() : menu.getKeyboard())
-                    .text(menu.getText())
+                    .replyMarkup(menu.getKeyboard())
+                    .text(menu.getTitle())
                     .build();
+            titleMessage.enableMarkdown(true);
 
-            if (enableMDV2) {
-                String str = menu.getText()
-                        .replaceAll("-", ":")
-                        .replaceAll("\\(", "[")
-                        .replaceAll("\\)", "]")
-                        .replaceAll("\\.", ";");
-                textMessage.setText(str);
-                textMessage.enableMarkdownV2(true);
+            try {
+                execute(titleMessage);
+            } catch (TelegramApiException e) {
+                executeSendingMessageWithoutMD(chatId, titleMessage);
             }
+        }
 
+        SendMessage textMessage = SendMessage.builder()
+                .chatId(chatId)
+                .replyMarkup(needSendTitle ? menu.getInlineKeyboard() : menu.getKeyboard())
+                .text(menu.getText())
+                .build();
+
+        if (enableMDV2) {
+            String str = menu.getText()
+                    .replaceAll("-", ":")
+                    .replaceAll("\\(", "[")
+                    .replaceAll("\\)", "]")
+                    .replaceAll("\\.", ";");
+
+            textMessage.setText(str);
+            textMessage.enableMarkdownV2(true);
+        } else textMessage.enableMarkdown(true);
+
+        try {
             execute(textMessage);
-
-        } catch (TelegramApiException e) {
-            executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
-            DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
-            sendMenu(chatId, resp.getMenu());
-            e.printStackTrace();
+        } catch (Exception e) {
+            executeSendingMessageWithoutMD(chatId, textMessage);
         }
 
     }
 
     private void executeSendingMessage(Long chatId, String text) {
+        SendMessage messageWithKeyboard = SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .build();
+        messageWithKeyboard.enableMarkdown(true);
+
         try {
-            SendMessage messageWithKeyboard = SendMessage.builder()
-                    .chatId(chatId)
-                    .text(text)
-                    .build();
-            messageWithKeyboard.enableMarkdown(true);
             execute(messageWithKeyboard);
+        } catch (TelegramApiException e) {
+            executeSendingMessageWithoutMD(chatId, messageWithKeyboard);
+        }
+    }
+
+    private void executeSendingMessageWithoutMD(Long chatId, SendMessage message) {
+        message.enableMarkdown(false);
+        message.enableMarkdownV2(false);
+
+        try {
+            execute(message);
         } catch (TelegramApiException e) {
             executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
             DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
