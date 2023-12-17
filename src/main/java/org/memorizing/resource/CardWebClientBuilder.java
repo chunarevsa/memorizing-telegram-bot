@@ -15,7 +15,7 @@ public class CardWebClientBuilder {
 
     // /storage
     public StorageDto getStorageByUserId(Long userId) {
-        log.debug("getStorageByUserId with req: " + userId);
+        log.debug("REQ to "+ serviceName +" /storage/getByUserId with req: " + userId);
         try {
             StorageDto req = new StorageDto(null, userId, null);
             return WebClient.create(baseUrl)
@@ -34,7 +34,7 @@ public class CardWebClientBuilder {
     // /cardStock
     public List<CardStockDto> getCardStocksByStorageId(Integer storageId) {
         try {
-            log.debug("retrieve req to serviceName + \"/cardStocks\" with req: " + storageId);
+            log.debug("REQ to " + serviceName +" /cardStocks with req: " + storageId);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/cardStocks")
@@ -51,7 +51,7 @@ public class CardWebClientBuilder {
 
     public CardStockDto createCardStock(CardStockFieldsDto req) {
         try {
-            log.debug("retrieve req to serviceName + \"/cardStock\" with req: " + req);
+            log.debug("REQ to " + serviceName +" /cardStock with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/cardStock")
@@ -67,7 +67,7 @@ public class CardWebClientBuilder {
 
     public CardStockDto updateCardStock(CardStockFieldsDto req, Integer cardStockId) {
         try {
-            log.debug("retrieve req to serviceName + \"/cardStock\" with req: " + req);
+            log.debug("REQ to " + serviceName +" /cardStock with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/cardStock/" + cardStockId)
@@ -99,7 +99,7 @@ public class CardWebClientBuilder {
     // /card
     public List<CardDto> getCardsByCardStockId(Integer cardStockId) {
         try {
-            log.debug("retrieve req to serviceName + \"/cards\" with req: " + cardStockId);
+            log.debug("REQ to " + serviceName +" /cards with req: " + cardStockId);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/cards")
@@ -116,7 +116,7 @@ public class CardWebClientBuilder {
 
     public CardStockDto getCardStockById(Integer cardStockId) {
         try {
-            log.debug("retrieve req to serviceName + \"/cardStock\" with req: " + cardStockId);
+            log.debug("REQ to " + serviceName +" /cardStock with req: " + cardStockId);
             return WebClient.create(baseUrl)
                     .get()
                     .uri(serviceName + "/cardStock/" + cardStockId)
@@ -131,7 +131,7 @@ public class CardWebClientBuilder {
 
     public CardDto getCardById(Integer cardId) {
         try {
-            log.debug("retrieve req to serviceName + \"/card/ " + cardId);
+            log.debug("REQ to " + serviceName +" /card/ " + cardId);
             return WebClient.create(baseUrl)
                     .get()
                     .uri(serviceName + "/card/" + cardId)
@@ -146,7 +146,7 @@ public class CardWebClientBuilder {
 
     public CardDto createCard(CardFieldsDto req) {
         try {
-            log.debug("retrieve req to serviceName + \"/card\" with req: " + req);
+            log.debug("REQ to " + serviceName +" /card with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/card")
@@ -162,7 +162,7 @@ public class CardWebClientBuilder {
 
     public CardDto updateCard(CardFieldsDto req, Integer cardId) {
         try {
-            log.debug("retrieve req to serviceName + \"/card\" with req: " + req);
+            log.debug("REQ to " + serviceName +" /card with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
                     .uri(serviceName + "/card/" + cardId)
