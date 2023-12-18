@@ -29,7 +29,7 @@ public class MemorizingMenu extends AStudyingMenu {
 
     @Override
     public String getInfoText() {
-        return "Some info text from Memorizing menu";
+        return "Amount of cards:" + getIds().size();
     }
 
     @Override
@@ -46,6 +46,7 @@ public class MemorizingMenu extends AStudyingMenu {
 
     @Override
     public String getTitle() {
-        return "*Memorizing menu*";
+        return "*Memorizing menu*\n" +
+                "Amount of cards:" + getIds().size();
     }
 }
