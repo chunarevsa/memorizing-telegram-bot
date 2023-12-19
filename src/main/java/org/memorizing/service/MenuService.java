@@ -44,7 +44,9 @@ public class MenuService { //TODO: Add interface
                 menuFactory = new CardStockAddMenu();
                 break;
             case CARD_STOCK:
-                menuFactory = new CardStockMenu(storageResource.getCardStockById(state.getCardStockId()));
+                CardStockDto cardStock = storageResource.getCardStockById(state.getCardStockId());
+                List<CardDto> listOfCards = storageResource.getCardsByCardStockId(state.getCardStockId());
+                menuFactory = new CardStockMenu(cardStock, listOfCards);
                 break;
             case MODE:
                 menuFactory = new ModeMenu(storageResource.getCardStockById(state.getCardStockId()));
@@ -58,11 +60,17 @@ public class MenuService { //TODO: Add interface
                     ids = getCardIdsForStudyingByRequest(state.getCardStockId());
                 }
 
-                firstId = ids.stream().findFirst();
-                if (firstId.isPresent()) {
-                    CardDto card = storageResource.getCardById(firstId.get());
-                    menuFactory = new TestMenu(card, mode, ids);
+                CardDto firstCard;
+                for (Integer id: ids) {
+                    firstCard = storageResource.getCardById(id);
+                    if (firstCard == null) {
+                        state = userStateService.deleteCardIdFromSessionAndGet(state);
+                    } else {
+                        menuFactory = new TestMenu(firstCard, mode, ids);
+                        break;
+                    }
                 }
+
                 break;
             case FORWARD_SELF_CHECK:
             case BACKWARD_SELF_CHECK:
@@ -100,11 +108,14 @@ public class MenuService { //TODO: Add interface
                 break;
             case CARDS:
                 List<CardDto> cards = storageResource.getCardsByCardStockId(state.getCardStockId());
-                Map<Integer, String> map = new HashMap();
-                cards.forEach(card ->  {
-                    map.put(card.getId(), card.getCardKey());
-                });
-                menuFactory = new CardsMenu(state.getCardStockId(), map);
+
+                if (cards == null || cards.isEmpty()) {
+                    menuFactory = new CardStockMenu(storageResource.getCardStockById(state.getCardStockId()), cards);
+                } else {
+                    Map<Integer, String> map = new HashMap();
+                    cards.forEach(card -> map.put(card.getId(), card.getCardKey()));
+                    menuFactory = new CardsMenu(state.getCardStockId(), map);
+                }
                 break;
             case CARD_ADD:
                 menuFactory = new CardAddMenu();
@@ -151,7 +162,8 @@ public class MenuService { //TODO: Add interface
                 }
 
                 if (cardStock.isPresent()) {
-                    menuFactory = new CardStockMenu(cardStock.get());
+                    List<CardDto> cards = storageResource.getCardsByCardStockId(cardStock.get().getId());
+                    menuFactory = new CardStockMenu(cardStock.get(), cards);
                     userStateService.updateUserStateByMenu(userState, menuFactory);
                 }
                 break;

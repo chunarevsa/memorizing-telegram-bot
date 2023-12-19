@@ -76,14 +76,21 @@ public class MessageDispatcherService {
         EPlaceholderCommand command = EPlaceholderCommand.getPlaceholderCommandByPref(data);
 
         EStatus status = executeRequest(command, data, userState);
+        EMenu menuType;
 
         if (command == EPlaceholderCommand.DELETE_CARD_STOCK) {
             userState = userStateService.deleteCardStockIdFromSessionAndGet(userState);
+            menuType = userState.getLastMenu();
         } else if (command == EPlaceholderCommand.DELETE_CARD) {
             userState = userStateService.deleteCardIdFromSessionAndGet(userState);
-        }
+            menuType = userState.getLastMenu();
+        } else if (command == EPlaceholderCommand.ADD_CARD) {
+            menuType = EMenu.CARDS;
+        } else if (command == EPlaceholderCommand.ADD_CARD_STOCK) {
+            menuType = EMenu.CARD_STOCKS;
+        } else menuType = userState.getLastMenu();
 
-        MenuFactory menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
+        MenuFactory menu = menuService.createMenu(storageId, userState, menuType);
         return new DispatcherResponse(menu, status, true);
     }
 
