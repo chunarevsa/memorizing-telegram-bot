@@ -26,7 +26,6 @@ public class JsonObjectMapper implements IMapper {
 
     @Override
     public <T extends IMappable> T readValue(String content, Class<T> valueType) throws ProtocolException, JsonProcessingException {
-//        mapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
         return mapper.readValue(content, valueType);
     }
 

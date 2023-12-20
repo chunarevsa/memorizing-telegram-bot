@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface UsersRepo extends JpaRepository<User, Integer> {
     Boolean existsByChatId(Long chatId);
 

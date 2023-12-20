@@ -1,13 +1,8 @@
 package org.memorizing.model.command;
 
-import org.memorizing.model.menu.AMenu;
 import org.memorizing.model.menu.EMenu;
-import org.memorizing.model.EMode;
-import org.memorizing.resource.cardApi.CardDto;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.Arrays;
-import java.util.List;
 
 public enum EKeyboardCommand {
     ADD_CARD_STOCK("add card stock", EMenu.CARD_STOCK_ADD),
