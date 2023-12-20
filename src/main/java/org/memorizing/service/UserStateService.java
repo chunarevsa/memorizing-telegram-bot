@@ -1,5 +1,6 @@
 package org.memorizing.service;
 
+import org.apache.log4j.Logger;
 import org.memorizing.entity.CardStockHistory;
 import org.memorizing.entity.UserState;
 import org.memorizing.model.EMode;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Service
 public class UserStateService {
+    private static final Logger log = Logger.getLogger(UserStateService.class);
     private final UserStateRepository userStates;
     private final CardStockHistoryRepository cardStockHistoryRepository;
 
@@ -24,6 +26,7 @@ public class UserStateService {
     }
 
     public void updateUserStateByMenu(UserState userState, MenuFactory menu) {
+        log.debug("updateUserStateByMenu" + userState.getId());
         if (menu == null) return;
 
         userState.setCurrentMenu(menu.getCurrentMenu());
@@ -70,6 +73,7 @@ public class UserStateService {
     }
 
     public UserState deleteCardStockIdFromSessionAndGet(UserState userState) {
+        log.debug("deleteCardStockIdFromSessionAndGet:" + userState.getCardStockId());
         List<CardStockHistory> cardStockHistory = cardStockHistoryRepository.findAllByCardStockId(userState.getCardStockId());
         if (!cardStockHistory.isEmpty()) {
             cardStockHistoryRepository.deleteAll(cardStockHistory);
@@ -79,6 +83,8 @@ public class UserStateService {
     }
 
     public UserState deleteCardIdFromSessionAndGet(UserState userState) {
+        log.debug("deleteCardIdFromSessionAndGet:" + userState.getCardStockId());
+
         List<CardStockHistory> studyingHistory = userState.getStudyingHistory();
         if (studyingHistory.isEmpty()) return userState;
 
