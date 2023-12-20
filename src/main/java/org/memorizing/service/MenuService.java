@@ -136,6 +136,7 @@ public class MenuService { //TODO: Add interface
     }
 
     private List<Integer> getCardIdsForStudyingByRequest(Integer cardStockId) {
+        log.debug("getCardIdsForStudyingByRequest :" + cardStockId);
         List<Integer> ids = new ArrayList<>();
         List<CardDto> allCards = storageResource.getCardsByCardStockId(cardStockId);
         if (!allCards.isEmpty()) {
