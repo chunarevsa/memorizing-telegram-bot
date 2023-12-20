@@ -21,8 +21,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.memorizing.model.ERegularMessages.HOW_IT_WORKS;
@@ -54,14 +52,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
         Message message = null;
         String text = null;
         String data = null;
-        boolean hasCallback = false,
-                hasRegularMessage = false;
+        boolean hasCallback = false;
+        boolean hasRegularMessage = false;
 
-        //take apart incoming update
         if (update.hasCallbackQuery()) {
             hasCallback = true;
             CallbackQuery callbackQuery = update.getCallbackQuery();
@@ -81,86 +77,78 @@ public class TelegramBot extends TelegramLongPollingBot {
             String userName = Optional.ofNullable(message.getFrom().getUserName())
                     .orElse(message.getFrom().getFirstName() + " " + message.getFrom().getLastName());
 
-            try {
-                if (hasCallback) {
-                    DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
-                    sendMenu(chatId, resp.getMenu());
+            if (hasCallback) {
+                DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
+                sendMenu(chatId, resp.getMenu());
 
-                } else if (!userService.isUserExistsByChatId(chatId)) {
-                    // TODO: Add registration via auth-service, when it will be completed
-                    // adding new user
-                    messageDispatcherService.registerIfAbsent(chatId, userName);
-                    String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
+            } else if (!userService.isUserExistsByChatId(chatId)) {
+                // TODO: Add registration via auth-service, when it will be completed
+                // adding new user
+                messageDispatcherService.registerIfAbsent(chatId, userName);
+                String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
 
-                    executeSendingMessage(chatId, welcomeMessage);
-                    sendMenu(chatId, messageDispatcherService.getFirstMenu(chatId));
+                executeSendingMessage(chatId, welcomeMessage);
+                sendMenu(chatId, messageDispatcherService.getFirstMenu(chatId));
 
-                } else if (ECommand.getCommandByMessage(text) != null) {
-                    // обработка команд из основной менюшки
-                    ECommand command = ECommand.getCommandByMessage(text);
+            } else if (ECommand.getCommandByMessage(text) != null) {
+                // /start /help /howitworks ...
+                ECommand command = ECommand.getCommandByMessage(text);
 
-                    executeSendingMessage(chatId, command.getMessageText().replaceAll("\\{name}", userName));
-                    sendMenu(chatId, messageDispatcherService.getResponseByCommand(chatId, command).getMenu());
+                executeSendingMessage(chatId, command.getMessageText().replaceAll("\\{name}", userName));
+                sendMenu(chatId, messageDispatcherService.getResponseByCommand(chatId, command).getMenu());
 
-                } else if (EPlaceholderCommand.getPlaceholderCommandByPref(text) != null) {
-                    // Обработка входящего изменения
-                    DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, text);
+            } else if (EPlaceholderCommand.getPlaceholderCommandByPref(text) != null) {
+                // #add, #update, #delete ...
+                DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, text);
 
+                executeSendingMessage(chatId, resp.getStatus().getText());
+                sendMenu(chatId, resp.getMenu());
+
+            } else if (EKeyboardCommand.getKeyboardCommandByMessage(text) != null) {
+                // Keyboard buttons
+                EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
+
+                DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
+                if (command == EKeyboardCommand.GET_INFO)
+                    executeSendingMessage(chatId, resp.getMenu().getInfoText());
+
+                if (resp.getMenu() instanceof SelfCheckMenu) {
+                    executeSendingMenu(chatId, resp.getMenu(), command != EKeyboardCommand.NEXT, true);
+                    if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
+
+                } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
+                    executeSendingMenu(chatId, resp.getMenu(), false, false);
+                    if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
+
+                } else if (command == EKeyboardCommand.NEXT && !(resp.getMenu() instanceof AStudyingMenu)) {
                     executeSendingMessage(chatId, resp.getStatus().getText());
                     sendMenu(chatId, resp.getMenu());
 
-                } else if (EKeyboardCommand.getKeyboardCommandByMessage(text) != null) {
-                    // обработка с основной клавиатуры
-                    EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
+                } else if (command == EKeyboardCommand.SKIP) {
+                    sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
+                    executeSendingMenu(chatId, resp.getMenu(), false, false);
 
-                    DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
-                    if (command == EKeyboardCommand.GET_INFO)
-                        executeSendingMessage(chatId, resp.getMenu().getInfoText());
+                } else sendMenu(chatId, resp.getMenu());
 
-                    if (resp.getMenu() instanceof SelfCheckMenu) {
-                        executeSendingMenu(chatId, resp.getMenu(), command != EKeyboardCommand.NEXT, true);
-                        if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
+            } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
+                // Perhaps, it will be a user test answer
+                DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, text);
 
-                    } else if (command == EKeyboardCommand.NEXT && resp.getMenu() instanceof AStudyingMenu) {
-                        executeSendingMenu(chatId, resp.getMenu(), false, false);
-                        if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
+                if (!resp.getTestResult().getRightAnswer())
+                    sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
 
-                    } else if (command == EKeyboardCommand.NEXT && !(resp.getMenu() instanceof AStudyingMenu)) {
-                        executeSendingMessage(chatId, resp.getStatus().getText());
-                        sendMenu(chatId, resp.getMenu());
-
-                    } else if (command == EKeyboardCommand.SKIP) {
-                        sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
-                        executeSendingMenu(chatId, resp.getMenu(), false, false);
-
-                    } else sendMenu(chatId, resp.getMenu());
-
-                } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
-                    // may be, it is user test answer
-                    DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, text);
-
-                    if (!resp.getTestResult().getRightAnswer())
-                        sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
-
-                    // If we continue testing
-                    if (resp.getMenu() instanceof AStudyingMenu) {
-                        executeSendingMenu(chatId, resp.getMenu(), false, false);
-                    } else {
-                        executeSendingMessage(chatId, COMPLETE_SET.getText());
-                        executeSendingMenu(chatId, resp.getMenu(), true, false);
-                    }
-
+                // If we continue testing
+                if (resp.getMenu() instanceof AStudyingMenu) {
+                    executeSendingMenu(chatId, resp.getMenu(), false, false);
                 } else {
-                    executeSendingMessage(chatId, BAD_REQUEST.getText());
-                    DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
-                    sendMenu(chatId, resp.getMenu());
+                    executeSendingMessage(chatId, COMPLETE_SET.getText());
+                    executeSendingMenu(chatId, resp.getMenu(), true, false);
                 }
 
-            } catch (Exception e) {
-                executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
+            } else {
+                executeSendingMessage(chatId, BAD_REQUEST.getText());
                 DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
                 sendMenu(chatId, resp.getMenu());
-                e.printStackTrace();
             }
         }
     }
@@ -193,6 +181,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 .build();
 
         if (enableMDV2) {
+            // TODO: complete MDV2 handling
             String str = menu.getText()
                     .replaceAll("-", ":")
                     .replaceAll("\\(", "[")
@@ -226,16 +215,23 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void executeSendingMessageWithoutMD(Long chatId, SendMessage message) {
+        log.debug("--- Can't send title \n" +
+                "chatId:" + chatId + " ;\n" +
+                "menu.getKeyboard(): " + message.getReplyMarkup() + " ;\n" +
+                "menu.getTitle(): " + message.getText() + " ;\n");
+
         message.enableMarkdown(false);
         message.enableMarkdownV2(false);
 
         try {
             execute(message);
         } catch (TelegramApiException e) {
+            log.debug("--- Can't send message without MD and MDV2:\n" + message);
+            e.printStackTrace();
+
             executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
             DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
             sendMenu(chatId, resp.getMenu());
-            e.printStackTrace();
         }
     }
 
@@ -255,80 +251,4 @@ public class TelegramBot extends TelegramLongPollingBot {
         executeSendingMessage(chatId, "❗" + correctAnswer + "❗");
     }
 
-    // For testing "Styled" text
-    private void startEcho(Long chatId, String data) throws TelegramApiException {
-        String testString = data.substring("#test ".length());
-        log.debug("testString: " + testString);
-        String tempVar = "\\uD83D\uDD18▪️▫️\uD83D\uDD39✅❗️❌\uD83D\uDC49\uD83E\uDEE5";
-
-        SendMessage sendMessage = SendMessage.builder()
-                .chatId(chatId)
-                .replyMarkup(null)
-                .text(testString)
-                .build();
-        execute(sendMessage);
-
-        List<String> messages = new ArrayList<>();
-        messages.add("Some text with Styled text");
-
-        messages.forEach(message -> {
-            try {
-                sendMessage.setText(message + " MD");
-                sendMessage.enableMarkdownV2(false);
-                sendMessage.enableMarkdown(true);
-                execute(sendMessage);
-            } catch (Exception e) {
-                log.debug("exception MD with message:" + message);
-            }
-
-            try {
-                sendMessage.setText(message + " MDV2");
-                sendMessage.enableMarkdown(false);
-                sendMessage.enableMarkdownV2(true);
-                execute(sendMessage);
-            } catch (Exception e) {
-                log.debug("exception MDV2 with message:" + message);
-            }
-
-        });
-
-        List<String> trueMDList = new ArrayList<>();
-        trueMDList.add("`Inner text`");
-        trueMDList.add("*innerText*");
-        trueMDList.add("#Inner text");
-        trueMDList.add("_Inner text_");
-
-        trueMDList.add("|Inner text|");
-        trueMDList.add("||Inner text||");
-        trueMDList.forEach(message -> {
-            try {
-                sendMessage.setText(message + " MD");
-                sendMessage.enableMarkdownV2(false);
-                sendMessage.enableMarkdown(true);
-                execute(sendMessage);
-            } catch (Exception e) {
-                log.debug("exception MD with message:" + message);
-            }
-        });
-
-        List<String> trueMDV2List = new ArrayList<>();
-        trueMDV2List.add(">innerText ");
-        trueMDV2List.add("* innerText *");
-        trueMDV2List.add("_Inner text_");
-        trueMDV2List.add("~Inner text~");
-        trueMDV2List.add("__Inner text__");
-
-        trueMDV2List.add("||Inner text||");
-        trueMDV2List.add("|Inner text|");
-        trueMDV2List.forEach(message -> {
-            try {
-                sendMessage.setText(message + " MDV2");
-                sendMessage.enableMarkdown(false);
-                sendMessage.enableMarkdownV2(true);
-                execute(sendMessage);
-            } catch (Exception e) {
-                log.debug("exception MDV2 with message:" + message);
-            }
-        });
-    }
 }

@@ -42,11 +42,6 @@ public class MessageDispatcherService {
         this.userStateService = userStateService;
     }
 
-    // TODO: обработка ошибок, когда основной сервис не доступен сервис не доступен
-    // TODO: не отображать start studying если нет карточек
-    // TODO: Отображать количество оставшихся карточек когда заходишь в обучение
-    // TODO: отображать количество карточек в cardStock menu и cards
-
     public DispatcherResponse getResponseByCallback(Long chatId, String data) {
         log.debug("getResponseByCallback. req:" + chatId + ", " + data);
         User user = userService.getByChatId(chatId);
@@ -130,11 +125,12 @@ public class MessageDispatcherService {
         if (nextMenu != null) {
             resp.setMenu(menuService.createMenu(storageId, userState, nextMenu));
             return resp;
-        } else return new DispatcherResponse(null, SOMETHING_WENT_WRONG);
+        } else return new DispatcherResponse(null, SOMETHING_WENT_WRONG); // TODO add throw Exception
 
     }
 
     private DispatcherResponse getResponseByNextButton(EMenu nextMenu, UserState userState, boolean isSkip) {
+        log.debug("getResponseByNextButton req:" + nextMenu + ", " + isSkip);
         EMode mode = EMode.getModeByMenu(nextMenu);
 
         DispatcherResponse resp = new DispatcherResponse();
@@ -173,15 +169,15 @@ public class MessageDispatcherService {
     public DispatcherResponse checkAnswer(Long chatId, String data) {
         log.debug("checkAnswer. req:" + chatId + ", " + data);
         User user = userService.getByChatId(chatId);
-        ;
         UserState userState = user.getUserState();
-
         EMenu nextMenu = userState.getCurrentMenu();
         EMode mode = EMode.getModeByMenu(nextMenu);
 
         Optional<CardStockHistory> history = userStateService.findCardStockHistoryByCardStockId(userState.getCardStockId());
 
         if (history.isEmpty()) {
+            log.debug("History for user:" + user.getId() + "is empty.");
+            // TODO add throw Exception
             return new DispatcherResponse(menuService.createMenu(user.getStorageId(), userState, nextMenu), SOMETHING_WENT_WRONG, true);
         }
 
@@ -202,7 +198,6 @@ public class MessageDispatcherService {
     public MenuFactory getFirstMenu(Long chatId) {
         log.debug("getFirstMenu. req:" + chatId);
         User user = userService.getByChatId(chatId);
-        ;
         UserState state = user.getUserState();
 
         // TODO: Temp. Clear it after adding auth
@@ -247,6 +242,7 @@ public class MessageDispatcherService {
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 
+    // TODO: TEMP
     private void addFirstData(Integer storageId) {
         CardStockFieldsDto firstReq = new CardStockFieldsDto(
                 storageId,
@@ -337,7 +333,7 @@ public class MessageDispatcherService {
                 return BAD_REQUEST;
             } catch (ProtocolException e) {
                 e.printStackTrace();
-                return SOMETHING_WENT_WRONG;
+                return SOMETHING_WENT_WRONG; // TODO add throw Exception
             }
         }
 
@@ -361,7 +357,7 @@ public class MessageDispatcherService {
                     storageResource.deleteCardStock(userState.getCardStockId());
                     break;
                 default:
-                    return SOMETHING_WENT_WRONG;
+                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
             }
 
         } else if (entity instanceof CardFieldsDto) {
@@ -381,10 +377,11 @@ public class MessageDispatcherService {
                     storageResource.deleteCard(userState.getCardId());
                     break;
                 default:
-                    return SOMETHING_WENT_WRONG;
+                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
             }
 
         } else {
+            // TODO add throw Exception
             return SOMETHING_WENT_WRONG;
         }
 
