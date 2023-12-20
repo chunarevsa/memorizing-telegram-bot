@@ -19,7 +19,7 @@ public class StudyingStateConverter implements AttributeConverter<Map<String, Li
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            // Обработка ошибки сериализации
+            //TODO: add exception handling
             e.printStackTrace();
             return null;
         }
@@ -34,7 +34,7 @@ public class StudyingStateConverter implements AttributeConverter<Map<String, Li
         try {
             return objectMapper.readValue(dbData, new TypeReference<>() {});
         } catch (IOException e) {
-            // Обработка ошибки десериализации
+            //TODO: add exception handling
             e.printStackTrace();
             return null;
         }
