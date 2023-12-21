@@ -22,7 +22,7 @@ public class UserState {
     private Integer cardStockId = null;
     private Integer cardId = null;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardStockHistory> studyingHistory = new ArrayList<>();
 
     public UserState() {

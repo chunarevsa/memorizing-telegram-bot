@@ -17,11 +17,11 @@ import java.util.Optional;
 @Service
 public class UserStateService {
     private static final Logger log = Logger.getLogger(UserStateService.class);
-    private final UserStateRepository userStates;
+    private final UserStateRepository userStateRepository;
     private final CardStockHistoryRepository cardStockHistoryRepository;
 
-    public UserStateService(UserStateRepository userStates, CardStockHistoryRepository cardStockHistoryRepository) {
-        this.userStates = userStates;
+    public UserStateService(UserStateRepository userStateRepository, CardStockHistoryRepository cardStockHistoryRepository) {
+        this.userStateRepository = userStateRepository;
         this.cardStockHistoryRepository = cardStockHistoryRepository;
     }
 
@@ -69,14 +69,14 @@ public class UserStateService {
             userState.setCardId(cardMenu.getCard().getId());
         }
 
-        userStates.save(userState);
+        userStateRepository.save(userState);
     }
 
     public UserState deleteCardStockIdFromSessionAndGet(UserState userState) {
         log.debug("deleteCardStockIdFromSessionAndGet:" + userState.getCardStockId());
-        List<CardStockHistory> cardStockHistory = cardStockHistoryRepository.findAllByCardStockId(userState.getCardStockId());
-        if (!cardStockHistory.isEmpty()) {
-            cardStockHistoryRepository.deleteAll(cardStockHistory);
+        List<CardStockHistory> listOfHistory = cardStockHistoryRepository.findAllByCardStockId(userState.getCardStockId());
+        if (!listOfHistory.isEmpty()) {
+            cardStockHistoryRepository.deleteAll(listOfHistory);
         }
         userState.setCardStockId(null);
         return userState;

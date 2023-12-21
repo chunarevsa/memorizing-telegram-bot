@@ -11,7 +11,7 @@ import java.util.*;
 import static org.memorizing.model.EMode.values;
 
 @Entity
-public class CardStockHistory {
+public class  CardStockHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
