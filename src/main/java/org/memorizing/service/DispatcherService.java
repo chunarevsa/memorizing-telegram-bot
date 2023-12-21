@@ -11,7 +11,7 @@ import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.EMenu;
-import org.memorizing.model.menu.MenuFactory;
+import org.memorizing.model.menu.Menu;
 import org.memorizing.resource.StorageResource;
 import org.memorizing.resource.cardApi.*;
 import org.springframework.stereotype.Service;
@@ -24,15 +24,15 @@ import java.util.Optional;
 import static org.memorizing.model.EStatus.*;
 
 @Service
-public class MessageDispatcherService {
-    private static final Logger log = Logger.getLogger(MessageDispatcherService.class);
+public class DispatcherService {
+    private static final Logger log = Logger.getLogger(DispatcherService.class);
     private final UserService userService;
     private final StorageResource storageResource;
     private final MenuService menuService;
     private final UserStateService userStateService;
     private final JsonObjectMapper mapper = new JsonObjectMapper();
 
-    public MessageDispatcherService(
+    public DispatcherService(
             UserService userService,
             StorageResource storageResource,
             MenuService menuService, UserStateService userStateService) {
@@ -46,7 +46,7 @@ public class MessageDispatcherService {
         log.debug("getResponseByCallback. req:" + chatId + ", " + data);
         User user = userService.getByChatId(chatId);
         UserState userState = user.getUserState();
-        MenuFactory menu = menuService.createMenuByCallback(user.getStorageId(), userState, userState.getCurrentMenu(), data);
+        Menu menu = menuService.createMenuByCallback(user.getStorageId(), userState, userState.getCurrentMenu(), data);
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 
@@ -58,7 +58,7 @@ public class MessageDispatcherService {
         EMenu menuType = userState.getCurrentMenu();
         if (command == ECommand.START_COMMAND) menuType = EMenu.CARD_STOCKS;
 
-        MenuFactory menu = menuService.createMenu(storageId, userState, menuType);
+        Menu menu = menuService.createMenu(storageId, userState, menuType);
         // TODO: Add logic when something went wrong (need try catch in createMenu)
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
@@ -85,7 +85,7 @@ public class MessageDispatcherService {
             menuType = EMenu.CARD_STOCKS;
         } else menuType = userState.getLastMenu();
 
-        MenuFactory menu = menuService.createMenu(storageId, userState, menuType);
+        Menu menu = menuService.createMenu(storageId, userState, menuType);
         return new DispatcherResponse(menu, status, true);
     }
 
@@ -103,13 +103,9 @@ public class MessageDispatcherService {
                     nextMenu = userState.getCurrentMenu();
                     break;
                 case SKIP:
-                    nextMenu = userState.getCurrentMenu();
-                    resp = getResponseByNextButton(nextMenu, userState, true);
-                    if (resp.getStatus() == COMPLETE_SET) nextMenu = nextMenu.getLastMenu();
-                    break;
                 case NEXT:
                     nextMenu = userState.getCurrentMenu();
-                    resp = getResponseByNextButton(nextMenu, userState, false);
+                    resp = getResponseByNextButton(nextMenu, userState, command == EKeyboardCommand.SKIP);
                     if (resp.getStatus() == COMPLETE_SET) nextMenu = nextMenu.getLastMenu();
                     break;
                 case GO_BACK:
@@ -182,11 +178,8 @@ public class MessageDispatcherService {
         }
 
         List<Integer> ids = userStateService.getCardIdsByHistory(history.get(), mode.name());
-
         TestResultDto testResultDto = storageResource.checkCard(userState.getCardStockId(), ids.get(0), data, mode.isFromKeyMode());
-
         ids.remove(0);
-
         userStateService.updateHistoryByNewIds(history.get(), mode, ids);
 
         // If it was last card
@@ -195,7 +188,7 @@ public class MessageDispatcherService {
         return new DispatcherResponse(menuService.createMenu(user.getStorageId(), userState, nextMenu), SUCCESSFULLY, testResultDto);
     }
 
-    public MenuFactory getFirstMenu(Long chatId) {
+    public Menu getFirstMenu(Long chatId) {
         log.debug("getFirstMenu. req:" + chatId);
         User user = userService.getByChatId(chatId);
         UserState state = user.getUserState();
@@ -238,8 +231,82 @@ public class MessageDispatcherService {
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
 
-        MenuFactory menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
+        Menu menu = menuService.createMenu(storageId, userState, userState.getLastMenu());
         return new DispatcherResponse(menu, SUCCESSFULLY);
+    }
+
+    private EStatus executeRequest(EPlaceholderCommand command, String data, UserState userState) {
+        log.debug("executeRequest. req:" + command + ", " + userState);
+
+        IMappable entity = command.getNewEntity();
+        if (!Objects.equals(command.getMethod(), "delete")) {
+
+            try {
+                // TODO fix it
+                String body = data.substring(data.indexOf("{"))
+                        .replace("\n", "")
+                        .replace("*", "")
+                        .replace("`", "");
+
+                entity = mapper.readValue(body, entity.getClass());
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                return BAD_REQUEST;
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+                return SOMETHING_WENT_WRONG; // TODO add throw Exception
+            }
+        }
+
+        if (entity instanceof CardStockFieldsDto) {
+            CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
+            cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
+            switch (command.getMethod()) {
+                case "add":
+                    storageResource.createCardStock(cardStockFieldsDto);
+                    break;
+                case "update":
+                    storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
+                    break;
+                case "delete":
+                    List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
+
+                    if (cards != null && !cards.isEmpty()) {
+                        cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+                    }
+
+                    storageResource.deleteCardStock(userState.getCardStockId());
+                    break;
+                default:
+                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
+            }
+
+        } else if (entity instanceof CardFieldsDto) {
+            CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
+            cardFieldsDto.setCardStockId(userState.getCardStockId());
+            CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
+            cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
+            switch (command.getMethod()) {
+                case "add":
+                    storageResource.createCard(cardFieldsDto);
+                    break;
+                case "update":
+                    cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
+                    storageResource.updateCard(cardFieldsDto, userState.getCardId());
+                    break;
+                case "delete":
+                    storageResource.deleteCard(userState.getCardId());
+                    break;
+                default:
+                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
+            }
+
+        } else {
+            // TODO add throw Exception
+            return SOMETHING_WENT_WRONG;
+        }
+
+        return SUCCESSFULLY;
     }
 
     // TODO: TEMP
@@ -313,78 +380,5 @@ public class MessageDispatcherService {
                 new CardFieldsDto(thirdCardStockId, "return", "вернуть", false)
         );
 
-    }
-
-    private EStatus executeRequest(EPlaceholderCommand command, String data, UserState userState) {
-        log.debug("executeRequest. req:" + command + ", " + userState);
-
-        IMappable entity = command.getNewEntity();
-        if (!Objects.equals(command.getMethod(), "delete")) {
-
-            try {
-                String body = data.substring(data.indexOf("{"))
-                        .replace("\n", "")
-                        .replace("*", "")
-                        .replace("`", "");
-
-                entity = mapper.readValue(body, entity.getClass());
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return BAD_REQUEST;
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-                return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
-        }
-
-        if (entity instanceof CardStockFieldsDto) {
-            CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
-            cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
-            switch (command.getMethod()) {
-                case "add":
-                    storageResource.createCardStock(cardStockFieldsDto);
-                    break;
-                case "update":
-                    storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
-                    break;
-                case "delete":
-                    List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
-
-                    if (cards != null && !cards.isEmpty()) {
-                        cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
-                    }
-
-                    storageResource.deleteCardStock(userState.getCardStockId());
-                    break;
-                default:
-                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
-
-        } else if (entity instanceof CardFieldsDto) {
-            CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
-            cardFieldsDto.setCardStockId(userState.getCardStockId());
-            CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
-            cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
-            switch (command.getMethod()) {
-                case "add":
-                    storageResource.createCard(cardFieldsDto);
-                    break;
-                case "update":
-                    cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
-                    storageResource.updateCard(cardFieldsDto, userState.getCardId());
-                    break;
-                case "delete":
-                    storageResource.deleteCard(userState.getCardId());
-                    break;
-                default:
-                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
-
-        } else {
-            // TODO add throw Exception
-            return SOMETHING_WENT_WRONG;
-        }
-
-        return SUCCESSFULLY;
     }
 }

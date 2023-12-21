@@ -5,12 +5,12 @@ import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.AStudyingMenu;
-import org.memorizing.model.menu.MenuFactory;
+import org.memorizing.model.menu.Menu;
 import org.memorizing.model.menu.SelfCheckMenu;
 import org.memorizing.resource.cardApi.CardDto;
 import org.memorizing.resource.cardApi.TestResultDto;
 import org.memorizing.service.DispatcherResponse;
-import org.memorizing.service.MessageDispatcherService;
+import org.memorizing.service.DispatcherService;
 import org.memorizing.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,17 +32,17 @@ public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = Logger.getLogger(TelegramBot.class);
     private final String botName;
     private final UserService userService;
-    private final MessageDispatcherService messageDispatcherService;
+    private final DispatcherService dispatcherService;
 
     public TelegramBot(
             @Value("${telegram.bot.token}") String botToken,
             @Value("${telegram.bot.name}") String botName,
             UserService userService,
-            MessageDispatcherService messageDispatcherService) {
+            DispatcherService dispatcherService) {
         super(botToken);
         this.botName = botName;
         this.userService = userService;
-        this.messageDispatcherService = messageDispatcherService;
+        this.dispatcherService = dispatcherService;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             text = message.getText();
         }
 
-        log.info("onUpdateReceived:" + text + "\n---");
+        log.info("onUpdateReceived:" + text);
 
         if (hasCallback || hasRegularMessage) {
             Long chatId = message.getChatId();
@@ -78,28 +78,28 @@ public class TelegramBot extends TelegramLongPollingBot {
                     .orElse(message.getFrom().getFirstName() + " " + message.getFrom().getLastName());
 
             if (hasCallback) {
-                DispatcherResponse resp = messageDispatcherService.getResponseByCallback(chatId, data);
+                DispatcherResponse resp = dispatcherService.getResponseByCallback(chatId, data);
                 sendMenu(chatId, resp.getMenu());
 
             } else if (!userService.isUserExistsByChatId(chatId)) {
                 // TODO: Add registration via auth-service, when it will be completed
                 // adding new user
-                messageDispatcherService.registerIfAbsent(chatId, userName);
+                dispatcherService.registerIfAbsent(chatId, userName);
                 String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
 
                 executeSendingMessage(chatId, welcomeMessage);
-                sendMenu(chatId, messageDispatcherService.getFirstMenu(chatId));
+                sendMenu(chatId, dispatcherService.getFirstMenu(chatId));
 
             } else if (ECommand.getCommandByMessage(text) != null) {
                 // /start /help /howitworks ...
                 ECommand command = ECommand.getCommandByMessage(text);
 
                 executeSendingMessage(chatId, command.getMessageText().replaceAll("\\{name}", userName));
-                sendMenu(chatId, messageDispatcherService.getResponseByCommand(chatId, command).getMenu());
+                sendMenu(chatId, dispatcherService.getResponseByCommand(chatId, command).getMenu());
 
             } else if (EPlaceholderCommand.getPlaceholderCommandByPref(text) != null) {
                 // #add, #update, #delete ...
-                DispatcherResponse resp = messageDispatcherService.getResponseByPlaceholderCommand(chatId, text);
+                DispatcherResponse resp = dispatcherService.getResponseByPlaceholderCommand(chatId, text);
 
                 executeSendingMessage(chatId, resp.getStatus().getText());
                 sendMenu(chatId, resp.getMenu());
@@ -108,7 +108,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 // Keyboard buttons
                 EKeyboardCommand command = EKeyboardCommand.getKeyboardCommandByMessage(text);
 
-                DispatcherResponse resp = messageDispatcherService.getResponseByKeyboardCommand(chatId, command);
+                DispatcherResponse resp = dispatcherService.getResponseByKeyboardCommand(chatId, command);
                 if (command == EKeyboardCommand.GET_INFO)
                     executeSendingMessage(chatId, resp.getMenu().getInfoText());
 
@@ -130,9 +130,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 } else sendMenu(chatId, resp.getMenu());
 
-            } else if (messageDispatcherService.isUserCurrentMenuStudying(chatId)) {
+            } else if (dispatcherService.isUserCurrentMenuStudying(chatId)) {
                 // Perhaps, it will be a user test answer
-                DispatcherResponse resp = messageDispatcherService.checkAnswer(chatId, text);
+                DispatcherResponse resp = dispatcherService.checkAnswer(chatId, text);
 
                 if (!resp.getTestResult().getRightAnswer())
                     sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
@@ -147,17 +147,18 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             } else {
                 executeSendingMessage(chatId, BAD_REQUEST.getText());
-                DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
+                DispatcherResponse resp = dispatcherService.getLastMenu(chatId);
                 sendMenu(chatId, resp.getMenu());
             }
+            log.info("\n---\n");
         }
     }
 
-    private void sendMenu(Long chatId, MenuFactory menu) {
+    private void sendMenu(Long chatId, Menu menu) {
         executeSendingMenu(chatId, menu, true, false);
     }
 
-    private void executeSendingMenu(Long chatId, MenuFactory menu, Boolean needSendTitle, Boolean enableMDV2) {
+    private void executeSendingMenu(Long chatId, Menu menu, Boolean needSendTitle, Boolean enableMDV2) {
 
         if (needSendTitle) {
             SendMessage titleMessage = SendMessage.builder()
@@ -230,12 +231,12 @@ public class TelegramBot extends TelegramLongPollingBot {
             e.printStackTrace();
 
             executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
-            DispatcherResponse resp = messageDispatcherService.getLastMenu(chatId);
+            DispatcherResponse resp = dispatcherService.getLastMenu(chatId);
             sendMenu(chatId, resp.getMenu());
         }
     }
 
-    private void sendCorrectAnswer(Long chatId, MenuFactory menu, TestResultDto result) {
+    private void sendCorrectAnswer(Long chatId, Menu menu, TestResultDto result) {
         String correctAnswer;
         CardDto card = result.getCard();
 
