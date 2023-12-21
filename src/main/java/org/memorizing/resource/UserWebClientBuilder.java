@@ -10,15 +10,14 @@ import java.util.List;
 @Component
 public class UserWebClientBuilder {
     private static final Logger log = Logger.getLogger(CardWebClientBuilder.class);
-    // TODO edit url
-    // TODO add api map
     private static final String baseUrl = "http://localhost:8098/";
     private static final String serviceName = "";
 
     public UserDto getUserByChatId(Long chatId) {
         try {
             UserDto req = new UserDto(null, chatId);
-            log.debug("retrieve req to " + serviceName +" /user/getByChatId with req: " + req);
+            log.debug("getUserByChatId: REQ to " + serviceName + "/user/getByChatId with req: " + req);
+            // TODO: update after creating user-service
 //            return WebClient.create(baseUrl)
 //                    .post()
 //                    .uri(serviceName + "/user/getByChatId")
@@ -26,8 +25,9 @@ public class UserWebClientBuilder {
 //                    .retrieve()
 //                    .bodyToFlux(UserDto.class)
 //                    .blockFirst();
-            // TODO: TEMP
-            return new UserDto(1, chatId);
+            UserDto userDto = new UserDto(1, chatId);
+            log.debug("!!! CREATED STUB:" + userDto);
+            return userDto;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -36,8 +36,8 @@ public class UserWebClientBuilder {
 
     public List<UserDto> getChatIdListWithUserId() {
         try {
-            log.debug("retrieve req to " + serviceName + " /user/getChatIdListWithUserId with req: ");
-
+            log.debug("getChatIdListWithUserId: REQ to " + serviceName + "/user/getChatIdListWithUserId with data: ");
+            // TODO: update after creating user-service
 //            return WebClient.create(baseUrl)
 //                    .post()
 //                    .uri(serviceName + "/user/getByChatId")
@@ -45,8 +45,8 @@ public class UserWebClientBuilder {
 //                    .retrieve()
 //                    .bodyToFlux(UserDto.class)
 //                    .blockFirst();
-            // TODO: TEMP
             UserDto userDto = new UserDto(1, 1L);
+            log.debug("!!! CREATED STUB:" + userDto);
             List<UserDto> list = new ArrayList<>();
             list.add(userDto);
             return list;

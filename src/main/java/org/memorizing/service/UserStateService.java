@@ -25,7 +25,7 @@ public class UserStateService {
         this.cardStockHistoryRepository = cardStockHistoryRepository;
     }
 
-    public void updateUserStateByMenu(UserState userState, MenuFactory menu) {
+    public void updateUserStateByMenu(UserState userState, Menu menu) {
         log.debug("updateUserStateByMenu" + userState.getId());
         if (menu == null) return;
 
