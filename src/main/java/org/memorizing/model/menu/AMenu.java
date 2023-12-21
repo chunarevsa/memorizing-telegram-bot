@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AMenu implements MenuFactory {
+public abstract class AMenu implements Menu {
 
     @Override
     public EMenu getLastMenu() {

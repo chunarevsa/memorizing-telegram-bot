@@ -1,28 +1,28 @@
 package org.memorizing.service;
 
 import org.memorizing.model.EStatus;
-import org.memorizing.model.menu.MenuFactory;
+import org.memorizing.model.menu.Menu;
 import org.memorizing.resource.cardApi.TestResultDto;
 
 public class DispatcherResponse {
-    private MenuFactory menu;
+    private Menu menu;
     private EStatus status;
     private boolean isNeedSendStatus = false;
     private boolean isNeedSendTitle = true;
     private TestResultDto testResult;
 
-    public DispatcherResponse(MenuFactory menu, EStatus status) {
+    public DispatcherResponse(Menu menu, EStatus status) {
         this.menu = menu;
         this.status = status;
     }
 
-    public DispatcherResponse(MenuFactory menu, EStatus status, boolean isNeedSendStatus) {
+    public DispatcherResponse(Menu menu, EStatus status, boolean isNeedSendStatus) {
         this.menu = menu;
         this.status = status;
         this.isNeedSendStatus = isNeedSendStatus;
     }
 
-    public DispatcherResponse(MenuFactory menu, EStatus status, TestResultDto testResult) {
+    public DispatcherResponse(Menu menu, EStatus status, TestResultDto testResult) {
         this.menu = menu;
         this.status = status;
         this.testResult = testResult;
@@ -31,11 +31,11 @@ public class DispatcherResponse {
     public DispatcherResponse() {
     }
 
-    public MenuFactory getMenu() {
+    public Menu getMenu() {
         return menu;
     }
 
-    public void setMenu(MenuFactory menu) {
+    public void setMenu(Menu menu) {
         this.menu = menu;
     }
 
