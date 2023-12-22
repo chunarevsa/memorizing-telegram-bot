@@ -1,0 +1,121 @@
+
+    /**
+     * -- Card Stocks menu (1):
+     * Список Card Stock
+     * "ENG/RUS" "Interview question/Answer"          -> Card stock menu
+     *
+     * "add card stock"                               -> adding Card stock menu
+     * "info"                                         -> info menu 1
+     *
+     * -- Card Stock Add menu
+     *
+     *
+     *
+     * -- Card stock menu (2)
+     * Информация о текущем Card Stock   / ENG/RUS
+     * Какие доступны режимы                          / TESTING_TO_KEY, TESTING_FROM_KEY, SHOWING SELF-CHECK
+     * Сколько карточек                               / 385
+     * Показывается статистика по доступным режимам   / FROM_KEY HARD:20 NORMAL:60 COMPLETED 305
+     * / TO_KEY HARD:15 NORMAL:200 COMPLETED 170
+     *
+     * "start studying"                               -> Studying menu
+     * "show cards"                                   -> Cards menu
+     * "edit card stock"                              -> editing Card Stock menu
+     * "delete card stock"                            -> Delete Card stock and -> Main menu (1)
+     * "info"                                         -> info menu 2
+     * "go to back"                                   -> Card Stocks (1)
+     *
+     * -- Cards menu (3)
+     * Все карточки из этого Card Stock
+     * "provide" "supply"
+     *
+     * "add card"                                     -> adding Card menu
+     * "go to back"                                   -> Card stock menu (2)
+     * "info"                                         -> info menu 3
+     *
+     * -- Card menu (4)
+     * Информация о карте
+     *
+     * "edit card"                                    -> editing Card menu
+     * "delete card"                                  -> Delete Card and -> Cards menu (3)
+     * "info"                                         -> info menu 2
+     * "go to back"                                   -> Card Stocks (1)
+     */
+
+         /**
+          * hasCallback
+          * 1) Title(+inline)
+          * 2) next menu(+keyboard)
+          * <p>
+          * !users.containsKey(chatId)
+          * 1) Regular
+          * 2) Title(+inline)
+          * 3) CardStocksMenu text(+keyboard)
+          * <p>
+          * /start /help /howitworks
+          * 1) Regular
+          * 2) Если Start -> Send: Title(+inline) + MAIN(CARD_STOCKS)
+          * 2) Если other -> Send: Title(+inline) + CURRENT
+          * <p>
+          * #add-CardStock ...
+          * 1) Status
+          * 2) Title(+inline)
+          * 3) Last menu text (+keyboard)
+          * <p>
+          * Keyboard buttons
+          * GET_INFO
+          * 1) Info text
+          * 2) Title(+inline)
+          * 3) Menu text(+keyboard)
+          * <p>
+          * NEXT
+          * 1) Menu text(+keyboard) (MDV2)
+          * 2) Если resp.isNeedSendStatus() Status
+          * <p>
+          * SKIP
+          * 1) Correct answer
+          * 2) Если resp.isNeedSendStatus() Status
+          * 3) Menu text(+keyboard)
+          * <p>
+          * OTHER
+          * 1) Title(+inline)
+          * 2) Menu text(+keyboard)
+          * <p>
+          * isUserCurrentMenuStudying
+          * 1) Correct answer
+          * 2) Если NEXT == AStudyingMenu -> Menu text(+keyboard)
+          * 2) Если NEXT != AStudyingMenu -> Regular
+          * 3) Title(+inline)
+          * 4) Menu text(+keyboard)
+          * <p>
+          * else
+          * 1) Status
+          * 2) Title(+inline)
+          * 3) Menu text(+keyboard)
+          */
+          
+     Message format for sending 
+     MD 
+     `Inner text`
+     *innerText*
+     #Inner text
+     _Inner text_
+     |Inner text|
+     ||Inner text||
+                     
+     MDV2
+     >innerText 
+     * innerText *
+     _Inner text_
+     ~Inner text~
+     __Inner text__
+     ||Inner text||
+     |Inner text|
+
+     more about MDV2
+     *bold \*text*
+     _italic \*text_
+     __underline__
+     ~strikethrough~
+     ||spoiler||
+     *bold _italic bold ~italic bold strikethrough ||italic bold strikethrough spoiler||~ __underline italic bold___ bold*
