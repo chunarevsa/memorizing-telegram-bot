@@ -6,7 +6,9 @@ import org.memorizing.model.menu.EMenu;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user_state")
@@ -38,6 +40,12 @@ public class UserState {
 
     public void addStudyingHistory(CardStockHistory history) {
         this.studyingHistory.add(history);
+    }
+
+    public void updateStudyingHistory(CardStockHistory history) {
+        setStudyingHistory(this.studyingHistory.stream().map(it ->
+            Objects.equals(it.getId(), history.getId()) ? history : it
+        ).collect(Collectors.toList()));
     }
 
     public Integer getId() {

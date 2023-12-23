@@ -49,11 +49,11 @@ public class UserStateService {
             if (userState.getStudyingHistory().isEmpty() || cardStockHistory.isEmpty()) {
                 history = new CardStockHistory(userState);
                 history.updateStudyingStateIds(testMenu.getMode(), testMenu.getIds());
-                userState.addStudyingHistory(cardStockHistoryRepository.save(history));
+                userState.addStudyingHistory(history);
             } else {
                 history = cardStockHistory.get();
                 history.updateStudyingStateIds(testMenu.getMode(), testMenu.getIds());
-                cardStockHistoryRepository.save(history);
+                userState.updateStudyingHistory(history);
             }
 
             userState.setCardId(null);
