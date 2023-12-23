@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_URL:postgres}/${spring.application.name}
+    username: root
+    password: root
+  jpa:
+    show-sql: false

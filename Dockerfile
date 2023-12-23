@@ -21,4 +21,4 @@ WORKDIR /app
 COPY --from=builder /app/target/telegram-bot-1.0-SNAPSHOT.jar .
 
 # Задаем команду для запуска приложения
-CMD ["java", "-jar", "telegram-bot-1.0-SNAPSHOT.jar"]
+CMD ["java", "-Dspring.profiles.active=prod", "-jar", "telegram-bot-1.0-SNAPSHOT.jar"]
