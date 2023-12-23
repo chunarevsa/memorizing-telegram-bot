@@ -1,0 +1,20 @@
+server:
+  port: 8096
+
+spring:
+  application:
+    name: telegram-bot-service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: false
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
+telegram:
+  bot:
+    name: memorizing_telegram_bot
+    token: 6784016579:AAGLRgVj4z-ktU8DWlSt4SORX6Pdy0etZ_o
