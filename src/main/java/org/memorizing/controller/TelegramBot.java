@@ -196,6 +196,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(textMessage);
         } catch (Exception e) {
+            e.printStackTrace();
             executeSendingMessageWithoutMD(chatId, textMessage);
         }
 
@@ -216,10 +217,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void executeSendingMessageWithoutMD(Long chatId, SendMessage message) {
-        log.debug("--- Can't send title \n" +
-                "chatId:" + chatId + " ;\n" +
-                "menu.getKeyboard(): " + message.getReplyMarkup() + " ;\n" +
-                "menu.getTitle(): " + message.getText() + " ;\n");
+        log.debug("--- Can't send message \n" +
+                "chatId:" + chatId + "\n" +
+                "message.getReplyMarkup(): " + message.getReplyMarkup() + "\n" +
+                "message.getParseMode(): " + message.getParseMode() + "\n" +
+                "message.getText(): " + message.getText() + "\n");
 
         message.enableMarkdown(false);
         message.enableMarkdownV2(false);
