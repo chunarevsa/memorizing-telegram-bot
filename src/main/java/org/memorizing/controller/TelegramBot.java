@@ -126,6 +126,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 } else if (command == EKeyboardCommand.SKIP) {
                     sendCorrectAnswer(chatId, resp.getMenu(), resp.getTestResult());
+                    if (resp.isNeedSendStatus()) executeSendingMessage(chatId, resp.getStatus().getText());
                     executeSendingMenu(chatId, resp.getMenu(), false, false);
 
                 } else sendMenu(chatId, resp.getMenu());
