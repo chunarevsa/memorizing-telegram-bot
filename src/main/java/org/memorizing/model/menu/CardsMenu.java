@@ -2,6 +2,7 @@ package org.memorizing.model.menu;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class CardsMenu extends AMenu {
     @Override
     public String getText() {
         if (!inlineKeyboard.getKeyboard().isEmpty()) {
-            int size = inlineKeyboard.getKeyboard().get(0).size();
+            int size = inlineKeyboard.getKeyboard().stream().mapToInt(List::size).sum();
             return String.format("You have %s cards", size);
         } else return "You don't have cards. " +
                 "Push the button `add card`";
