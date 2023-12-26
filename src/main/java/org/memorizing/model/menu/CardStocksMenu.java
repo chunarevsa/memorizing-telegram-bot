@@ -67,7 +67,7 @@ public class CardStocksMenu extends AMenu {
     @Override
     public String getText() {
         if (!inlineKeyboard.getKeyboard().isEmpty()) {
-            int size = inlineKeyboard.getKeyboard().get(0).size();
+            int size = inlineKeyboard.getKeyboard().stream().mapToInt(List::size).sum();
             return String.format("You have %s card stocks", size);
         } else return "You don't have a card stocks. " +
                 "Push the button `add card stock`";
