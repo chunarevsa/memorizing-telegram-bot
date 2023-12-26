@@ -36,8 +36,8 @@ public abstract class AStudyingMenu extends AMenu {
     @Override
     public ReplyKeyboardMarkup getKeyboard() {
         return getKeyboardByButtons(new String[][]{
-
                 getNextButton(),
+                {GO_TO_CARD.getButtonText()},
                 {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
         });
     }

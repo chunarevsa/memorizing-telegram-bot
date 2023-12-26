@@ -102,14 +102,26 @@ public class DispatcherService {
                 case GET_INFO:
                     nextMenu = userState.getCurrentMenu();
                     break;
+                case GO_BACK:
+                    nextMenu = userState.getLastMenu();
+                    break;
                 case SKIP:
                 case NEXT:
                     nextMenu = userState.getCurrentMenu();
                     resp = getResponseByNextButton(nextMenu, userState, command == EKeyboardCommand.SKIP);
                     if (resp.getStatus() == COMPLETE_SET) nextMenu = nextMenu.getLastMenu();
                     break;
-                case GO_BACK:
-                    nextMenu = userState.getLastMenu();
+                case GO_TO_CARD:
+                    EMode mode = EMode.getModeByMenu(userState.getCurrentMenu());
+                    Optional<CardStockHistory> cardStockHistory = userStateService.findCardStockHistoryByCardStockId(userState.getCardStockId());
+                    if (cardStockHistory.isPresent()) {
+                        List<Integer> ids = userStateService.getCardIdsByHistory(cardStockHistory.get(), mode.name());
+                        if (!ids.isEmpty()) {
+                            userState.setCardId(ids.get(0));
+                            nextMenu = EMenu.CARD;
+                        }
+                    }
+
                     break;
                 case DELETE_CARD_STOCK:
                     return getResponseByPlaceholderCommand(chatId, "#delete-CardStock");
