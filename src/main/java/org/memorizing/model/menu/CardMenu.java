@@ -59,15 +59,15 @@ public class CardMenu extends AMenu {
 
     @Override
     public String getText() {
-        String backwardString = "";
-        if (!Objects.equals(card.getStatusToKey(), "NO_SUPPORTED")) {
-            backwardString = "▪ backward (value->key): `" + card.getStatusToKey() + "` (" + card.getPointToKey() + ")\n";
-        }
+        String backwardString = !Objects.equals(card.getStatusToKey(), "NOT_SUPPORTED")
+                ? "▪ backward (value->key): `" + card.getStatusToKey() + "` (" + card.getPointToKey() + ")\n"
+                : "";
 
-        return card.getCardKey() + " = " + card.getCardValue() + "\n" +
-                "\n" +
+        return "*"+card.getCardKey()+"*\n" +
                 "▪ forward (key->value): `" + card.getStatusFromKey() + "` (" + card.getPointFromKey() + ")\n" +
                 backwardString +
+                "\n" +
+                card.getCardValue() + "\n" +
                 "\n";
 
     }
