@@ -58,7 +58,7 @@ public class MenuService { //TODO: Add interface
 
                 List<Integer> ids = userStateService.getCardIdsByMode(state, mode.name());
                 if (ids.isEmpty()) {
-                    ids = getCardIdsForStudyingByRequest(state.getCardStockId());
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId(), mode);
                     // TODO add exception if ids.isEmpty
                 }
 
@@ -102,7 +102,7 @@ public class MenuService { //TODO: Add interface
 
     private Optional<CardDto> getCardForMenu(UserState state, List<Integer> ids) {
         CardDto card = null;
-        for (Integer id: ids) {
+        for (Integer id : ids) {
             CardDto mayBeCard = storageResource.getCardById(id);
             if (mayBeCard == null) {
                 state = userStateService.deleteCardIdFromSessionAndGet(state);
@@ -115,12 +115,16 @@ public class MenuService { //TODO: Add interface
         return Optional.ofNullable(card);
     }
 
-    private List<Integer> getCardIdsForStudyingByRequest(Integer cardStockId) {
+    private List<Integer> getCardIdsForStudyingByRequest(Integer cardStockId, EMode mode) {
         log.debug("getCardIdsForStudyingByRequest :" + cardStockId);
         List<Integer> ids = new ArrayList<>();
         List<CardDto> allCards = storageResource.getCardsByCardStockId(cardStockId);
         if (!allCards.isEmpty()) {
-            ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
+            ids = allCards.stream()
+                    .filter(it ->
+                            (mode.isFromKeyMode() && !Objects.equals(it.getStatusFromKey(), "COMPLETED")) ||
+                                    (!mode.isFromKeyMode() && !Objects.equals(it.getStatusToKey(), "COMPLETED")))
+                    .map(CardDto::getId).collect(Collectors.toList());
             Collections.shuffle(ids);
         }
         return ids;
