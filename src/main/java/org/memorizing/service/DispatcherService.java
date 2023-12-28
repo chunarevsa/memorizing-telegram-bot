@@ -152,8 +152,7 @@ public class DispatcherService {
         } else {
             ids = userStateService.getCardIdsByHistory(cardStockHistory.get(), mode.name());
 
-            if (isSkip)
-                resp.setTestResult(storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
+            if (isSkip) resp.setTestResult(storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
 
             ids.remove(0);
             userStateService.updateHistoryByNewIds(cardStockHistory.get(), mode, ids);
