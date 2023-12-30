@@ -20,6 +20,7 @@ import java.net.ProtocolException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.memorizing.model.EStatus.*;
 
@@ -152,7 +153,8 @@ public class DispatcherService {
         } else {
             ids = userStateService.getCardIdsByHistory(cardStockHistory.get(), mode.name());
 
-            if (isSkip) resp.setTestResult(storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
+            if (isSkip)
+                resp.setTestResult(storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
 
             ids.remove(0);
             userStateService.updateHistoryByNewIds(cardStockHistory.get(), mode, ids);
@@ -253,11 +255,17 @@ public class DispatcherService {
         if (!Objects.equals(command.getMethod(), "delete")) {
 
             try {
-                // TODO fix it
-                String body = data.substring(data.indexOf("{"))
-                        .replace("\n", "")
-                        .replace("*", "")
-                        .replace("`", "");
+                List<String> collect = data.lines().skip(1).map(line -> {
+                    String field = line.substring(0, line.indexOf(":"));
+                    String value = line.substring(line.indexOf(":")+1).trim();
+                    return '\"' + field + "\":\"" + value +'\"';
+                }).collect(Collectors.toList());
+
+                collect.set(0, '{' + collect.get(0));
+                collect.set(collect.size()-1, collect.get(collect.size()-1) + '}');
+
+                String temp = collect.toString();
+                String body = temp.substring(1, temp.length()-1);
 
                 entity = mapper.readValue(body, entity.getClass());
             } catch (JsonProcessingException e) {
