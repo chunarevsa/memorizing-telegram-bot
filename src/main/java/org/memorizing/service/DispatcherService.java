@@ -252,77 +252,80 @@ public class DispatcherService {
         log.debug("executeRequest. req:" + command + ", " + userState);
 
         IMappable entity = command.getNewEntity();
-        if (!Objects.equals(command.getMethod(), "delete")) {
+        String[] set = data.split(command.getPref());
+        for (String element : set) {
+            if( element.isBlank()) continue;
+            if (!Objects.equals(command.getMethod(), "delete")) {
+                try {
+                    List<String> collect = element.lines().skip(1).map(line -> {
+                        String field = line.replace("\n","").substring(0, line.indexOf(":"));
+                        String value = line.substring(line.indexOf(":")+1).trim();
+                        return '\"' + field + "\":\"" + value +'\"';
+                    }).collect(Collectors.toList());
 
-            try {
-                List<String> collect = data.lines().skip(1).map(line -> {
-                    String field = line.substring(0, line.indexOf(":"));
-                    String value = line.substring(line.indexOf(":")+1).trim();
-                    return '\"' + field + "\":\"" + value +'\"';
-                }).collect(Collectors.toList());
+                    collect.set(0, '{' + collect.get(0));
+                    collect.set(collect.size()-1, collect.get(collect.size()-1) + '}');
 
-                collect.set(0, '{' + collect.get(0));
-                collect.set(collect.size()-1, collect.get(collect.size()-1) + '}');
+                    String temp = collect.toString();
+                    String body = temp.substring(1, temp.length()-1);
 
-                String temp = collect.toString();
-                String body = temp.substring(1, temp.length()-1);
-
-                entity = mapper.readValue(body, entity.getClass());
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return BAD_REQUEST;
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-                return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
-        }
-
-        if (entity instanceof CardStockFieldsDto) {
-            CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
-            cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
-            switch (command.getMethod()) {
-                case "add":
-                    storageResource.createCardStock(cardStockFieldsDto);
-                    break;
-                case "update":
-                    storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
-                    break;
-                case "delete":
-                    List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
-
-                    if (cards != null && !cards.isEmpty()) {
-                        cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
-                    }
-
-                    storageResource.deleteCardStock(userState.getCardStockId());
-                    break;
-                default:
+                    entity = mapper.readValue(body, entity.getClass());
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    return BAD_REQUEST;
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
                     return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                }
             }
 
-        } else if (entity instanceof CardFieldsDto) {
-            CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
-            cardFieldsDto.setCardStockId(userState.getCardStockId());
-            CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
-            cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
-            switch (command.getMethod()) {
-                case "add":
-                    storageResource.createCard(cardFieldsDto);
-                    break;
-                case "update":
-                    cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
-                    storageResource.updateCard(cardFieldsDto, userState.getCardId());
-                    break;
-                case "delete":
-                    storageResource.deleteCard(userState.getCardId());
-                    break;
-                default:
-                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
+            if (entity instanceof CardStockFieldsDto) {
+                CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
+                cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
+                switch (command.getMethod()) {
+                    case "add":
+                        storageResource.createCardStock(cardStockFieldsDto);
+                        break;
+                    case "update":
+                        storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
+                        break;
+                    case "delete":
+                        List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
 
-        } else {
-            // TODO add throw Exception
-            return SOMETHING_WENT_WRONG;
+                        if (cards != null && !cards.isEmpty()) {
+                            cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+                        }
+
+                        storageResource.deleteCardStock(userState.getCardStockId());
+                        break;
+                    default:
+                        return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                }
+
+            } else if (entity instanceof CardFieldsDto) {
+                CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
+                cardFieldsDto.setCardStockId(userState.getCardStockId());
+                CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
+                cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
+                switch (command.getMethod()) {
+                    case "add":
+                        storageResource.createCard(cardFieldsDto);
+                        break;
+                    case "update":
+                        cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
+                        storageResource.updateCard(cardFieldsDto, userState.getCardId());
+                        break;
+                    case "delete":
+                        storageResource.deleteCard(userState.getCardId());
+                        break;
+                    default:
+                        return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                }
+
+            } else {
+                // TODO add throw Exception
+                return SOMETHING_WENT_WRONG;
+            }
         }
 
         return SUCCESSFULLY;
