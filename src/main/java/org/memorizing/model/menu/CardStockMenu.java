@@ -86,7 +86,7 @@ public class CardStockMenu extends AMenu {
                 }
             }
 
-            statuses = "  from key"+ (!cardStock.getOnlyFromKey() ? " / to key:\n" : ":\n") +
+            statuses = "  Status        - (from key)"+ (!cardStock.getOnlyFromKey() ? " / (to key):\n" : ":\n") +
                     "    `NORMAL`       - ("+normalCountFromKey+")" + (!cardStock.getOnlyFromKey() ? " / ("+normalCountToKey+")\n" : ":\n") +
                     "    `HARD`             - ("+hardCountFromKey+")" + (!cardStock.getOnlyFromKey() ? " / ("+hardCountToKey+")\n" : ":\n") +
                     "    `COMPLETED` - ("+completedCountFromKey+")" + (!cardStock.getOnlyFromKey() ? " / ("+completedCountToKey+")\n" : ":\n");
