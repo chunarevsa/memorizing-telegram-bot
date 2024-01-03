@@ -253,9 +253,11 @@ public class DispatcherService {
 
         IMappable entity = command.getNewEntity();
         String[] set = data.split(command.getPref());
+        if (command.getMethod().equals("delete")) set = new String[]{"delete"};
+
         for (String element : set) {
-            if( element.isBlank()) continue;
-            if (!Objects.equals(command.getMethod(), "delete")) {
+            if(element.isBlank()) continue;
+            if (!Objects.equals(element, "delete")) {
                 try {
                     List<String> collect = element.lines().skip(1).map(line -> {
                         String field = line.replace("\n","").substring(0, line.indexOf(":"));
