@@ -78,7 +78,7 @@ public class DispatcherService {
             userState = userStateService.deleteCardStockIdFromSessionAndGet(userState);
             menuType = userState.getLastMenu();
         } else if (command == EPlaceholderCommand.DELETE_CARD) {
-            userState = userStateService.deleteCardIdFromSessionAndGet(userState);
+            userState = userStateService.deleteCardIdFromSessionAndGet(userState, userState.getCardId());
             menuType = userState.getLastMenu();
         } else if (command == EPlaceholderCommand.ADD_CARD) {
             menuType = EMenu.CARDS;

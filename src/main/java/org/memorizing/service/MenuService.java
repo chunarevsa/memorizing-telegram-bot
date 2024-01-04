@@ -62,7 +62,7 @@ public class MenuService { //TODO: Add interface
                     // TODO add exception if ids.isEmpty
                 }
 
-                Optional<CardDto> mayBeCard = getCardForMenu(state, ids, mode.isFromKeyMode());
+                Optional<CardDto> mayBeCard = getCardForMenu(state, ids, mode);
                 if (mayBeCard.isPresent()) {
                     menu = new StudyingMenuFactory().createStudyingMenu(mayBeCard.get(), menuType, ids);
                 } else createMenu(storageId, state, menuType.getLastMenu());
@@ -100,19 +100,24 @@ public class MenuService { //TODO: Add interface
         return menu;
     }
 
-    private Optional<CardDto> getCardForMenu(UserState state, List<Integer> ids, boolean fromKey) {
+    private Optional<CardDto> getCardForMenu(UserState state, List<Integer> ids, EMode mode) {
         CardDto card = null;
         for (Integer id : ids) {
             // TODO: edit to optional
             CardDto mayBeCard = storageResource.getCardById(id);
+            if (mayBeCard == null) {
+                userStateService.deleteCardIdFromSessionAndGet(state, id);
+                continue;
+            }
 
-            if (mayBeCard != null &&
-                    (fromKey && !Objects.equals(mayBeCard.getStatusFromKey(), "COMPLETED")) ||
-                    (!fromKey && !Objects.equals(mayBeCard.getStatusToKey(), "COMPLETED"))) {
+            String status =  mode.isFromKeyMode() ? mayBeCard.getStatusFromKey() : mayBeCard.getStatusToKey();
+            if (status.equals("COMPLETED")) {
+                userStateService.deleteCardIdFromStudyingHistoryByMode(state, id, mode);
+                continue;
+            }
+            card = mayBeCard;
+            break;
 
-                card = mayBeCard;
-                break;
-            } else state = userStateService.deleteCardIdFromSessionAndGet(state);
         }
 
         return Optional.ofNullable(card);

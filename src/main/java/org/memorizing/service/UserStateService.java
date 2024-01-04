@@ -82,18 +82,14 @@ public class UserStateService {
         return userState;
     }
 
-    public UserState deleteCardIdFromSessionAndGet(UserState userState) {
+    public UserState deleteCardIdFromSessionAndGet(UserState userState, Integer cardId) {
         log.debug("deleteCardIdFromSessionAndGet:" + userState.getCardStockId());
-
-        List<CardStockHistory> studyingHistory = userState.getStudyingHistory();
-        if (studyingHistory.isEmpty()) return userState;
 
         List<CardStockHistory> cardStockHistory = cardStockHistoryRepository.findAllByCardStockId(userState.getCardStockId());
         if (cardStockHistory.isEmpty()) return userState;
 
         cardStockHistory.forEach(history -> {
                     Map<String, List<Integer>> studyingState = history.getStudyingState();
-                    Integer cardId = userState.getCardId();
 
                     studyingState.keySet().stream()
                             .filter(key -> studyingState.get(key).stream().anyMatch(it -> it.equals(cardId)))
@@ -108,6 +104,21 @@ public class UserStateService {
 
         userState.setCardId(null);
         return userState;
+    }
+
+    public void deleteCardIdFromStudyingHistoryByMode(UserState userState, Integer cardId, EMode mode) {
+        log.debug("deleteCardIdFromStudyingHistoryByMode:" + userState.getCardStockId() + ", " + cardId + ", " + mode.name());
+
+        List<CardStockHistory> studyingHistory = userState.getStudyingHistory();
+        if (studyingHistory.isEmpty()) return;
+
+        studyingHistory.forEach(history -> {
+            List<Integer> ids = history.getStudyingState().get(mode.name());
+            ids.remove(cardId);
+            history.updateStudyingStateIds(mode, ids);
+            cardStockHistoryRepository.save(history);
+        });
+
     }
 
     public List<Integer> getCardIdsByMode(UserState userState, String modeName) {
