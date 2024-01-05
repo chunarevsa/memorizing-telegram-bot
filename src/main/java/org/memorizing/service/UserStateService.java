@@ -144,4 +144,8 @@ public class UserStateService {
     public Optional<CardStockHistory> findCardStockHistoryByCardStockId(Integer cardStockId) {
         return cardStockHistoryRepository.findAllByCardStockId(cardStockId).stream().findFirst();
     }
+
+    public Optional<UserState> findUserStateById(Integer id) {
+        return userStateRepository.findById(id);
+    }
 }

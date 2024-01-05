@@ -110,6 +110,7 @@ public class DispatcherService {
                 case NEXT:
                     nextMenu = userState.getCurrentMenu();
                     resp = getResponseByNextButton(nextMenu, userState, command == EKeyboardCommand.SKIP);
+                    userState = userStateService.findUserStateById(userState.getId()).orElse(userState);
                     if (resp.getStatus() == COMPLETE_SET) nextMenu = nextMenu.getLastMenu();
                     break;
                 case GO_TO_CARD:

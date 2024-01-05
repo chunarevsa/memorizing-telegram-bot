@@ -65,7 +65,18 @@ public class MenuService { //TODO: Add interface
                 Optional<CardDto> mayBeCard = getCardForMenu(state, ids, mode);
                 if (mayBeCard.isPresent()) {
                     menu = new StudyingMenuFactory().createStudyingMenu(mayBeCard.get(), menuType, ids);
-                } else createMenu(storageId, state, menuType.getLastMenu());
+                } else {
+                    // take all cards when all ids were deleted
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId(), mode);
+                    mayBeCard = getCardForMenu(state, ids, mode);
+
+                    if (mayBeCard.isPresent()) {
+                        menu = new StudyingMenuFactory().createStudyingMenu(mayBeCard.get(), menuType, ids);
+                    } else {
+                        // TODO add exception if ids.isEmpty
+                        menu = createMenu(storageId, state, menuType.getLastMenu());
+                    }
+                }
 
                 break;
             case CARD_STOCK_UPDATE:
