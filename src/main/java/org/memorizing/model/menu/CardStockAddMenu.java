@@ -39,13 +39,13 @@ public class CardStockAddMenu extends AMenu {
     @Override
     public String getText() {
         return "#add-CardStock\n"+
-                "`cardStockName`: IT term\n" +
-                "`description`: Only it words for interview\n" +
-                "`keyType`: ENG\n" +
-                "`valueType`: RUS\n" +
-                "`maxPoint`: 5\n" +
-                "`testModeIsAvailable`: true\n" +
-                "`onlyFromKey`: false\n" +
+                "#cardStockName : IT term\n" +
+                "#description : Only it words for interview\n" +
+                "#keyType : ENG\n" +
+                "#valueType : RUS\n" +
+                "#maxPoint : 5\n" +
+                "#testModeIsAvailable : true\n" +
+                "#onlyFromKey : false\n" +
                 "\n";
     }
 

@@ -37,14 +37,14 @@ public class CardUpdateMenu extends AMenu {
                 "Please use this format:\n" +
                 "\n" +
                 "#update-Card\n" +
-                "`cardValue`: "+card.getCardValue()+"\n" +
+                "`#cardValue`: "+card.getCardValue()+"\n" +
                 "\n";
     }
 
     @Override
     public String getText() {
         return "#update-Card\n" +
-                "`cardValue`: "+card.getCardValue()+"\n" +
+                "#cardValue : "+card.getCardValue()+"\n" +
                 "\n";
     }
 

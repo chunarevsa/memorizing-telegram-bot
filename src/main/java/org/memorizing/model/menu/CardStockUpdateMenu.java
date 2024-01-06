@@ -50,13 +50,13 @@ public class CardStockUpdateMenu extends AMenu {
     @Override
     public String getText() {
         return "#update-CardStock\n" +
-                "`cardStockName`: " + cardStock.getCardStockName() + "\n" +
-                "`description`: " + cardStock.getDescription() + "\n" +
-                "`keyType`: " + cardStock.getKeyType() + "\n" +
-                "`valueType`: " + cardStock.getValueType() + "\n" +
-                "`maxPoint`: " + cardStock.getMaxPoint() + "\n" +
-                "`testModeIsAvailable`: " + cardStock.getTestModeIsAvailable() + "\n" +
-                "`onlyFromKey`: " + cardStock.getOnlyFromKey() + "\n" +
+                "#cardStockName: " + cardStock.getCardStockName() + "\n" +
+                "#description: " + cardStock.getDescription() + "\n" +
+                "#keyType: " + cardStock.getKeyType() + "\n" +
+                "#valueType: " + cardStock.getValueType() + "\n" +
+                "#maxPoint: " + cardStock.getMaxPoint() + "\n" +
+                "#testModeIsAvailable: " + cardStock.getTestModeIsAvailable() + "\n" +
+                "#onlyFromKey: " + cardStock.getOnlyFromKey() + "\n" +
                 "\n";
     }
 

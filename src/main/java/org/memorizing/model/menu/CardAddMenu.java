@@ -35,8 +35,8 @@ public class CardAddMenu extends AMenu {
     @Override
     public String getText() {
         return "#add-Card\n"+
-                "`cardKey`: provide\n" +
-                "`cardValue`: предоставлять\n" +
+                "#cardKey : provide\n" +
+                "#cardValue : предоставлять\n" +
                 "\n";
     }
 

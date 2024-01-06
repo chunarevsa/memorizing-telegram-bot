@@ -1,6 +1,7 @@
 package org.memorizing.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
@@ -26,6 +27,9 @@ public class JsonObjectMapper implements IMapper {
 
     @Override
     public <T extends IMappable> T readValue(String content, Class<T> valueType) throws ProtocolException, JsonProcessingException {
+        mapper.configure(
+                JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature(),
+                true);
         return mapper.readValue(content, valueType);
     }
 

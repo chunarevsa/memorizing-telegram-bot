@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.memorizing.model.EStatus.*;
 
@@ -253,24 +254,22 @@ public class DispatcherService {
         log.debug("executeRequest. req:" + command + ", " + userState);
 
         IMappable entity = command.getNewEntity();
-        String[] set = data.split(command.getPref());
-        if (command.getMethod().equals("delete")) set = new String[]{"delete"};
+        String[] elements = data.split(command.getPref());
 
-        for (String element : set) {
-            if(element.isBlank()) continue;
+        if (command.getMethod().equals("delete")) elements = new String[]{"delete"};
+        for (String element : elements) {
+            if (element.isBlank()) continue;
             if (!Objects.equals(element, "delete")) {
                 try {
-                    List<String> collect = element.lines().skip(1).map(line -> {
-                        String field = line.replace("\n","").substring(0, line.indexOf(":"));
-                        String value = line.substring(line.indexOf(":")+1).trim();
-                        return '\"' + field + "\":\"" + value +'\"';
-                    }).collect(Collectors.toList());
-
-                    collect.set(0, '{' + collect.get(0));
-                    collect.set(collect.size()-1, collect.get(collect.size()-1) + '}');
-
-                    String temp = collect.toString();
-                    String body = temp.substring(1, temp.length()-1);
+                    String[] fields = element.split("\n#");
+                    String body = "{";
+                    for (String field: fields) {
+                        if (field.isBlank()) continue;
+                        String fieldName = field.substring(0, field.indexOf(':')).trim();
+                        String fieldValue = field.substring(field.indexOf(':')+1).trim();
+                        body += '\"' + fieldName + "\":\"" + fieldValue +"\"";
+                        body += field.equals(fields[fields.length - 1]) ? '}' : ',';
+                    }
 
                     entity = mapper.readValue(body, entity.getClass());
                 } catch (JsonProcessingException e) {
