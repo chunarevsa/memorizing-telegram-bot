@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.memorizing</groupId>
-    <artifactId>telegram-bot</artifactId>
+    <artifactId>memorizing-telegram-bot</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
