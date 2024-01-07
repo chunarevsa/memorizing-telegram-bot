@@ -2,6 +2,7 @@ package org.memorizing.resource;
 
 import org.apache.log4j.Logger;
 import org.memorizing.resource.cardApi.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -11,7 +12,8 @@ import java.util.List;
 public class CardWebClientBuilder {
     private static final Logger log = Logger.getLogger(CardWebClientBuilder.class);
     private static final String baseUrl = "http://192.168.1.76:8095/";
-    private static final String serviceName = "";
+    @Value("${core-service.name}")
+    private String serviceName;
 
     // /storage
     public StorageDto getStorageByUserId(Long userId) {
