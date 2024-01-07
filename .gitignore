@@ -38,6 +38,5 @@ out/
 .vscode/
 
 ### Custom ###
-dispatcher/src/main/resources/application.properties
-dispatcher/target
+src/main/resources/application.yml
 logs
