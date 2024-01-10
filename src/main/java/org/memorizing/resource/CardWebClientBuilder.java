@@ -11,9 +11,20 @@ import java.util.List;
 @Component
 public class CardWebClientBuilder {
     private static final Logger log = Logger.getLogger(CardWebClientBuilder.class);
-    private static final String baseUrl = "http://192.168.1.76:8095/";
-    @Value("${core-service.name}")
-    private String serviceName;
+
+    private final String serviceName;
+    private final String baseUrl;
+
+    public CardWebClientBuilder(
+            @Value("${localhost}")
+            String localhost,
+            @Value("${core-service.name}")
+            String serviceName,
+            @Value("${api-gateway.port}")
+            String gatewayPort) {
+        this.serviceName = serviceName;
+        this.baseUrl = "http://"+localhost+":"+gatewayPort+"/"+serviceName;
+    }
 
     // /storage
     public StorageDto getStorageByUserId(Long userId) {
@@ -22,7 +33,7 @@ public class CardWebClientBuilder {
             StorageDto req = new StorageDto(null, userId, null);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/storage/getByUserId")
+                    .uri("/storage/getByUserId")
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(StorageDto.class)
@@ -39,7 +50,7 @@ public class CardWebClientBuilder {
             log.debug("getCardStocksByStorageId: REQ to " + serviceName +"/cardStocks with req: " + storageId);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/cardStocks")
+                    .uri("/cardStocks")
                     .bodyValue(storageId)
                     .retrieve()
                     .bodyToFlux(CardStockDto.class)
@@ -56,7 +67,7 @@ public class CardWebClientBuilder {
             log.debug("createCardStock: REQ to " + serviceName +"/cardStock with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/cardStock")
+                    .uri("/cardStock")
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(CardStockDto.class)
@@ -72,7 +83,7 @@ public class CardWebClientBuilder {
             log.debug("updateCardStock: REQ to " + serviceName +"/cardStock/ with req: " + req);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/cardStock/" + cardStockId)
+                    .uri("/cardStock/" + cardStockId)
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(CardStockDto.class)
@@ -88,7 +99,7 @@ public class CardWebClientBuilder {
             log.debug("deleteCardStock: REQ to " + serviceName + "/cardStock/ with data: " + cardStockId);
             WebClient.create(baseUrl)
                     .delete()
-                    .uri(serviceName + "/cardStock/" + cardStockId)
+                    .uri("/cardStock/" + cardStockId)
                     .retrieve()
                     .bodyToFlux(Void.class)
                     .blockFirst();
@@ -104,7 +115,7 @@ public class CardWebClientBuilder {
             log.debug("getCardsByCardStockId: REQ to " + serviceName +"/cards with data: " + cardStockId);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/cards")
+                    .uri("/cards")
                     .bodyValue(cardStockId)
                     .retrieve()
                     .bodyToFlux(CardDto.class)
@@ -121,7 +132,7 @@ public class CardWebClientBuilder {
             log.debug("getCardStockById: REQ to " + serviceName +"/cardStock/ with data: " + cardStockId);
             return WebClient.create(baseUrl)
                     .get()
-                    .uri(serviceName + "/cardStock/" + cardStockId)
+                    .uri("/cardStock/" + cardStockId)
                     .retrieve()
                     .bodyToFlux(CardStockDto.class)
                     .blockFirst();
@@ -136,7 +147,7 @@ public class CardWebClientBuilder {
             log.debug("getCardById: REQ to " + serviceName +"/card/ with data:" + cardId);
             return WebClient.create(baseUrl)
                     .get()
-                    .uri(serviceName + "/card/" + cardId)
+                    .uri("/card/" + cardId)
                     .retrieve()
                     .bodyToFlux(CardDto.class)
                     .blockFirst();
@@ -151,7 +162,7 @@ public class CardWebClientBuilder {
             log.debug("createCard: REQ to " + serviceName +"/card with data: " + req);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/card")
+                    .uri("/card")
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(CardDto.class)
@@ -167,7 +178,7 @@ public class CardWebClientBuilder {
             log.debug("updateCard: REQ to " + serviceName +"/card/ with data: " + req);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/card/" + cardId)
+                    .uri("/card/" + cardId)
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(CardDto.class)
@@ -183,7 +194,7 @@ public class CardWebClientBuilder {
             log.debug("deleteCard: REQ to " + serviceName + "/card/ with data: " + cardId);
             WebClient.create(baseUrl)
                     .delete()
-                    .uri(serviceName + "/card/" + cardId)
+                    .uri("/card/" + cardId)
                     .retrieve()
                     .bodyToFlux(Void.class)
                     .blockFirst();
@@ -197,7 +208,7 @@ public class CardWebClientBuilder {
             log.debug("createStorage: REQ to : " + serviceName + "/storage with data" + req);
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/storage")
+                    .uri("/storage")
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(StorageDto.class)
@@ -213,7 +224,7 @@ public class CardWebClientBuilder {
             log.debug("checkCard: REQ to : " + serviceName + "/card/" + cardId + "/check");
             return WebClient.create(baseUrl)
                     .post()
-                    .uri(serviceName + "/card/" + cardId + "/check")
+                    .uri("/card/" + cardId + "/check")
                     .bodyValue(req)
                     .retrieve()
                     .bodyToFlux(TestResultDto.class)
