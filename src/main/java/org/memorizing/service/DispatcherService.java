@@ -211,7 +211,13 @@ public class DispatcherService {
 
             // TODO delete it after creating user-service
             Integer storageId;
-            StorageDto storage = storageResource.getStorageByUserId(chatId);
+            StorageDto storage;
+            try {
+                storage = storageResource.getStorageByUserId(chatId);
+            }catch (Exception e) {
+                storage = null;
+                log.debug("registerIfAbsent. EXCEPTION:" + e.getStackTrace());
+            }
 
             if (storage != null) {
                 storageId = storage.getId();
