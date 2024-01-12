@@ -20,12 +20,7 @@ public class TestMenu extends AStudyingMenu {
     }
 
     @Override
-    public ReplyKeyboardMarkup getKeyboard() {
-        return getKeyboardByButtons(new String[][]{
-                {SKIP.getButtonText()},
-                {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
-        });
-    }
+    public String[] getNextButton() { return new String[]{SKIP.getButtonText()}; }
 
     @Override
     public String getInfoText() {

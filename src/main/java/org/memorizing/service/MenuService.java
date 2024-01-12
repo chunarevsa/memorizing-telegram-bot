@@ -58,14 +58,25 @@ public class MenuService { //TODO: Add interface
 
                 List<Integer> ids = userStateService.getCardIdsByMode(state, mode.name());
                 if (ids.isEmpty()) {
-                    ids = getCardIdsForStudyingByRequest(state.getCardStockId());
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId(), mode);
                     // TODO add exception if ids.isEmpty
                 }
 
-                Optional<CardDto> mayBeCard = getCardForMenu(state, ids);
+                Optional<CardDto> mayBeCard = getCardForMenu(state, ids, mode);
                 if (mayBeCard.isPresent()) {
                     menu = new StudyingMenuFactory().createStudyingMenu(mayBeCard.get(), menuType, ids);
-                } else createMenu(storageId, state, menuType.getLastMenu());
+                } else {
+                    // take all cards when all ids were deleted
+                    ids = getCardIdsForStudyingByRequest(state.getCardStockId(), mode);
+                    mayBeCard = getCardForMenu(state, ids, mode);
+
+                    if (mayBeCard.isPresent()) {
+                        menu = new StudyingMenuFactory().createStudyingMenu(mayBeCard.get(), menuType, ids);
+                    } else {
+                        // TODO add exception if ids.isEmpty
+                        menu = createMenu(storageId, state, menuType.getLastMenu());
+                    }
+                }
 
                 break;
             case CARD_STOCK_UPDATE:
@@ -100,27 +111,35 @@ public class MenuService { //TODO: Add interface
         return menu;
     }
 
-    private Optional<CardDto> getCardForMenu(UserState state, List<Integer> ids) {
+    private Optional<CardDto> getCardForMenu(UserState state, List<Integer> ids, EMode mode) {
         CardDto card = null;
-        for (Integer id: ids) {
+        for (Integer id : ids) {
+            // TODO: edit to optional
             CardDto mayBeCard = storageResource.getCardById(id);
             if (mayBeCard == null) {
-                state = userStateService.deleteCardIdFromSessionAndGet(state);
-            } else {
-                card = mayBeCard;
-                break;
+                userStateService.deleteCardIdFromSessionAndGet(state, id);
+                continue;
             }
+
+            String status =  mode.isFromKeyMode() ? mayBeCard.getStatusFromKey() : mayBeCard.getStatusToKey();
+            if (status.equals("COMPLETED")) {
+                userStateService.deleteCardIdFromStudyingHistoryByMode(state, id, mode);
+                continue;
+            }
+            card = mayBeCard;
+            break;
+
         }
 
         return Optional.ofNullable(card);
     }
 
-    private List<Integer> getCardIdsForStudyingByRequest(Integer cardStockId) {
+    private List<Integer> getCardIdsForStudyingByRequest(Integer cardStockId, EMode mode) {
         log.debug("getCardIdsForStudyingByRequest :" + cardStockId);
         List<Integer> ids = new ArrayList<>();
         List<CardDto> allCards = storageResource.getCardsByCardStockId(cardStockId);
         if (!allCards.isEmpty()) {
-            ids = allCards.stream().map(CardDto::getId).collect(Collectors.toList());
+            ids = allCards.stream().filter(it -> (mode.isFromKeyMode() && !Objects.equals(it.getStatusFromKey(), "COMPLETED")) || (!mode.isFromKeyMode() && !Objects.equals(it.getStatusToKey(), "COMPLETED"))).map(CardDto::getId).collect(Collectors.toList());
             Collections.shuffle(ids);
         }
         return ids;
@@ -137,9 +156,7 @@ public class MenuService { //TODO: Add interface
                 Optional<CardStockDto> cardStock = Optional.empty();
                 if (!cardStocks.isEmpty()) {
                     Integer cardStockId = Integer.valueOf(callback);
-                    cardStock = cardStocks.stream()
-                            .filter(cardStockDto -> Objects.equals(cardStockDto.getId(), cardStockId))
-                            .findFirst();
+                    cardStock = cardStocks.stream().filter(cardStockDto -> Objects.equals(cardStockDto.getId(), cardStockId)).findFirst();
                 }
 
                 if (cardStock.isPresent()) {
@@ -153,9 +170,7 @@ public class MenuService { //TODO: Add interface
                 Optional<CardDto> card = Optional.empty();
                 if (!cards.isEmpty()) {
                     Integer cardId = Integer.valueOf(callback);
-                    card = cards.stream()
-                            .filter(it -> Objects.equals(it.getId(), cardId))
-                            .findFirst();
+                    card = cards.stream().filter(it -> Objects.equals(it.getId(), cardId)).findFirst();
                 }
 
                 if (card.isPresent()) {

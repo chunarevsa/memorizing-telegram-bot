@@ -20,12 +20,7 @@ public class SelfCheckMenu extends AStudyingMenu {
     }
 
     @Override
-    public ReplyKeyboardMarkup getKeyboard() {
-        return getKeyboardByButtons(new String[][]{
-                {NEXT.getButtonText()},
-                {GET_INFO.getButtonText(), GO_BACK.getButtonText()}
-        });
-    }
+    public String[] getNextButton() { return new String[]{NEXT.getButtonText()}; }
 
     @Override
     public String getInfoText() {

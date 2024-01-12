@@ -5,6 +5,7 @@ import org.memorizing.resource.cardApi.CardStockDto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 import static org.memorizing.model.command.EKeyboardCommand.*;
@@ -54,23 +55,53 @@ public class CardStockMenu extends AMenu {
 
     @Override
     public String getText() {
-        String testModeIsAvailable = "isn't";
-        String testBackwardIsAvailable = "";
+        String testModeIsAvailable = cardStock.getTestModeIsAvailable() ? "is" : "isn't";
+        String testBackwardIsAvailable = cardStock.getTestModeIsAvailable() || !cardStock.getOnlyFromKey()
+                ? "▪ You can learn it backwards.\n"
+                : "";
 
-        if (cardStock.getTestModeIsAvailable()) {
-            testModeIsAvailable = "is";
-            if (!cardStock.getOnlyFromKey()) testBackwardIsAvailable = "▪ You can learn it backwards.";
+        String size = cards == null || cards.isEmpty()
+                ? "▪ You don't have cards\n"
+                : "▪ You have "+cards.size() +" cards\n";
+
+        String statuses = "";
+        if (cards != null && !cards.isEmpty() && cardStock.getTestModeIsAvailable()) {
+            long normalCountFromKey = 0;
+            long hardCountFromKey = 0;
+            long completedCountFromKey = 0;
+
+            long normalCountToKey = 0;
+            long hardCountToKey = 0;
+            long completedCountToKey = 0;
+
+            for (CardDto card : cards) {
+                if (card.getStatusFromKey().equals("NORMAL")) normalCountFromKey++;
+                if (card.getStatusFromKey().equals("HARD")) hardCountFromKey++;
+                if (card.getStatusFromKey().equals("COMPLETED")) completedCountFromKey++;
+
+                if (!cardStock.getOnlyFromKey()) {
+                    if (card.getStatusToKey().equals("NORMAL")) normalCountToKey++;
+                    if (card.getStatusToKey().equals("HARD")) hardCountToKey++;
+                    if (card.getStatusToKey().equals("COMPLETED")) completedCountToKey++;
+                }
+            }
+
+            statuses = "  Status        - (from key)"+ (!cardStock.getOnlyFromKey() ? " / (to key):\n" : ":\n") +
+                    "    `NORMAL`       - ("+normalCountFromKey+")" + (!cardStock.getOnlyFromKey() ? " / ("+normalCountToKey+")\n" : ":\n") +
+                    "    `HARD`             - ("+hardCountFromKey+")" + (!cardStock.getOnlyFromKey() ? " / ("+hardCountToKey+")\n" : ":\n") +
+                    "    `COMPLETED` - ("+completedCountFromKey+")" + (!cardStock.getOnlyFromKey() ? " / ("+completedCountToKey+")\n" : ":\n");
+
         }
-        String size = cards == null || cards.isEmpty() ? "▪ You don't have cards\n" : "▪ You have "+cards.size() +" cards\n";
+
 
         return "*"+cardStock.getCardStockName()+"*\n" +
-                size +
-                cardStock.getDescription() + "\n" +
+                "▪ Description: " +cardStock.getDescription() + "\n" +
                 "▪ Key and value: " + cardStock.getKeyType() + "/" + cardStock.getValueType() + "\n" +
-                "▪ Your card is complete when it has "+ cardStock.getMaxPoint() + " points." + "\n" +
-                "▪ This card stock "+testModeIsAvailable+" available for testing mode."+ "\n" +
+                "▪ Your card is complete when it has "+ cardStock.getMaxPoint() + " points.\n" +
+                "▪ This card stock "+testModeIsAvailable+" available for testing mode.\n" +
                 testBackwardIsAvailable +
-                "\n";
+                size +
+                statuses;
     }
 
     @Override

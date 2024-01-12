@@ -20,6 +20,8 @@ import java.net.ProtocolException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.memorizing.model.EStatus.*;
 
@@ -77,7 +79,7 @@ public class DispatcherService {
             userState = userStateService.deleteCardStockIdFromSessionAndGet(userState);
             menuType = userState.getLastMenu();
         } else if (command == EPlaceholderCommand.DELETE_CARD) {
-            userState = userStateService.deleteCardIdFromSessionAndGet(userState);
+            userState = userStateService.deleteCardIdFromSessionAndGet(userState, userState.getCardId());
             menuType = userState.getLastMenu();
         } else if (command == EPlaceholderCommand.ADD_CARD) {
             menuType = EMenu.CARDS;
@@ -102,14 +104,27 @@ public class DispatcherService {
                 case GET_INFO:
                     nextMenu = userState.getCurrentMenu();
                     break;
+                case GO_BACK:
+                    nextMenu = userState.getLastMenu();
+                    break;
                 case SKIP:
                 case NEXT:
                     nextMenu = userState.getCurrentMenu();
                     resp = getResponseByNextButton(nextMenu, userState, command == EKeyboardCommand.SKIP);
+                    userState = userStateService.findUserStateById(userState.getId()).orElse(userState);
                     if (resp.getStatus() == COMPLETE_SET) nextMenu = nextMenu.getLastMenu();
                     break;
-                case GO_BACK:
-                    nextMenu = userState.getLastMenu();
+                case GO_TO_CARD:
+                    EMode mode = EMode.getModeByMenu(userState.getCurrentMenu());
+                    Optional<CardStockHistory> cardStockHistory = userStateService.findCardStockHistoryByCardStockId(userState.getCardStockId());
+                    if (cardStockHistory.isPresent()) {
+                        List<Integer> ids = userStateService.getCardIdsByHistory(cardStockHistory.get(), mode.name());
+                        if (!ids.isEmpty()) {
+                            userState.setCardId(ids.get(0));
+                            nextMenu = EMenu.CARD;
+                        }
+                    }
+
                     break;
                 case DELETE_CARD_STOCK:
                     return getResponseByPlaceholderCommand(chatId, "#delete-CardStock");
@@ -245,71 +260,80 @@ public class DispatcherService {
         log.debug("executeRequest. req:" + command + ", " + userState);
 
         IMappable entity = command.getNewEntity();
-        if (!Objects.equals(command.getMethod(), "delete")) {
+        String[] elements = data.split(command.getPref());
 
-            try {
-                // TODO fix it
-                String body = data.substring(data.indexOf("{"))
-                        .replace("\n", "")
-                        .replace("*", "")
-                        .replace("`", "");
-
-                entity = mapper.readValue(body, entity.getClass());
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return BAD_REQUEST;
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-                return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
-        }
-
-        if (entity instanceof CardStockFieldsDto) {
-            CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
-            cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
-            switch (command.getMethod()) {
-                case "add":
-                    storageResource.createCardStock(cardStockFieldsDto);
-                    break;
-                case "update":
-                    storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
-                    break;
-                case "delete":
-                    List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
-
-                    if (cards != null && !cards.isEmpty()) {
-                        cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+        if (command.getMethod().equals("delete")) elements = new String[]{"delete"};
+        for (String element : elements) {
+            if (element.isBlank()) continue;
+            if (!Objects.equals(element, "delete")) {
+                try {
+                    String[] fields = element.split("\n#");
+                    String body = "{";
+                    for (String field: fields) {
+                        if (field.isBlank()) continue;
+                        String fieldName = field.substring(0, field.indexOf(':')).trim();
+                        String fieldValue = field.substring(field.indexOf(':')+1).trim();
+                        body += '\"' + fieldName + "\":\"" + fieldValue +"\"";
+                        body += field.equals(fields[fields.length - 1]) ? '}' : ',';
                     }
 
-                    storageResource.deleteCardStock(userState.getCardStockId());
-                    break;
-                default:
+                    entity = mapper.readValue(body, entity.getClass());
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    return BAD_REQUEST;
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
                     return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                }
             }
 
-        } else if (entity instanceof CardFieldsDto) {
-            CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
-            cardFieldsDto.setCardStockId(userState.getCardStockId());
-            CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
-            cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
-            switch (command.getMethod()) {
-                case "add":
-                    storageResource.createCard(cardFieldsDto);
-                    break;
-                case "update":
-                    cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
-                    storageResource.updateCard(cardFieldsDto, userState.getCardId());
-                    break;
-                case "delete":
-                    storageResource.deleteCard(userState.getCardId());
-                    break;
-                default:
-                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
-            }
+            if (entity instanceof CardStockFieldsDto) {
+                CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
+                cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
+                switch (command.getMethod()) {
+                    case "add":
+                        storageResource.createCardStock(cardStockFieldsDto);
+                        break;
+                    case "update":
+                        storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
+                        break;
+                    case "delete":
+                        List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
 
-        } else {
-            // TODO add throw Exception
-            return SOMETHING_WENT_WRONG;
+                        if (cards != null && !cards.isEmpty()) {
+                            cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+                        }
+
+                        storageResource.deleteCardStock(userState.getCardStockId());
+                        break;
+                    default:
+                        return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                }
+
+            } else if (entity instanceof CardFieldsDto) {
+                CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
+                cardFieldsDto.setCardStockId(userState.getCardStockId());
+                CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
+                cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
+                switch (command.getMethod()) {
+                    case "add":
+                        storageResource.createCard(cardFieldsDto);
+                        break;
+                    case "update":
+                        cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
+                        storageResource.updateCard(cardFieldsDto, userState.getCardId());
+                        break;
+                    case "delete":
+                        storageResource.deleteCard(userState.getCardId());
+                        break;
+                    default:
+                        return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                }
+
+            } else {
+                // TODO add throw Exception
+                return SOMETHING_WENT_WRONG;
+            }
         }
 
         return SUCCESSFULLY;

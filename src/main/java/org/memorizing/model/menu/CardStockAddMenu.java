@@ -22,13 +22,13 @@ public class CardStockAddMenu extends AMenu {
     @Override
     public String getInfoText() {
         return "\n" +
-                "\"`cardStockName`\": this name will be unique for your list.\n" +
-                "\"`description`\": It need for you. I think, you manage it\n" +
-                "\"`keyType`\":\"English word\", \"Interview question\" etc.\n" +
-                "\"`valueType`\": What do you want to learn. \"Russian translation\", \"My answer\" etc\n" +
-                "\"`maxPoint`\": How many correct answers do you need before the card is no longer shown (status = COMPLETED)\n" +
-                "\"`testModeIsAvailable`\": Can you type entirely a card value? If you need it set `true`. \n" +
-                "\"`onlyFromKey`\": Do you need the backward submode? It means, do you need to remember a key by a value?\n " +
+                "`cardStockName`: this name will be unique for your list.\n" +
+                "`description`: It need for you. I think, you manage it\n" +
+                "`keyType`:\"English word\", \"Interview question\" etc.\n" +
+                "`valueType`: What do you want to learn. \"Russian translation\", \"My answer\" etc\n" +
+                "`maxPoint`: How many correct answers do you need before the card is no longer shown (status = COMPLETED)\n" +
+                "`testModeIsAvailable`\": Can you type entirely a card value? If you need it set `true`. \n" +
+                "`onlyFromKey`: Do you need the backward submode? It means, do you need to remember a key by a value?\n " +
                 "\"English word\" by \"Russian translation\" is a acceptable situation. \n" +
                 "But \"Interview question\" by \"My answer\" is a bad approach. You should set `false`.\n" +
                 "\n" +
@@ -39,15 +39,13 @@ public class CardStockAddMenu extends AMenu {
     @Override
     public String getText() {
         return "#add-CardStock\n"+
-                "{\n" +
-                "  \"`cardStockName`\":             \"IT term\",\n" +
-                "  \"`description`\":                   \"Only it words for interview\",\n" +
-                "  \"`keyType`\":                            \"ENG\",\n" +
-                "  \"`valueType`\":                         \"RUS\",\n" +
-                "  \"`maxPoint`\":                           5,\n" +
-                "  \"`testModeIsAvailable`\": \"true\",\n" +
-                "  \"`onlyFromKey`\":                     \"false\"\n" +
-                "}\n" +
+                "#cardStockName : IT term\n" +
+                "#description : Only it words for interview\n" +
+                "#keyType : ENG\n" +
+                "#valueType : RUS\n" +
+                "#maxPoint : 5\n" +
+                "#testModeIsAvailable : true\n" +
+                "#onlyFromKey : false\n" +
                 "\n";
     }
 
