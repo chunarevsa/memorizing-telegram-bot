@@ -1,0 +1,35 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: memorizing-telegram-bot
+
+  cloud:
+    inetutils:
+      preferred-networks: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: false
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
+telegram:
+  bot:
+    name: ${TELEGRAM_BOT_NAME}
+    token: ${TELEGRAM_BOT_TOKEN}
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}
+
+# Custom
+core-service:
+  name: memorizing-core
+
+api-gateway:
+  port: ${GATEWAY_PORT}

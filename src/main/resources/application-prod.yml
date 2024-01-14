@@ -1,3 +1,5 @@
+localhost: ${LOCALHOST}
+
 
 spring:
   config:
