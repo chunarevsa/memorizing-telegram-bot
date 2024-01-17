@@ -77,6 +77,7 @@ public class StorageResourceImpl implements StorageResource {
 
     // TODO: TEMP
     @Override
+    @Deprecated
     public StorageDto createStorage(StorageFieldsDto req) {
         return cardWebClientBuilder.createStorage(req);
     }

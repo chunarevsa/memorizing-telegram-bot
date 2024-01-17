@@ -17,12 +17,14 @@ public class UserService {
         this.userResource = userResource;
     }
 
-    public Boolean isUserExistsByChatId(Long chatId) {
-        Boolean isPresent = usersRepo.existsByChatId(chatId);
-        if (!isPresent) {
-            UserDto user = userResource.getUserByChatId(chatId);
-            return user == null;
-        } return true;
+    public Boolean isUserExistsInRepoByChatId(Long chatId) {
+        return usersRepo.existsByChatId(chatId);
+    }
+
+    public User addNew(Long chatId) throws Exception {
+        UserDto userDto = userResource.getUserByChatId(chatId);
+        if (userDto == null) throw new Exception("not found");
+        return usersRepo.save(new User(userDto.getChatId(), userDto.getTelegramUserName(), userDto.getStorageId()));
     }
 
     public User getByChatId(Long chatId) {
@@ -31,5 +33,9 @@ public class UserService {
 
     public void save(User user) {
         usersRepo.save(user);
+    }
+
+    public boolean isUserExistsInResourceByChatId(Long chatId) {
+        return userResource.isUserExistsByChatId(chatId);
     }
 }

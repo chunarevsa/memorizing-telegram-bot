@@ -3,8 +3,6 @@ package org.memorizing.resource;
 import org.memorizing.resource.cardApi.UserDto;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class UserResourceImpl implements UserResource {
     private final UserWebClientBuilder userWebClientBuilder;
@@ -19,7 +17,7 @@ public class UserResourceImpl implements UserResource {
     }
 
     @Override
-    public List<UserDto> getChatIdListWithUserId() {
-        return userWebClientBuilder.getChatIdListWithUserId();
+    public boolean isUserExistsByChatId(Long chatId) {
+        return userWebClientBuilder.isUserExistByChatId(chatId);
     }
 }

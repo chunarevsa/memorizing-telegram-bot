@@ -81,10 +81,24 @@ public class TelegramBot extends TelegramLongPollingBot {
                 DispatcherResponse resp = dispatcherService.getResponseByCallback(chatId, data);
                 sendMenu(chatId, resp.getMenu());
 
-            } else if (!userService.isUserExistsByChatId(chatId)) {
-                // TODO: Add registration via auth-service, when it will be completed
-                // adding new user
-                dispatcherService.registerIfAbsent(chatId, userName);
+            } else if (!userService.isUserExistsInRepoByChatId(chatId)) {
+                try {
+                    if (userService.isUserExistsInResourceByChatId(chatId)) {
+                            userService.addNew(chatId);
+                    } else {
+                        // TODO: Add registration via auth-service, when it will be completed
+                        // async user creating request
+                        // send message with registration links
+
+                        // Temp solution
+                        dispatcherService.createUserStorage(chatId, userName);
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    executeSendingMessage(chatId, SOMETHING_WENT_WRONG.getText());
+                }
+
                 String welcomeMessage = (WELCOME.getText() + HOW_IT_WORKS.getText()).replaceAll("\\{name}", userName);
 
                 executeSendingMessage(chatId, welcomeMessage);

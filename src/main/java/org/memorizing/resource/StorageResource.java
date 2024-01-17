@@ -27,6 +27,7 @@ public interface StorageResource {
 
     void deleteCard(Integer cardId);
 
+    @Deprecated
     StorageDto createStorage(StorageFieldsDto storageFieldsDto);
 
     TestResultDto checkCard(Integer cardStockId, Integer cardId, String userValue, boolean fromKeyMode);

@@ -7,5 +7,5 @@ import java.util.List;
 public interface UserResource {
     UserDto getUserByChatId(Long chatId);
 
-    List<UserDto> getChatIdListWithUserId();
+    boolean isUserExistsByChatId(Long chatId);
 }

@@ -38,5 +38,5 @@ out/
 .vscode/
 
 ### Custom ###
-logs
-target
+logs/
+target/

@@ -20,8 +20,6 @@ import java.net.ProtocolException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.memorizing.model.EStatus.*;
 
@@ -213,39 +211,6 @@ public class DispatcherService {
         return menuService.createMenu(user.getStorageId(), state, firstMenu);
     }
 
-    /**
-     * Register in db through spring data
-     *
-     * @param chatId
-     * @param userName
-     */
-    public void registerIfAbsent(Long chatId, String userName) {
-        log.debug("registerIfAbsent. req:" + chatId + ", " + userName);
-        if (!userService.isUserExistsByChatId(chatId)) {
-//            UserDto userDto = userResource.getUserByChatId(chatId);
-
-            // TODO delete it after creating user-service
-            Integer storageId;
-            StorageDto storage;
-            try {
-                storage = storageResource.getStorageByUserId(chatId);
-            }catch (Exception e) {
-                storage = null;
-                log.debug("registerIfAbsent. EXCEPTION:" + e.getStackTrace());
-            }
-
-            if (storage != null) {
-                storageId = storage.getId();
-            } else {
-                storageId = storageResource.createStorage(new StorageFieldsDto(chatId, userName)).getId();
-                addFirstData(storageId);
-            }
-
-            User user = new User(chatId, userName, storageId);
-            userService.save(user);
-        }
-    }
-
     public DispatcherResponse getLastMenu(Long chatId) {
         log.debug("getLastMenu req:" + chatId);
         User user = userService.getByChatId(chatId);
@@ -339,7 +304,15 @@ public class DispatcherService {
         return SUCCESSFULLY;
     }
 
-    // TODO: TEMP
+    // TODO: remove it, after creating auth-service and user-service
+    @Deprecated
+    public void createUserStorage(Long chatId, String username) throws Exception {
+        StorageDto storage = storageResource.createStorage(new StorageFieldsDto(chatId, username));
+        addFirstData(storage.getId());
+        userService.addNew(chatId);
+    }
+
+    // TODO: create trigger in data base
     private void addFirstData(Integer storageId) {
         CardStockFieldsDto firstReq = new CardStockFieldsDto(
                 storageId,

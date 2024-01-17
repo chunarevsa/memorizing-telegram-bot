@@ -203,6 +203,8 @@ public class CardWebClientBuilder {
         }
     }
 
+    @Deprecated
+    // TODO: remove it after adding user-service and auth-service
     public StorageDto createStorage(StorageFieldsDto req) {
         try {
             log.debug("createStorage: REQ to : " + serviceName + "/storage with data" + req);
