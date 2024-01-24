@@ -16,7 +16,6 @@ spring:
     hibernate:
       ddl-auto: validate
     generate-ddl: false
-    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
 
 telegram:
   bot:

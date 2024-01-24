@@ -3,9 +3,9 @@ package org.memorizing.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,8 @@ public class StudyingStateConverter implements AttributeConverter<Map<String, Li
         }
 
         try {
-            return objectMapper.readValue(dbData, new TypeReference<>() {});
+            return objectMapper.readValue(dbData, new TypeReference<>() {
+            });
         } catch (IOException e) {
             //TODO: add exception handling
             e.printStackTrace();

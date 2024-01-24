@@ -1,11 +1,11 @@
 package org.memorizing.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import org.hibernate.annotations.NaturalId;
 import org.memorizing.model.EMode;
 import org.memorizing.utils.StudyingStateConverter;
 
-import javax.persistence.*;
 import java.util.*;
 
 import static org.memorizing.model.EMode.values;

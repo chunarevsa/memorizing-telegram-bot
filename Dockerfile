@@ -1,5 +1,5 @@
 # Используем образ Maven для сборки проекта
-FROM maven:3.8.4-openjdk-11 AS builder
+FROM maven:3.8.4-openjdk-17 AS builder
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -12,7 +12,7 @@ COPY src src
 RUN mvn -B clean package -DskipTests
 
 # Используем минимальный образ с JRE
-FROM openjdk:11-jre-slim
+FROM openjdk:17
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
