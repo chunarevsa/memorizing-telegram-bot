@@ -1,17 +1,21 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.model.storage;
 
-public class TestResultDto {
+import org.memorizing.service.IMappable;
+
+import java.io.Serializable;
+
+public class TestResult implements IMappable, Serializable {
     private Boolean rightAnswer;
     private Boolean answerToOtherCard;
-    private CardDto card;
+    private Card card;
 
-    public TestResultDto(Boolean rightAnswer, Boolean answerToOtherCard, CardDto card) {
+    public TestResult() {
+    }
+
+    public TestResult(Boolean rightAnswer, Boolean answerToOtherCard, Card card) {
         this.rightAnswer = rightAnswer;
         this.answerToOtherCard = answerToOtherCard;
         this.card = card;
-    }
-
-    public TestResultDto() {
     }
 
     public void setRightAnswer(Boolean rightAnswer) {
@@ -22,11 +26,11 @@ public class TestResultDto {
         this.answerToOtherCard = answerToOtherCard;
     }
 
-    public CardDto getCard() {
+    public Card getCard() {
         return card;
     }
 
-    public void setCard(CardDto card) {
+    public void setCard(Card card) {
         this.card = card;
     }
 

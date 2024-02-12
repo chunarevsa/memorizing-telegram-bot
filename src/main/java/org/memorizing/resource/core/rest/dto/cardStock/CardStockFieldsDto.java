@@ -1,21 +1,18 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.resource.core.rest.dto.cardStock;
 
-import org.memorizing.service.IMappable;
+import java.io.Serializable;
 
-public class CardStockFieldsDto implements IMappable {
+public class CardStockFieldsDto implements Serializable {
     private Integer storageId;
     private String cardStockName;
     private String description;
     private String keyType;
     private String valueType;
-    private int maxPoint;
+    private Integer maxPoint;
     private Boolean testModeIsAvailable;
     private Boolean onlyFromKey;
-
-    public CardStockFieldsDto() {
-    }
-
-    public CardStockFieldsDto(Integer storageId, String cardStockName, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
+    public CardStockFieldsDto() {}
+    public CardStockFieldsDto(Integer storageId, String cardStockName, String description, String keyType, String valueType, Integer maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
         this.storageId = storageId;
         this.cardStockName = cardStockName;
         this.description = description;
@@ -66,11 +63,11 @@ public class CardStockFieldsDto implements IMappable {
         this.valueType = valueType;
     }
 
-    public int getMaxPoint() {
+    public Integer getMaxPoint() {
         return maxPoint;
     }
 
-    public void setMaxPoint(int maxPoint) {
+    public void setMaxPoint(Integer maxPoint) {
         this.maxPoint = maxPoint;
     }
 

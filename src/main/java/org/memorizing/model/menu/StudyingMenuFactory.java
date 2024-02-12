@@ -1,14 +1,14 @@
 package org.memorizing.model.menu;
 
 import org.memorizing.model.EMode;
-import org.memorizing.resource.cardApi.CardDto;
+import org.memorizing.model.storage.Card;
 
 import java.util.List;
 
 public class StudyingMenuFactory implements MenuFactory {
 
     @Override
-    public AStudyingMenu createStudyingMenu(CardDto card, EMenu menuType, List<Integer> ids) {
+    public AStudyingMenu createStudyingMenu(Card card, EMenu menuType, List<Integer> ids) {
         EMode mode = EMode.getModeByMenu(menuType);
 
         switch (mode) {

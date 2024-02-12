@@ -1,21 +1,31 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.model.storage;
 
 import org.memorizing.service.IMappable;
 
-public class CardDto implements IMappable {
-    private int id;
+import java.io.Serializable;
+
+public class Card implements IMappable, Serializable {
+    private Integer id;
+    private Integer cardStockId;
     private String cardKey;
     private String cardValue;
-    private int pointFromKey;
-    private int pointToKey;
+    private Integer pointFromKey;
+    private Integer pointToKey;
     private String statusFromKey;
     private String statusToKey;
 
-    public CardDto() {
+    public Card() {
     }
 
-    public CardDto(int id, String cardKey, String cardValue, int pointFromKey, int pointToKey, String statusFromKey, String statusToKey) {
+    public Card(Integer cardStockId, String cardKey, String cardValue) {
+        this.cardStockId = cardStockId;
+        this.cardKey = cardKey;
+        this.cardValue = cardValue;
+    }
+
+    public Card(Integer id, Integer cardStockId, String cardKey, String cardValue, int pointFromKey, int pointToKey, String statusFromKey, String statusToKey) {
         this.id = id;
+        this.cardStockId = cardStockId;
         this.cardKey = cardKey;
         this.cardValue = cardValue;
         this.pointFromKey = pointFromKey;
@@ -30,6 +40,14 @@ public class CardDto implements IMappable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Integer getCardStockId() {
+        return cardStockId;
+    }
+
+    public void setCardStockId(Integer cardStockId) {
+        this.cardStockId = cardStockId;
     }
 
     public String getCardKey() {
@@ -82,8 +100,9 @@ public class CardDto implements IMappable {
 
     @Override
     public String toString() {
-        return "CardDto{" +
+        return "Card{" +
                 "id=" + id +
+                ", cardStockId=" + cardStockId +
                 ", cardKey='" + cardKey + '\'' +
                 ", cardValue='" + cardValue + '\'' +
                 ", pointFromKey=" + pointFromKey +

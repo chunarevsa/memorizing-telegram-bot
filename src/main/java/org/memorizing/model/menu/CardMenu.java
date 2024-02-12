@@ -1,6 +1,6 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.resource.cardApi.CardDto;
+import org.memorizing.model.storage.Card;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
@@ -10,16 +10,16 @@ import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class CardMenu extends AMenu {
     private final Integer cardStockId;
-    private final CardDto card;
+    private final Card card;
     private final int maxCardStockPoint;
 
-    public CardMenu(Integer cardStockId, int maxCardStockPoint ,CardDto card) {
+    public CardMenu(Integer cardStockId, int maxCardStockPoint , Card card) {
         this.cardStockId = cardStockId;
         this.maxCardStockPoint = maxCardStockPoint;
         this.card = card;
     }
 
-    public CardDto getCard() {
+    public Card getCard() {
         return card;
     }
 

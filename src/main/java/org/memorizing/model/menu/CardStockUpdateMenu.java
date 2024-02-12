@@ -1,6 +1,6 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.resource.cardApi.CardStockDto;
+import org.memorizing.model.storage.CardStock;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import static org.memorizing.model.command.EKeyboardCommand.GET_INFO;
@@ -8,13 +8,13 @@ import static org.memorizing.model.command.EKeyboardCommand.GO_BACK;
 
 public class CardStockUpdateMenu extends AMenu {
 
-    private final CardStockDto cardStock;
+    private final CardStock cardStock;
 
-    public CardStockUpdateMenu(CardStockDto oldCardStock) {
+    public CardStockUpdateMenu(CardStock oldCardStock) {
         this.cardStock = oldCardStock;
     }
 
-    public CardStockDto getCardStock() {
+    public CardStock getCardStock() {
         return cardStock;
     }
 

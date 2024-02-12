@@ -1,28 +1,16 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.resource.core.rest.dto.storage;
 
-// TODO: add it to separated module
-public class StorageDto {
-    private Integer id;
+import java.io.Serializable;
+
+public class StorageFieldsDto implements Serializable {
     private Long userId;
     private String storageName;
 
-    public StorageDto(Integer id, Long userId, String storageName) {
-        this.id = id;
+    public StorageFieldsDto() {}
+    public StorageFieldsDto(Long userId, String storageName) {
         this.userId = userId;
         this.storageName = storageName;
     }
-
-    public StorageDto() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Long getUserId() {
         return userId;
     }
@@ -41,9 +29,8 @@ public class StorageDto {
 
     @Override
     public String toString() {
-        return "StorageDto{" +
-                "id=" + id +
-                ", userId=" + userId +
+        return "StorageFieldsDto{" +
+                "userId=" + userId +
                 ", storageName='" + storageName + '\'' +
                 '}';
     }

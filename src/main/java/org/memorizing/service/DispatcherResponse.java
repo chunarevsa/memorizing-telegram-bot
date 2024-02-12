@@ -2,14 +2,14 @@ package org.memorizing.service;
 
 import org.memorizing.model.EStatus;
 import org.memorizing.model.menu.Menu;
-import org.memorizing.resource.cardApi.TestResultDto;
+import org.memorizing.model.storage.TestResult;
 
 public class DispatcherResponse {
     private Menu menu;
     private EStatus status;
     private boolean isNeedSendStatus = false;
     private boolean isNeedSendTitle = true;
-    private TestResultDto testResult;
+    private TestResult testResult;
 
     public DispatcherResponse(Menu menu, EStatus status) {
         this.menu = menu;
@@ -22,7 +22,7 @@ public class DispatcherResponse {
         this.isNeedSendStatus = isNeedSendStatus;
     }
 
-    public DispatcherResponse(Menu menu, EStatus status, TestResultDto testResult) {
+    public DispatcherResponse(Menu menu, EStatus status, TestResult testResult) {
         this.menu = menu;
         this.status = status;
         this.testResult = testResult;
@@ -63,11 +63,11 @@ public class DispatcherResponse {
         isNeedSendTitle = needSendTitle;
     }
 
-    public TestResultDto getTestResult() {
+    public TestResult getTestResult() {
         return testResult;
     }
 
-    public void setTestResult(TestResultDto testResult) {
+    public void setTestResult(TestResult testResult) {
         this.testResult = testResult;
     }
 

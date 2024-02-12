@@ -1,8 +1,7 @@
 package org.memorizing.model.menu;
 
 import org.memorizing.model.EMode;
-import org.memorizing.resource.cardApi.CardDto;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.memorizing.model.storage.Card;
 
 import java.util.List;
 
@@ -10,7 +9,7 @@ import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class SelfCheckMenu extends AStudyingMenu {
 
-    public SelfCheckMenu(CardDto card, EMode mode, List<Integer> ids) {
+    public SelfCheckMenu(Card card, EMode mode, List<Integer> ids) {
         super(card, mode, ids);
     }
 

@@ -1,15 +1,15 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.resource.cardApi.CardStockDto;
+import org.memorizing.model.storage.CardStock;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class ModeMenu extends AMenu {
 
-    CardStockDto cardStock;
+    CardStock cardStock;
 
-    public ModeMenu(CardStockDto cardStock) {
+    public ModeMenu(CardStock cardStock) {
         this.cardStock = cardStock;
     }
 

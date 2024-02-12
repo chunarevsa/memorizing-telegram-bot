@@ -1,4 +1,4 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.resource.user.rest.dto;
 
 public class UserDto {
     private Integer id;

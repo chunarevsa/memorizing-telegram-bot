@@ -1,15 +1,12 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.resource.core.rest.dto.card;
 
-import org.memorizing.service.IMappable;
-
-public class CardFieldsDto implements IMappable {
+import java.io.Serializable;
+public class CardFieldsDto implements Serializable {
     private Integer cardStockId;
     private String cardKey;
     private String cardValue;
     private Boolean onlyFromKey;
-
-    public CardFieldsDto() {
-    }
+    public CardFieldsDto() {}
 
     public CardFieldsDto(Integer cardStockId, String cardKey, String cardValue, Boolean onlyFromKey) {
         this.cardStockId = cardStockId;

@@ -1,20 +1,23 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.model.storage;
 
-public class CardStockDto {
-    private int id;
+import org.memorizing.service.IMappable;
+
+import java.io.Serializable;
+
+public class CardStock implements IMappable, Serializable {
+    private Integer id;
+    private Integer storageId;
     private String cardStockName;
     private String description;
     private String keyType;
     private String valueType;
-    private int maxPoint;
+    private Integer maxPoint;
     private Boolean testModeIsAvailable;
     private Boolean onlyFromKey;
-
-    public CardStockDto() {
-    }
-
-    public CardStockDto(int id, String cardStockName, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
+    public CardStock() {}
+    public CardStock(Integer id, Integer storageId, String cardStockName, String description, String keyType, String valueType, int maxPoint, Boolean testModeIsAvailable, Boolean onlyFromKey) {
         this.id = id;
+        this.storageId = storageId;
         this.cardStockName = cardStockName;
         this.description = description;
         this.keyType = keyType;
@@ -23,13 +26,20 @@ public class CardStockDto {
         this.testModeIsAvailable = testModeIsAvailable;
         this.onlyFromKey = onlyFromKey;
     }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Integer getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(Integer storageId) {
+        this.storageId = storageId;
     }
 
     public String getCardStockName() {
@@ -90,9 +100,10 @@ public class CardStockDto {
 
     @Override
     public String toString() {
-        return "CardStockDto{" +
+        return "CardStock{" +
                 "id=" + id +
-                ", name='" + cardStockName + '\'' +
+                ", storageId=" + storageId +
+                ", cardStockName='" + cardStockName + '\'' +
                 ", description='" + description + '\'' +
                 ", keyType='" + keyType + '\'' +
                 ", valueType='" + valueType + '\'' +

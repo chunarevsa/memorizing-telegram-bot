@@ -1,6 +1,6 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.resource.cardApi.CardDto;
+import org.memorizing.model.storage.Card;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import static org.memorizing.model.command.EKeyboardCommand.GET_INFO;
@@ -8,13 +8,13 @@ import static org.memorizing.model.command.EKeyboardCommand.GO_BACK;
 
 public class CardUpdateMenu extends AMenu {
 
-    private final CardDto card;
+    private final Card card;
 
-    public CardUpdateMenu(CardDto card) {
+    public CardUpdateMenu(Card card) {
         this.card = card;
     }
 
-    public CardDto getCard() {
+    public Card getCard() {
         return card;
     }
 

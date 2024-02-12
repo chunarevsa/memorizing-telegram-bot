@@ -1,7 +1,7 @@
 package org.memorizing.model.command;
 
-import org.memorizing.resource.cardApi.CardFieldsDto;
-import org.memorizing.resource.cardApi.CardStockFieldsDto;
+import org.memorizing.model.storage.Card;
+import org.memorizing.model.storage.CardStock;
 import org.memorizing.service.IMappable;
 
 import java.util.Arrays;
@@ -39,11 +39,11 @@ public enum EPlaceholderCommand {
             case ADD_CARD_STOCK:
             case UPDATE_CARD_STOCK:
             case DELETE_CARD_STOCK:
-                return new CardStockFieldsDto();
+                return new CardStock();
             case ADD_CARD:
             case UPDATE_CARD:
             case DELETE_CARD:
-                return new CardFieldsDto();
+                return new Card();
         }
         return null;
     }

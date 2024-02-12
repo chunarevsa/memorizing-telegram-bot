@@ -1,25 +1,24 @@
 package org.memorizing.model.menu;
 
-import org.memorizing.resource.cardApi.CardDto;
-import org.memorizing.resource.cardApi.CardStockDto;
+import org.memorizing.model.storage.Card;
+import org.memorizing.model.storage.CardStock;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public class CardStockMenu extends AMenu {
-    private final CardStockDto cardStock;
-    private final List<CardDto> cards;
+    private final CardStock cardStock;
+    private final List<Card> cards;
 
-    public CardStockMenu(CardStockDto cardStock, List<CardDto> cards) {
+    public CardStockMenu(CardStock cardStock, List<Card> cards) {
         this.cardStock = cardStock;
         this.cards = cards;
     }
 
-    public CardStockDto getCardStock() {
+    public CardStock getCardStock() {
         return this.cardStock;
     }
 
@@ -74,7 +73,7 @@ public class CardStockMenu extends AMenu {
             long hardCountToKey = 0;
             long completedCountToKey = 0;
 
-            for (CardDto card : cards) {
+            for (Card card : cards) {
                 if (card.getStatusFromKey().equals("NORMAL")) normalCountFromKey++;
                 if (card.getStatusFromKey().equals("HARD")) hardCountFromKey++;
                 if (card.getStatusFromKey().equals("COMPLETED")) completedCountFromKey++;

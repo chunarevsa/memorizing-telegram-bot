@@ -1,12 +1,29 @@
-package org.memorizing.resource.cardApi;
+package org.memorizing.model.storage;
 
-public class StorageFieldsDto {
+import org.memorizing.service.IMappable;
+
+import java.io.Serializable;
+
+public class Storage implements IMappable, Serializable {
+    private Integer id;
     private Long userId;
     private String storageName;
 
-    public StorageFieldsDto(Long userId, String storageName) {
+    public Storage() {
+    }
+
+    public Storage(Integer id, Long userId, String storageName) {
+        this.id = id;
         this.userId = userId;
         this.storageName = storageName;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Long getUserId() {
@@ -27,8 +44,9 @@ public class StorageFieldsDto {
 
     @Override
     public String toString() {
-        return "StorageFieldsDto{" +
-                "userId=" + userId +
+        return "StorageDto{" +
+                "id=" + id +
+                ", userId=" + userId +
                 ", storageName='" + storageName + '\'' +
                 '}';
     }

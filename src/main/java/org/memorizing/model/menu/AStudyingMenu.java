@@ -1,7 +1,7 @@
 package org.memorizing.model.menu;
 
 import org.memorizing.model.EMode;
-import org.memorizing.resource.cardApi.CardDto;
+import org.memorizing.model.storage.Card;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.List;
 import static org.memorizing.model.command.EKeyboardCommand.*;
 
 public abstract class AStudyingMenu extends AMenu {
-    private final CardDto card;
+    private final Card card;
     private final EMode mode;
     private final List<Integer> ids;
 
-    protected AStudyingMenu(CardDto card, EMode mode, List<Integer> ids) {
+    protected AStudyingMenu(Card card, EMode mode, List<Integer> ids) {
         this.card = card;
         this.mode = mode;
         this.ids = ids;
@@ -21,7 +21,7 @@ public abstract class AStudyingMenu extends AMenu {
 
     public abstract String[] getNextButton();
 
-    public CardDto getCard() {
+    public Card getCard() {
         return card;
     }
 
