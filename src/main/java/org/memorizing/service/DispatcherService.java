@@ -12,8 +12,13 @@ import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.EMenu;
 import org.memorizing.model.menu.Menu;
-import org.memorizing.resource.StorageResource;
-import org.memorizing.resource.cardApi.*;
+import org.memorizing.model.storage.Card;
+import org.memorizing.model.storage.CardStock;
+import org.memorizing.model.storage.Storage;
+import org.memorizing.model.storage.TestResult;
+import org.memorizing.resource.core.CardResource;
+import org.memorizing.resource.core.CardStockResource;
+import org.memorizing.resource.core.StorageResource;
 import org.springframework.stereotype.Service;
 
 import java.net.ProtocolException;
@@ -28,6 +33,8 @@ public class DispatcherService {
     private static final Logger log = Logger.getLogger(DispatcherService.class);
     private final UserService userService;
     private final StorageResource storageResource;
+    private final CardStockResource cardStockResource;
+    private final CardResource cardResource;
     private final MenuService menuService;
     private final UserStateService userStateService;
     private final JsonObjectMapper mapper = new JsonObjectMapper();
@@ -35,9 +42,14 @@ public class DispatcherService {
     public DispatcherService(
             UserService userService,
             StorageResource storageResource,
-            MenuService menuService, UserStateService userStateService) {
+            CardStockResource cardStockResource,
+            CardResource cardResource,
+            MenuService menuService,
+            UserStateService userStateService) {
         this.userService = userService;
         this.storageResource = storageResource;
+        this.cardStockResource = cardStockResource;
+        this.cardResource = cardResource;
         this.menuService = menuService;
         this.userStateService = userStateService;
     }
@@ -154,7 +166,7 @@ public class DispatcherService {
             ids = userStateService.getCardIdsByHistory(cardStockHistory.get(), mode.name());
 
             if (isSkip)
-                resp.setTestResult(storageResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
+                resp.setTestResult(cardResource.skipCard(userState.getCardStockId(), ids.get(0), mode.isFromKeyMode()));
 
             ids.remove(0);
             userStateService.updateHistoryByNewIds(cardStockHistory.get(), mode, ids);
@@ -191,14 +203,14 @@ public class DispatcherService {
         }
 
         List<Integer> ids = userStateService.getCardIdsByHistory(history.get(), mode.name());
-        TestResultDto testResultDto = storageResource.checkCard(userState.getCardStockId(), ids.get(0), data, mode.isFromKeyMode());
+        TestResult testResult = cardResource.checkCard(userState.getCardStockId(), ids.get(0), data, mode.isFromKeyMode());
         ids.remove(0);
         userStateService.updateHistoryByNewIds(history.get(), mode, ids);
 
         // If it was last card
         if (ids.isEmpty()) nextMenu = nextMenu.getLastMenu();
 
-        return new DispatcherResponse(menuService.createMenu(user.getStorageId(), userState, nextMenu), SUCCESSFULLY, testResultDto);
+        return new DispatcherResponse(menuService.createMenu(user.getStorageId(), userState, nextMenu), SUCCESSFULLY, testResult);
     }
 
     public Menu getFirstMenu(Long chatId) {
@@ -233,16 +245,16 @@ public class DispatcherService {
             if (!Objects.equals(element, "delete")) {
                 try {
                     String[] fields = element.split("\n#");
-                    String body = "{";
-                    for (String field: fields) {
+                    StringBuilder body = new StringBuilder("{");
+                    for (String field : fields) {
                         if (field.isBlank()) continue;
                         String fieldName = field.substring(0, field.indexOf(':')).trim();
-                        String fieldValue = field.substring(field.indexOf(':')+1).trim();
-                        body += '\"' + fieldName + "\":\"" + fieldValue +"\"";
-                        body += field.equals(fields[fields.length - 1]) ? '}' : ',';
+                        String fieldValue = field.substring(field.indexOf(':') + 1).trim();
+                        body.append('\"').append(fieldName).append("\":\"").append(fieldValue).append("\"");
+                        body.append(field.equals(fields[fields.length - 1]) ? '}' : ',');
                     }
 
-                    entity = mapper.readValue(body, entity.getClass());
+                    entity = mapper.readValue(body.toString(), entity.getClass());
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                     return BAD_REQUEST;
@@ -252,44 +264,43 @@ public class DispatcherService {
                 }
             }
 
-            if (entity instanceof CardStockFieldsDto) {
-                CardStockFieldsDto cardStockFieldsDto = (CardStockFieldsDto) entity;
-                cardStockFieldsDto.setStorageId(userState.getUser().getStorageId());
+            if (entity instanceof CardStock) {
+                CardStock cardStock = (CardStock) entity;
+                cardStock.setStorageId(userState.getUser().getStorageId());
                 switch (command.getMethod()) {
                     case "add":
-                        storageResource.createCardStock(cardStockFieldsDto);
+                        cardStockResource.createCardStock(cardStock);
                         break;
                     case "update":
-                        storageResource.updateCardStock(cardStockFieldsDto, userState.getCardStockId());
+                        cardStockResource.updateCardStock(cardStock, userState.getCardStockId());
                         break;
                     case "delete":
-                        List<CardDto> cards = storageResource.getCardsByCardStockId(userState.getCardStockId());
+                        List<Card> cards = cardResource.getCardsByCardStockId(userState.getCardStockId());
 
                         if (cards != null && !cards.isEmpty()) {
-                            cards.forEach(cardDto -> storageResource.deleteCard(cardDto.getId()));
+                            cards.forEach(cardDto -> cardResource.deleteCard(cardDto.getId()));
                         }
 
-                        storageResource.deleteCardStock(userState.getCardStockId());
+                        cardStockResource.deleteCardStock(userState.getCardStockId());
                         break;
                     default:
                         return SOMETHING_WENT_WRONG; // TODO add throw Exception
                 }
 
-            } else if (entity instanceof CardFieldsDto) {
-                CardFieldsDto cardFieldsDto = (CardFieldsDto) entity;
-                cardFieldsDto.setCardStockId(userState.getCardStockId());
-                CardStockDto cardStock = storageResource.getCardStockById(userState.getCardStockId());
-                cardFieldsDto.setOnlyFromKey(cardStock.getOnlyFromKey());
+            } else if (entity instanceof Card) {
+                Card card = (Card) entity;
+                card.setCardStockId(userState.getCardStockId());
+                CardStock cardStock = cardStockResource.getCardStockById(userState.getCardStockId());
+
                 switch (command.getMethod()) {
                     case "add":
-                        storageResource.createCard(cardFieldsDto);
+                        cardResource.createCard(card, cardStock.getOnlyFromKey());
                         break;
                     case "update":
-                        cardFieldsDto.setCardKey(storageResource.getCardById(userState.getCardId()).getCardKey());
-                        storageResource.updateCard(cardFieldsDto, userState.getCardId());
+                        cardResource.updateCard(card, userState.getCardId());
                         break;
                     case "delete":
-                        storageResource.deleteCard(userState.getCardId());
+                        cardResource.deleteCard(userState.getCardId());
                         break;
                     default:
                         return SOMETHING_WENT_WRONG; // TODO add throw Exception
@@ -307,14 +318,19 @@ public class DispatcherService {
     // TODO: remove it, after creating auth-service and user-service
     @Deprecated
     public void createUserStorage(Long chatId, String username) throws Exception {
-        StorageDto storage = storageResource.createStorage(new StorageFieldsDto(chatId, username));
-        addFirstData(storage.getId());
+        Storage storage = new Storage();
+        storage.setStorageName(username);
+        storage.setUserId(chatId);
+
+        Storage newStorage = storageResource.createStorage(storage);
+        addFirstData(newStorage.getId());
         userService.addNew(chatId);
     }
 
     // TODO: create trigger in data base
     private void addFirstData(Integer storageId) {
-        CardStockFieldsDto firstReq = new CardStockFieldsDto(
+        CardStock cardStock = new CardStock(
+                null,
                 storageId,
                 "English words",
                 "All words I should remember",
@@ -324,18 +340,14 @@ public class DispatcherService {
                 true,
                 false
         );
-        Integer firstCardStockId = storageResource.createCardStock(firstReq).getId();
-        storageResource.createCard(
-                new CardFieldsDto(firstCardStockId, "provide", "предоставлять", false)
-        );
-        storageResource.createCard(
-                new CardFieldsDto(firstCardStockId, "memory", "память", false)
-        );
-        storageResource.createCard(
-                new CardFieldsDto(firstCardStockId, "coffee", "кофе", false)
-        );
+        Integer firstCardStockId = cardStockResource.createCardStock(cardStock).getId();
 
-        CardStockFieldsDto secondReq = new CardStockFieldsDto(
+        cardResource.createCard(new Card(firstCardStockId, "provide", "предоставлять"), false);
+        cardResource.createCard(new Card(firstCardStockId, "memory", "память"), false);
+        cardResource.createCard(new Card(firstCardStockId, "coffee", "кофе"), false);
+
+        CardStock secondCardStock = new CardStock(
+                null,
                 storageId,
                 "Interview",
                 "Only provocation questions",
@@ -345,24 +357,19 @@ public class DispatcherService {
                 false,
                 true
         );
-        Integer secondCardStockId = storageResource.createCardStock(secondReq).getId();
-        storageResource.createCard(
-                new CardFieldsDto(
-                        secondCardStockId,
+        Integer secondCardStockId = cardStockResource.createCardStock(secondCardStock).getId();
+
+        cardResource.createCard(new Card(secondCardStockId,
                         "What three words do your co-workers use to describe you?",
-                        "curious, scrupulous, conscientious",
-                        true)
-        );
-        storageResource.createCard(
-                new CardFieldsDto(
-                        secondCardStockId,
+                        "curious, scrupulous, conscientious"),
+                true);
+        cardResource.createCard(new Card(secondCardStockId,
                         "Do you prefer working alone or with a team or colleagues?",
-                        "I like to work efficiently and it takes both to do that.",
-                        true)
-        );
+                        "I like to work efficiently and it takes both to do that."),
+                true);
 
-
-        CardStockFieldsDto thirdReq = new CardStockFieldsDto(
+        CardStock thirdCardStock = new CardStock(
+                null,
                 storageId,
                 "IT terms",
                 "Only IT terms in English",
@@ -372,16 +379,14 @@ public class DispatcherService {
                 true,
                 false
         );
-        Integer thirdCardStockId = storageResource.createCardStock(thirdReq).getId();
-        storageResource.createCard(
-                new CardFieldsDto(thirdCardStockId, "instance", "экземпляр'", false)
-        );
-        storageResource.createCard(
-                new CardFieldsDto(thirdCardStockId, "Inheritance", "наследование", false)
-        );
-        storageResource.createCard(
-                new CardFieldsDto(thirdCardStockId, "return", "вернуть", false)
-        );
+        Integer thirdCardStockId = cardStockResource.createCardStock(thirdCardStock).getId();
+
+        cardResource.createCard(
+                new Card(thirdCardStockId, "instance", "экземпляр'"), false);
+        cardResource.createCard(
+                new Card(thirdCardStockId, "Inheritance", "наследование"), false);
+        cardResource.createCard(
+                new Card(thirdCardStockId, "return", "вернуть"), false);
 
     }
 }

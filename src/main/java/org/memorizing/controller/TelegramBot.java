@@ -7,8 +7,8 @@ import org.memorizing.model.command.EPlaceholderCommand;
 import org.memorizing.model.menu.AStudyingMenu;
 import org.memorizing.model.menu.Menu;
 import org.memorizing.model.menu.SelfCheckMenu;
-import org.memorizing.resource.cardApi.CardDto;
-import org.memorizing.resource.cardApi.TestResultDto;
+import org.memorizing.model.storage.Card;
+import org.memorizing.model.storage.TestResult;
 import org.memorizing.service.DispatcherResponse;
 import org.memorizing.service.DispatcherService;
 import org.memorizing.service.UserService;
@@ -253,9 +253,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendCorrectAnswer(Long chatId, Menu menu, TestResultDto result) {
+    private void sendCorrectAnswer(Long chatId, Menu menu, TestResult result) {
         String correctAnswer;
-        CardDto card = result.getCard();
+        Card card = result.getCard();
 
         // We can't show last card in a correct queue because we have only next menu
         if (menu instanceof AStudyingMenu) {

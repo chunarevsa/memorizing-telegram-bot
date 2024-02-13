@@ -2,8 +2,8 @@ package org.memorizing.service;
 
 import org.memorizing.entity.User;
 import org.memorizing.repository.UsersRepo;
-import org.memorizing.resource.UserResource;
-import org.memorizing.resource.cardApi.UserDto;
+import org.memorizing.resource.user.UserResource;
+import org.memorizing.resource.user.rest.dto.UserDto;
 import org.springframework.stereotype.Service;
 
 @Service
