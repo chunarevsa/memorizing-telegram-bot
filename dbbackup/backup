@@ -1,0 +1,8 @@
+# Creating backup
+docker exec -t memorizing-telegram-bot-db-1 pg_dump -U root -E UTF-8 -c memorizing-telegram-bot -f backup_date.sql
+docker cp memorizing-telegram-bot-db-1:backup_date.sql ./memorizing-telegram-bot/dbbackup/
+
+# Executing backup file
+docker cp ./dbbackup/backup_data.sql memorizing-telegram-bot-db-1:/
+docker exec -it memorizing-telegram-bot-db-1 /bin/bash
+psql -U root -d memorizing-telegram-bot < backup_data.sql
