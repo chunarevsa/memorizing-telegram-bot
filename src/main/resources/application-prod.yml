@@ -8,6 +8,11 @@ spring:
     password: root
   jpa:
     show-sql: false
+  rabbitmq:
+    host: ${LOCALHOST}
+    port: 15672
+    username: root
+    password: root
 
 eureka:
   client:
