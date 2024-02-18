@@ -1,6 +1,7 @@
 package org.memorizing.controller;
 
 import org.apache.log4j.Logger;
+import org.memorizing.config.TelegramBotConfig;
 import org.memorizing.model.command.ECommand;
 import org.memorizing.model.command.EKeyboardCommand;
 import org.memorizing.model.command.EPlaceholderCommand;
@@ -12,7 +13,6 @@ import org.memorizing.model.storage.TestResult;
 import org.memorizing.service.DispatcherResponse;
 import org.memorizing.service.DispatcherService;
 import org.memorizing.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -30,24 +30,23 @@ import static org.memorizing.model.EStatus.*;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     private static final Logger log = Logger.getLogger(TelegramBot.class);
-    private final String botName;
+    private final TelegramBotConfig config;
     private final UserService userService;
     private final DispatcherService dispatcherService;
 
     public TelegramBot(
-            @Value("${telegram.bot.token}") String botToken,
-            @Value("${telegram.bot.name}") String botName,
+            TelegramBotConfig config,
             UserService userService,
             DispatcherService dispatcherService) {
-        super(botToken);
-        this.botName = botName;
+        super(config.getBotToken());
+        this.config = config;
         this.userService = userService;
         this.dispatcherService = dispatcherService;
     }
 
     @Override
     public String getBotUsername() {
-        return botName;
+        return config.getBotName();
     }
 
     @Override
@@ -84,7 +83,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             } else if (!userService.isUserExistsInRepoByChatId(chatId)) {
                 try {
                     if (userService.isUserExistsInResourceByChatId(chatId)) {
-                            userService.addNew(chatId);
+                        userService.addNew(chatId);
                     } else {
                         // TODO: Add registration via auth-service, when it will be completed
                         // async user creating request
