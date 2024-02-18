@@ -1,6 +1,7 @@
 package org.memorizing.resource.core.rest;
 
 import org.apache.log4j.Logger;
+import org.memorizing.config.ApplicationEnvironmentConfig;
 import org.memorizing.model.storage.Card;
 import org.memorizing.resource.core.rest.dto.card.CardFieldsDto;
 import org.memorizing.resource.core.rest.dto.card.CheckCardDto;
@@ -10,32 +11,32 @@ import org.memorizing.resource.core.rest.dto.cardStock.CardStockFieldsDto;
 import org.memorizing.model.storage.Storage;
 import org.memorizing.resource.core.rest.dto.storage.StorageFieldsDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriBuilderFactory;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @Component
-//@Profile("rest") // TODO: add rest profile
+@Profile("rest")
 public class CoreWebClientBuilder {
     private static final Logger log = Logger.getLogger(CoreWebClientBuilder.class);
-    private final String serviceName;
     private final String baseUrl;
-
-    public CoreWebClientBuilder(
-            @Value("${localhost}")
-            String localhost,
-            @Value("${core-service.name}")
-            String serviceName,
-            @Value("${api-gateway.port}")
-            String gatewayPort) {
-        this.serviceName = serviceName;
-        // TODO: to Uri
-        this.baseUrl = "http://" + localhost + ":" + gatewayPort + "/" + serviceName;
+    private final String serviceName;
+    public CoreWebClientBuilder(ApplicationEnvironmentConfig config) {
+        this.serviceName = config.getCoreServiceName();
+        this.baseUrl = UriComponentsBuilder.newInstance()
+                .scheme("http").host(config.getLocalhost()).port(config.getGatewayPort())
+                .path("/" + config.getCoreServiceName())
+                .build().toUriString();
     }
 
     // /storage
-
     @Deprecated
     // TODO: remove it after adding user-service and auth-service
     public Storage createStorage(Storage storage) {

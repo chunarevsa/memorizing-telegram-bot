@@ -5,8 +5,8 @@ import org.memorizing.resource.core.StorageResource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-//@Component
-//@Profile("rest") // TODO: add rest profile
+@Component
+@Profile("rest")
 public class StorageRestResourceImpl implements StorageResource {
     private final CoreWebClientBuilder coreWebClientBuilder;
 
