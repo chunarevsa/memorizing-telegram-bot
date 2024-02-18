@@ -2,12 +2,13 @@ package org.memorizing.resource.core.rest;
 
 import org.memorizing.model.storage.CardStock;
 import org.memorizing.resource.core.CardStockResource;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-//@Profile("rest") // TODO: add rest profile
+@Profile("rest")
 public class CardStockRestResourceImpl implements CardStockResource {
 
     private final CoreWebClientBuilder coreWebClientBuilder;

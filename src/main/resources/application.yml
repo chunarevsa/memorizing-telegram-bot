@@ -18,8 +18,7 @@ spring:
     generate-ddl: false
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
 
-telegram:
-  bot:
+telegram-bot:
     name: ${TELEGRAM_BOT_NAME}
     token: ${TELEGRAM_BOT_TOKEN}
 

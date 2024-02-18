@@ -1,15 +1,15 @@
 package org.memorizing.resource.core.rest;
 
 import org.memorizing.model.storage.Card;
-import org.memorizing.model.storage.CardStock;
 import org.memorizing.model.storage.TestResult;
 import org.memorizing.resource.core.CardResource;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-//@Profile("rest") // TODO: add rest profile
+@Profile("rest")
 public class CardRestResourceImpl implements CardResource {
     private final CoreWebClientBuilder coreWebClientBuilder;
 
@@ -41,7 +41,7 @@ public class CardRestResourceImpl implements CardResource {
     public void deleteCard(Integer cardId) {
         coreWebClientBuilder.deleteCard(cardId);
     }
-    
+
     @Override
     public TestResult checkCard(Integer cardStockId, Integer cardId, String userValue, boolean fromKeyMode) {
         int maxPoint = coreWebClientBuilder.getCardStockById(cardStockId).getMaxPoint();
@@ -52,5 +52,5 @@ public class CardRestResourceImpl implements CardResource {
     public TestResult skipCard(Integer cardStockId, Integer cardId, boolean fromKeyMode) {
         return checkCard(cardStockId, cardId, "!!!", fromKeyMode);
     }
-    
+
 }
