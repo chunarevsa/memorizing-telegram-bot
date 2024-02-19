@@ -1,25 +1,20 @@
 package org.memorizing.resource.core.rest;
 
+import com.memorizing.commonapi.model.CheckCardDto;
 import org.apache.log4j.Logger;
 import org.memorizing.config.ApplicationEnvironmentConfig;
 import org.memorizing.model.storage.Card;
 import org.memorizing.resource.core.rest.dto.card.CardFieldsDto;
-import org.memorizing.resource.core.rest.dto.card.CheckCardDto;
 import org.memorizing.model.storage.TestResult;
 import org.memorizing.model.storage.CardStock;
 import org.memorizing.resource.core.rest.dto.cardStock.CardStockFieldsDto;
 import org.memorizing.model.storage.Storage;
 import org.memorizing.resource.core.rest.dto.storage.StorageFieldsDto;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
-import org.springframework.web.util.UriBuilderFactory;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @Component
