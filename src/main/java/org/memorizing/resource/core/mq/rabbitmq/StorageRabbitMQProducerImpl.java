@@ -4,31 +4,31 @@ import org.memorizing.resource.core.mq.StorageMessageProducer;
 import org.memorizing.resource.core.rest.dto.storage.StorageFieldsDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
+//import org.springframework.messaging.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 import reactor.util.concurrent.Queues;
 
 import java.util.function.Supplier;
 
-@Configuration
-//@Profile("rabbitMQ")
-public class StorageRabbitMQProducerImpl implements StorageMessageProducer {
-
-    Sinks.Many<Message<StorageFieldsDto>> innerBus = Sinks.many().multicast().onBackpressureBuffer(Queues.SMALL_BUFFER_SIZE, false);
-
-    @Bean
-    public Supplier<Flux<Message<StorageFieldsDto>>> createStorage() {
-        Sinks.Many<Message<StorageFieldsDto>> innerBus1 = this.innerBus;
-
-        return () -> this.innerBus.asFlux();
-    }
-
-    @Bean
-    public Supplier<Flux<Message<Long>>> getStorageByUserId() {
-
-        return innerBus::asFlux;
-    }
+//@Configuration
+////@Profile("rabbitMQ")
+//public class StorageRabbitMQProducerImpl implements StorageMessageProducer {
+//
+//    Sinks.Many<Message<StorageFieldsDto>> innerBus = Sinks.many().multicast().onBackpressureBuffer(Queues.SMALL_BUFFER_SIZE, false);
+//
+//    @Bean
+//    public Supplier<Flux<Message<StorageFieldsDto>>> createStorage() {
+//        Sinks.Many<Message<StorageFieldsDto>> innerBus1 = this.innerBus;
+//
+//        return () -> this.innerBus.asFlux();
+//    }
+//
+//    @Bean
+//    public Supplier<Flux<Message<Long>>> getStorageByUserId() {
+//
+//        return innerBus::asFlux;
+//    }
 
 //
 //    @Bean
@@ -71,4 +71,4 @@ public class StorageRabbitMQProducerImpl implements StorageMessageProducer {
 //        });
 //    }
 
-}
+//}
