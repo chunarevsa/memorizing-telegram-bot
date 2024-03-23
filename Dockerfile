@@ -1,25 +1,18 @@
-# Используем образ с Java и Gradle
-FROM gradle:latest AS builder
+FROM openjdk:11-jre-slim as builder
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+WORKDIR extracted
+ADD ./build/libs/*.jar app.jar
 
-# Копируем файлы с зависимостями и сборки
-COPY build.gradle .
-COPY settings.gradle .
-COPY src src
+RUN java -Djarmode=layertools -jar app.jar extract
 
-# Собираем проект
-RUN gradle build --no-daemon
-
-# Используем минимальный образ с JRE
 FROM openjdk:11-jre-slim
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+WORKDIR application
+COPY --from=builder extracted/dependencies/ ./
+COPY --from=builder extracted/spring-boot-loader/ ./
+COPY --from=builder extracted/snapshot-dependencies/ ./
+COPY --from=builder extracted/application/ ./
 
-# Копируем JAR файл из предыдущего этапа сборки
-COPY --from=builder /app/target/memorizing-telegram-bot-1.0-SNAPSHOT.jar .
+EXPOSE 8080
 
-# Задаем команду для запуска приложения
-CMD ["java", "-jar", "memorizing-telegram-bot-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
