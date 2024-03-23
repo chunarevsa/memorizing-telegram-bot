@@ -24,7 +24,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.memorizing:memorizing-common-api:0.0.1-SNAPSHOT'
+    implementation project(':memorizing-common-api')
+
     implementation 'org.telegram:telegrambots-spring-boot-starter:6.5.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
