@@ -134,11 +134,16 @@ public class CoreWebClientBuilder {
     }
 
     public CardStock updateCardStock(CardStock cardStock, Integer cardStockId) {
-        CardStockFieldsDto req = new CardStockFieldsDto();
-        req.setCardStockName(cardStock.getCardStockName());
-        req.setDescription(cardStock.getDescription());
-        req.setKeyType(cardStock.getKeyType());
-        req.setValueType(cardStock.getValueType());
+        CardStockFieldsDto req = new CardStockFieldsDto(
+                null,
+                cardStock.getCardStockName(),
+                cardStock.getDescription(),
+                cardStock.getKeyType(),
+                cardStock.getValueType(),
+                cardStock.getMaxPoint(),
+                cardStock.getTestModeIsAvailable(),
+                cardStock.getOnlyFromKey()
+        );
 
         try {
             log.debug("updateCardStock: REQ to " + serviceName + "/cardStock/ with req: " + req);

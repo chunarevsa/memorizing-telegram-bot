@@ -26,7 +26,7 @@ public class UserStateService {
     }
 
     public void updateUserStateByMenu(UserState userState, Menu menu) {
-        log.debug("updateUserStateByMenu" + userState.getId());
+        log.debug("updateUserStateByMenu. userStateId:" + userState.getId());
         if (menu == null) return;
 
         userState.setCurrentMenu(menu.getCurrentMenu());
