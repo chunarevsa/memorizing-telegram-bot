@@ -2,7 +2,7 @@ package org.memorizing.exception;
 
 import org.memorizing.model.EStatus;
 
-abstract class AChatException extends RuntimeException {
+public abstract class AChatException extends RuntimeException {
 
     private final Long chatId;
     private final String text;
