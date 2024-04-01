@@ -2,6 +2,7 @@ package org.memorizing.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.log4j.Logger;
+import org.memorizing.exception.BadRequestException;
 import org.memorizing.entity.CardStockHistory;
 import org.memorizing.entity.User;
 import org.memorizing.entity.UserState;
@@ -75,14 +76,14 @@ public class DispatcherService {
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 
-    public DispatcherResponse getResponseByPlaceholderCommand(Long chatId, String data) {
+    public DispatcherResponse getResponseByPlaceholderCommand(Long chatId, String data) throws ProtocolException {
         log.debug("getResponseByPlaceholderCommand req:" + chatId + ", " + data);
         User user = userService.getByChatId(chatId);
         Integer storageId = user.getStorageId();
         UserState userState = user.getUserState();
         EPlaceholderCommand command = EPlaceholderCommand.getPlaceholderCommandByPref(data);
 
-        EStatus status = executeRequest(command, data, userState);
+        EStatus status = executeRequest(chatId, command, data, userState);
         EMenu menuType;
 
         if (command == EPlaceholderCommand.DELETE_CARD_STOCK) {
@@ -101,7 +102,7 @@ public class DispatcherService {
         return new DispatcherResponse(menu, status, true);
     }
 
-    public DispatcherResponse getResponseByKeyboardCommand(Long chatId, EKeyboardCommand command) {
+    public DispatcherResponse getResponseByKeyboardCommand(Long chatId, EKeyboardCommand command) throws Exception {
         log.debug("getResponseByKeyboardCommand req:" + chatId + ", " + command);
         User user = userService.getByChatId(chatId);
         Integer storageId = user.getStorageId();
@@ -233,7 +234,7 @@ public class DispatcherService {
         return new DispatcherResponse(menu, SUCCESSFULLY);
     }
 
-    private EStatus executeRequest(EPlaceholderCommand command, String data, UserState userState) {
+    private EStatus executeRequest(Long chatId, EPlaceholderCommand command, String data, UserState userState) throws ProtocolException {
         log.debug("executeRequest. req:" + command + ", " + userState);
 
         IMappable entity = command.getNewEntity();
@@ -256,11 +257,10 @@ public class DispatcherService {
 
                     entity = mapper.readValue(body.toString(), entity.getClass());
                 } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                    return BAD_REQUEST;
+                    throw new BadRequestException(chatId);
                 } catch (ProtocolException e) {
-                    e.printStackTrace();
-                    return SOMETHING_WENT_WRONG; // TODO add throw Exception
+                    log.error(e);
+                    throw e;
                 }
             }
 
