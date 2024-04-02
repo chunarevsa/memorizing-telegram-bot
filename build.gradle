@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation project(':memorizing-common-api')
+    implementation project(':util')
 
     implementation 'org.telegram:telegrambots-spring-boot-starter:6.5.0'
 
