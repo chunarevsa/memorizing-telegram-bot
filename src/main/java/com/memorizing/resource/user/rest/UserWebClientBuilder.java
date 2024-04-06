@@ -1,28 +1,28 @@
-package org.memorizing.resource.user.rest;
+package com.memorizing.resource.user.rest;
 
+import com.memorizing.config.ApplicationEnvironmentConfig;
+import com.memorizing.model.storage.Storage;
+import com.memorizing.resource.user.rest.dto.UserDto;
 import org.apache.log4j.Logger;
-import org.memorizing.model.storage.Storage;
-import org.memorizing.resource.user.rest.dto.UserDto;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class UserWebClientBuilder {
     private static final Logger log = Logger.getLogger(UserWebClientBuilder.class);
-
     private final String serviceName;
     private final String baseUrl;
 
-    public UserWebClientBuilder(
-            @Value("${localhost}")
-            String localhost,
-            @Value("${core-service.name}")
-            String serviceName,
-            @Value("${api-gateway.port}")
-            String gatewayPort) {
-        this.serviceName = serviceName;
-        this.baseUrl = "http://" + localhost + ":" + gatewayPort + "/" + serviceName;
+    public UserWebClientBuilder(ApplicationEnvironmentConfig config) {
+        this.serviceName = config.getCoreServiceName();
+        // TODO: add finding services by names, not host
+        this.baseUrl = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host(config.getHost())
+                .port(config.getGatewayPort())
+                .path("/" + config.getCoreServiceName())
+                .build().toUriString();
     }
 
     public UserDto getUserByChatId(Long chatId) {

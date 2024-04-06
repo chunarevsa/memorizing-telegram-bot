@@ -1,15 +1,15 @@
-package org.memorizing.resource.core.rest;
+package com.memorizing.resource.core.rest;
 
 import com.memorizing.commonapi.model.CheckCardDto;
+import com.memorizing.config.ApplicationEnvironmentConfig;
 import org.apache.log4j.Logger;
-import org.memorizing.config.ApplicationEnvironmentConfig;
-import org.memorizing.model.storage.Card;
-import org.memorizing.resource.core.rest.dto.card.CardFieldsDto;
-import org.memorizing.model.storage.TestResult;
-import org.memorizing.model.storage.CardStock;
-import org.memorizing.resource.core.rest.dto.cardStock.CardStockFieldsDto;
-import org.memorizing.model.storage.Storage;
-import org.memorizing.resource.core.rest.dto.storage.StorageFieldsDto;
+import com.memorizing.model.storage.Card;
+import com.memorizing.resource.core.rest.dto.card.CardFieldsDto;
+import com.memorizing.model.storage.TestResult;
+import com.memorizing.model.storage.CardStock;
+import com.memorizing.resource.core.rest.dto.cardStock.CardStockFieldsDto;
+import com.memorizing.model.storage.Storage;
+import com.memorizing.resource.core.rest.dto.storage.StorageFieldsDto;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,8 +25,11 @@ public class CoreWebClientBuilder {
     private final String serviceName;
     public CoreWebClientBuilder(ApplicationEnvironmentConfig config) {
         this.serviceName = config.getCoreServiceName();
+        // TODO: add finding services by names, not host
         this.baseUrl = UriComponentsBuilder.newInstance()
-                .scheme("http").host(config.getLocalhost()).port(config.getGatewayPort())
+                .scheme("http")
+                .host(config.getHost())
+                .port(config.getGatewayPort())
                 .path("/" + config.getCoreServiceName())
                 .build().toUriString();
     }
