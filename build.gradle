@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group = 'com.memorizing'
+group = 'com.memorizing.telegrambot'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 targetCompatibility = '11'
@@ -25,7 +25,6 @@ repositories {
 
 dependencies {
     implementation project(':memorizing-common-api')
-    implementation project(':util')
 
     implementation 'org.telegram:telegrambots-spring-boot-starter:6.5.0'
 
