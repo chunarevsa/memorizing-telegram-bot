@@ -1,7 +1,7 @@
 
 spring:
   config:
-    import: configserver:http://${LOCALHOST}:8888
+    import: configserver:http://config-server:8888
   datasource:
     url: jdbc:postgresql://${POSTGRES_URL:telegram-bot-db}/${spring.application.name}
     username: root
@@ -9,7 +9,7 @@ spring:
   jpa:
     show-sql: false
   rabbitmq:
-    host: ${LOCALHOST}
+    host: localhost
     port: 15672
     username: root
     password: root
@@ -17,4 +17,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://${LOCALHOST}:8761/eureka
+      defaultZone: http://eureka-server:8761/eureka

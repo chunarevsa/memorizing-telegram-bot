@@ -31,4 +31,5 @@ core-service:
   name: memorizing-core
 
 api-gateway:
-  port: ${GATEWAY_PORT}
+  name: api-gateway
+  port: 8765
