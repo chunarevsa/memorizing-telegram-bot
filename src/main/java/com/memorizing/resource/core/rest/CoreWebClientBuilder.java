@@ -25,12 +25,10 @@ public class CoreWebClientBuilder {
     private final String serviceName;
     public CoreWebClientBuilder(ApplicationEnvironmentConfig config) {
         this.serviceName = config.getCoreServiceName();
-        // TODO: add finding services by names, not host
         this.baseUrl = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host(config.getHost())
                 .port(config.getGatewayPort())
-                .path("/" + config.getCoreServiceName())
                 .build().toUriString();
     }
 
